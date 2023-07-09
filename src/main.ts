@@ -20,11 +20,15 @@ import '@/styles/index.scss'
 import './assets/iconfont/iconfont.js'
 import './assets/iconfont/iconfont.css'
 
+
+
+
 const app = createApp(App)
 
 app.use(createPinia())
 app.use(router)
 app.use(ElementPlus)
+
 
 app.mount('#app')
 for (const [key, component] of Object.entries(ElementPlusIconsVue)) {

@@ -9,10 +9,10 @@ import appMain from '@/layouts/components/appMain.vue';
 <template>
     <div class="common-layout">
     <el-container>
-      <el-header>
+      <el-header >
         <nav-header></nav-header>
       </el-header>
-      <el-main>
+      <el-main >
         <app-main>miemiemie</app-main>
       </el-main>
       <el-footer>

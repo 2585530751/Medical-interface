@@ -20,7 +20,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
 </script>
 
 <template>
-    <el-menu
+    <el-menu 
     :default-active="activeIndex"
     class="el-menu-demo"
     mode="horizontal"
