@@ -13,7 +13,6 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@element-plus/icons-vue": "^2.1.0",
     "@vueuse/core": "^10.1.2",
     "animate.css": "^4.1.1",
     "axios": "^1.4.0",
@@ -22,7 +21,7 @@
     "vue-router": "^4.2.0"
   },
   "devDependencies": {
-    "@iconify-icons/ep": "^1.2.11",
+    "@iconify-icons/ep": "^1.2.12",
     "@iconify/json": "^2.2.77",
     "@iconify/vue": "^4.1.1",
     "@rushstack/eslint-patch": "^1.2.0",

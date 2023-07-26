@@ -16,11 +16,6 @@ import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 //dark mode
 import '@/styles/index.scss'
 
-// 导入字体图标
-import './assets/iconfont/iconfont.js'
-import './assets/iconfont/iconfont.css'
-
-
 
 
 const app = createApp(App)
@@ -29,12 +24,9 @@ app.use(createPinia())
 app.use(router)
 app.use(ElementPlus)
 
-
 app.mount('#app')
-for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-  app.component(key, component)
-}
-// 全局注册`@iconify/vue`图标库
+
+// 全局注册`@iconify/vue`图标�?
 import { IconifyIconOffline, IconifyIconOnline, FontIcon } from './components/ReIcon'
 app.component('IconifyIconOffline', IconifyIconOffline)
 app.component('IconifyIconOnline', IconifyIconOnline)
