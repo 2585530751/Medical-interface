@@ -1,6 +1,9 @@
 <script setup lang="ts">
-import type {  TableInstance } from 'element-plus'
+import type { TableInstance } from 'element-plus'
 import { ref } from 'vue'
+import editPen from '@iconify-icons/ep/edit-pen'
+import deleteUser from '@iconify-icons/ep/delete'
+import IonEllipsisHorizontal from '@/assets/svg/IonEllipsisHorizontal.svg?component'
 
 defineProps<{
   tableSize: string
@@ -218,7 +221,6 @@ const tableData = [
   }
 ]
 
-
 const filterGender = (value: string, row: any, column: any) => {
   return row.gender === value
 }
@@ -242,8 +244,8 @@ const filterGender = (value: string, row: any, column: any) => {
             <p m="t-0 b-2">Zip: {{ props.row.zip }}</p>
             <h3>随访记录</h3>
             <el-table :data="props.row.followUpVisits">
-              <el-table-column label="followUpDate" prop="followUpDate" />
-              <el-table-column label="followUpResult" prop="followUpResult" />
+              <el-table-column label="随访日期" prop="followUpDate" />
+              <el-table-column label="随访结果" prop="followUpResult" />
             </el-table>
           </div>
         </template>
@@ -260,20 +262,34 @@ const filterGender = (value: string, row: any, column: any) => {
         :filter-method="filterGender"
         filter-placement="top-end"
       />
-      <el-table-column sortable  label="年龄" prop="age" />
+      <el-table-column sortable label="年龄" prop="age" />
       <el-table-column label="联系方式" prop="contact" />
       <el-table-column label="住址" prop="address" />
       <el-table-column label="健康状况" prop="healthStatus" />
       <el-table-column label="就诊原因" prop="reasonForVisit" />
       <el-table-column label="诊断结果" prop="diagnosis" />
-      <el-table-column fixed="right" label="Operations" width="120">
-      <template #default>
-        <el-button link type="primary" size="small" @click=""
-          >Detail</el-button
-        >
-        <el-button link type="primary" size="small">Edit</el-button>
-      </template>
-    </el-table-column>
+      <el-table-column fixed="right" label="操作" width="200">
+        <template #default>
+          <el-button link type="primary" size="small" @click=""
+            ><template #icon>
+              <IconifyIconOffline :icon="editPen"></IconifyIconOffline>
+            </template>
+            修改</el-button
+          >
+          <el-popconfirm title="你确定要删除他吗?">
+            <template #reference>
+              <el-button link type="primary" size="small">
+                <template #icon>
+                  <IconifyIconOffline :icon="deleteUser"></IconifyIconOffline>
+                </template>
+                删除</el-button
+              >
+            </template>
+          </el-popconfirm>
+
+          <el-button :icon="IonEllipsisHorizontal" link type="primary" />
+        </template>
+      </el-table-column>
     </el-table>
   </el-card>
 </template>

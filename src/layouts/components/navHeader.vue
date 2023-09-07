@@ -17,7 +17,12 @@ const handleSelect = (key: string, keyPath: string[]) => {
 <template>
   <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false" menu-trigger="hover"
     unique-opened="true" router="true" @select="handleSelect">
-    <el-menu-item index="/">LOGO</el-menu-item>
+    <el-menu-item index="/">
+      <template #title>
+        <img src="@/assets/images/ncuLogo.png" alt="" class="h-14 w-full" />
+      </template>
+      
+    </el-menu-item>
     <div class="flex-grow" />
     <el-menu-item index="/image">医学影像</el-menu-item>
     <el-menu-item index="/model">算法模型</el-menu-item>

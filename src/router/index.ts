@@ -16,8 +16,6 @@ const routes:Array<RouteRecordRaw> = [];
 
 Object.keys(modules).forEach(key => {
   routes.push(modules[key].default);
-  console.log(routes)
-  console.log(routes.flat(Infinity))
 });
 
 /** 导出处理后的静态路由（三级及以上的路由全部拍成二级） */

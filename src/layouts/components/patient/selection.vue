@@ -7,6 +7,8 @@ import fold from '@iconify-icons/ep/fold'
 import refresh from '@iconify-icons/ep/refresh'
 import setUp from '@iconify-icons/ep/set-up'
 import rank from '@iconify-icons/ep/rank'
+
+
 import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
 
@@ -102,7 +104,7 @@ const handleCheckedColsChange = (value: string[]) => {
                 class="input-with-select"
               >
                 <template #prepend>
-                  <el-select placeholder="Select" style="width: 100px">
+                  <el-select placeholder="选择" style="width: 100px">
                     <el-option label="姓名" value="patientName" />
                     <el-option label="联系方式" value="contact" />
                     <el-option label="住址" value="address" />
