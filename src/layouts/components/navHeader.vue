@@ -1,10 +1,9 @@
-<script setup lang='ts'>
-import { ref } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue'
 
-import dayIcon from "@/assets/svg/day.svg?component";
-import darkIcon from "@/assets/svg/dark.svg?component";
-import { isDark } from "@/composables";
-
+import dayIcon from '@/assets/svg/day.svg?component'
+import darkIcon from '@/assets/svg/dark.svg?component'
+import { isDark } from '@/composables'
 
 const errorHandler = () => true
 
@@ -15,14 +14,30 @@ const handleSelect = (key: string, keyPath: string[]) => {
 </script>
 
 <template>
-  <el-menu :default-active="activeIndex" class="el-menu-demo" mode="horizontal" :ellipsis="false" menu-trigger="hover"
-    unique-opened="true" router="true" @select="handleSelect">
-    <el-menu-item index="/">
+  <el-menu
+    :default-active="activeIndex"
+    class="el-menu-demo"
+    mode="horizontal"
+    :ellipsis="false"
+    menu-trigger="hover"
+    unique-opened="true"
+    router="true"
+    @select="handleSelect"
+    ><el-menu-item index="/">
       <template #title>
-        <img src="@/assets/images/ncuLogo.png" alt="" class="h-14 w-full" />
+        <div class="dark:hidden flex items-center py-2">
+          <img src="@/assets/images/KDLWord1.png"  class="h-8" />
+          <img src="@/assets/images/KDLLogo1.png"  class="h-4 pr-5" />
+          <img src="@/assets/images/ncuLogo.png"  class="h-10" />
+        </div>
+        <div  class="dark:visible hidden dark:flex items-center py-2">
+          <img src="@/assets/images/KDLWord.png"  class="h-8" />
+          <img src="@/assets/images/KDLLogo.png" class="h-4 pr-5" />
+          <img src="@/assets/images/ncuLogo1.png"  class="h-10" />
+        </div>
       </template>
-      
     </el-menu-item>
+
     <div class="flex-grow" />
     <el-menu-item index="/image">医学影像</el-menu-item>
     <el-menu-item index="/model">算法模型</el-menu-item>
@@ -38,21 +53,26 @@ const handleSelect = (key: string, keyPath: string[]) => {
         <el-menu-item index="2-4-2">个人中心</el-menu-item>
         <el-menu-item index="2-4-3">锁屏</el-menu-item>
       </el-sub-menu>
-
     </el-sub-menu>
 
-    <div style="display: flex;" class="mx-5">
-      <el-switch style=" margin: auto;" v-model="isDark" inline-prompt :active-icon="dayIcon" :inactive-icon="darkIcon" />
+    <div style="display: flex" class="mx-5">
+      <el-switch
+        style="margin: auto"
+        v-model="isDark"
+        inline-prompt
+        :active-icon="dayIcon"
+        :inactive-icon="darkIcon"
+      />
     </div>
     <div class="demo-type mx-5">
-      <el-avatar style=" margin: auto;" :size="30" src="https://empty" @error="errorHandler">
+      <el-avatar style="margin: auto" :size="30" src="https://empty" @error="errorHandler">
         <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
       </el-avatar>
     </div>
   </el-menu>
 </template>
 
-<style lang='scss' scoped>
+<style lang="scss" scoped>
 .flex-grow {
   flex-grow: 1;
 }
@@ -62,12 +82,12 @@ const handleSelect = (key: string, keyPath: string[]) => {
   display: flex;
 }
 
-.demo-type>div {
+.demo-type > div {
   flex: 1;
   text-align: center;
 }
 
-.demo-type>div:not(:last-child) {
+.demo-type > div:not(:last-child) {
   border-right: 1px solid var(--el-border-color);
 }
 </style>

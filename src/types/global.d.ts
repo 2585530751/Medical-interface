@@ -4,6 +4,7 @@ declare module '*.vue' {
   export default componentOptions
 }
 
+declare module '@cornerstonejs/dicom-image-loader';
 interface RouteConfigsTable {
   /** 路由地址 `必填` */
   path: string;

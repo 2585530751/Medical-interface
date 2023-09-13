@@ -12,26 +12,31 @@ import navRightSidebar from '@/layouts/components/imageOperation/rightSidebar.vu
 
 <template>
   <div class="h-screen w-screen flex flex-col">
-    <div class=" w-full h-12 ">
+    <div class="w-full h-12">
       <nav-header></nav-header>
     </div>
 
     <div class="grow">
       <splitpanes vertical="vertical" class="default-theme dark:bg-gray-950">
-        <pane max-size="20" size="10" class="w-1/40">
+        <pane max-size="20" size="15" min-size="15">
           <nav-left-sidebar></nav-left-sidebar>
         </pane>
         <pane>
           <splitpanes horizontal="horizontal">
-            <pane dark:border-gray-700 dark:bg-gray-800>
-              <span>ss</span>
+            <pane dark:border-gray-700 dark:bg-gray-800 size="100">
+              <span
+                ><div
+                  class="bg-origin-border bg-no-repeat bg-center bg-contain h-full w-full"
+                  style="background-image: url('src/assets/images/{2AA25F20-AE72-4d6e-A136-A3BC0A02152B}.png')"
+                ></div>
+              </span>
             </pane>
-            <pane max-size="40" size="30">
+            <pane max-size="40" size="0">
               <span>2.1</span>
             </pane>
           </splitpanes>
         </pane>
-        <pane max-size="20" size="15"> 
+        <pane max-size="20" size="15" min-size="15">
           <nav-right-sidebar></nav-right-sidebar>
         </pane>
       </splitpanes>
@@ -39,10 +44,8 @@ import navRightSidebar from '@/layouts/components/imageOperation/rightSidebar.vu
   </div>
 </template>
 
-<style lang="scss" >
-
-.splitpanes.default-theme .splitpanes__pane{
-  background: none!important;
+<style lang="scss">
+.splitpanes.default-theme .splitpanes__pane {
+  background: none !important;
 }
-
 </style>

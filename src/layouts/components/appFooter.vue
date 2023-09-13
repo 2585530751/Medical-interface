@@ -9,54 +9,54 @@ defineOptions({
     <div
       class="container flex flex-col justify-between py-10 mx-auto space-y-8 lg:flex-row lg:space-y-0"
     >
-      <div class="lg:w-1/4">
-        <a
-          rel="noopener noreferrer"
-          href="#"
-          class="flex justify-center space-x-3 lg:justify-start"
-        >
-          <div class="flex items-center justify-center w-12 h-12 rounded-full dark:bg-violet-400">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 32 32"
-              fill="currentColor"
-              class="flex-shrink-0 w-5 h-5 rounded-full dark:text-gray-900"
-            >
-              <path
-                d="M18.266 26.068l7.839-7.854 4.469 4.479c1.859 1.859 1.859 4.875 0 6.734l-1.104 1.104c-1.859 1.865-4.875 1.865-6.734 0zM30.563 2.531l-1.109-1.104c-1.859-1.859-4.875-1.859-6.734 0l-6.719 6.734-6.734-6.734c-1.859-1.859-4.875-1.859-6.734 0l-1.104 1.104c-1.859 1.859-1.859 4.875 0 6.734l6.734 6.734-6.734 6.734c-1.859 1.859-1.859 4.875 0 6.734l1.104 1.104c1.859 1.859 4.875 1.859 6.734 0l21.307-21.307c1.859-1.859 1.859-4.875 0-6.734z"
-              ></path>
-            </svg>
+      <div class="lg:w-1/5 flex items-center justify-center">
+        <div class="flex flex-col gap-4 justify-center items-center dark:hidden">
+          <div class="flex items-center">
+            <img src="@/assets/images/KDLWord1.png" class="h-12 w-32" />
+            <img src="@/assets/images/KDLLogo1.png" class="h-8 w-16" />
           </div>
-          <span class="self-center text-2xl font-semibold no-underline">品牌名称</span>
-        </a>
+          <img src="@/assets/images/ncuLogo.png" class="h-18 w-40" />
+        </div>
+        <div class="dark:flex hidden flex-col gap-4 justify-center items-center ">
+          <div class="flex items-center">
+            <img src="@/assets/images/KDLWord.png" class="h-12 w-32" />
+            <img src="@/assets/images/KDLLogo.png" class="h-8 w-16" />
+          </div>
+          <img src="@/assets/images/ncuLogo1.png" class="h-18 w-40" />
+        </div>
       </div>
-      <div class="grid grid-cols-2 text-sm gap-x-3 gap-y-8 lg:w-2/3 sm:grid-cols-4">
+      <div class="grid grid-cols-2 text-base gap-x-6 gap-y-8 lg:w-2/3 sm:grid-cols-4">
         <div class="space-y-3">
           <ul class="space-y-1 list-none">
-            <h3 class="tracki uppercase dark:text-gray-50">产品</h3>
+            <h3 class="tracki uppercase dark:text-gray-50">产品服务</h3>
             <li>
-              <a class="no-underline" rel="noopener noreferrer" href="#">特点</a>
+              <a class="no-underline" rel="noopener noreferrer" href="#"></a>
             </li>
+            
             <li>
-              <a class="no-underline" rel="noopener noreferrer" href="#">融合</a>
-            </li>
-            <li>
-              <a class="no-underline" rel="noopener noreferrer" href="#">价格</a>
+              <a class="no-underline" rel="noopener noreferrer" href="#">产品价格</a>
             </li>
             <li>
               <a class="no-underline" rel="noopener noreferrer" href="#">疑问解答</a>
+            </li>
+            <li>
+              <a class="no-underline" rel="noopener noreferrer" href="#">其他</a>
             </li>
           </ul>
         </div>
         <div class="space-y-3">
           <ul class="space-y-1 list-none">
-            <h3 class="tracki uppercase dark:text-gray-50">公司</h3>
+            <h3 class="tracki uppercase dark:text-gray-50">公司简介</h3>
             <li>
-              <a class="no-underline" rel="noopener noreferrer" href="#">隐私</a>
+              <a class="no-underline" rel="noopener noreferrer" href="#">公司简介</a>
             </li>
             <li>
-              <a class="no-underline" rel="noopener noreferrer" href="#">团队服务</a>
+              <a class="no-underline" rel="noopener noreferrer" href="#">资质荣誉</a>
             </li>
+            <li>
+              <a class="no-underline" rel="noopener noreferrer" href="#">社会责任</a>
+            </li>
+
           </ul>
         </div>
         <div class="space-y-3">
@@ -66,10 +66,10 @@ defineOptions({
               <a class="no-underline" rel="noopener noreferrer" href="#">公共接口</a>
             </li>
             <li>
-              <a class="no-underline" rel="noopener noreferrer" href="#">文档</a>
+              <a class="no-underline" rel="noopener noreferrer" href="#">开发文档</a>
             </li>
             <li>
-              <a class="no-underline" rel="noopener noreferrer" href="#">向导</a>
+              <a class="no-underline" rel="noopener noreferrer" href="#">教程向导</a>
             </li>
           </ul>
         </div>
@@ -77,46 +77,20 @@ defineOptions({
           <h3 class="uppercase dark:text-gray-50">社交媒体</h3>
           <div class="flex justify-start space-x-3">
             <a rel="noopener noreferrer" href="#" title="Facebook" class="flex items-center p-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="currentColor"
-                viewBox="0 0 32 32"
-                class="w-5 h-5 fill-current"
-              >
-                <path
-                  d="M32 16c0-8.839-7.167-16-16-16-8.839 0-16 7.161-16 16 0 7.984 5.849 14.604 13.5 15.803v-11.177h-4.063v-4.625h4.063v-3.527c0-4.009 2.385-6.223 6.041-6.223 1.751 0 3.584 0.312 3.584 0.312v3.937h-2.021c-1.984 0-2.604 1.235-2.604 2.5v3h4.437l-0.713 4.625h-3.724v11.177c7.645-1.199 13.5-7.819 13.5-15.803z"
-                ></path>
-              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 256 256"><path fill="currentColor" d="m224 154.8l-47.09-21.11l-.18-.08a19.94 19.94 0 0 0-19 1.75a13.08 13.08 0 0 0-1.12.84l-22.31 19c-13-7.05-26.43-20.37-33.49-33.21l19.06-22.66a11.76 11.76 0 0 0 .85-1.15a20 20 0 0 0 1.66-18.83a1.42 1.42 0 0 1-.08-.18L101.2 32a20.06 20.06 0 0 0-20.78-11.85A60.27 60.27 0 0 0 28 80c0 81.61 66.39 148 148 148a60.27 60.27 0 0 0 59.85-52.42A20.06 20.06 0 0 0 224 154.8ZM176 204A124.15 124.15 0 0 1 52 80a36.29 36.29 0 0 1 28.48-35.54l18.82 42l-19.16 22.82a12 12 0 0 0-.86 1.16A20 20 0 0 0 78 130.08c9.42 19.28 28.83 38.56 48.31 48a20 20 0 0 0 19.69-1.45a11.63 11.63 0 0 0 1.11-.85l22.43-19.07l42 18.81A36.29 36.29 0 0 1 176 204Z"/></svg>
             </a>
             <a rel="noopener noreferrer" href="#" title="Twitter" class="flex items-center p-1">
-              <svg
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                class="w-5 h-5 fill-current"
-              >
-                <path
-                  d="M23.954 4.569a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.691 8.094 4.066 6.13 1.64 3.161a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.061a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.937 4.937 0 004.604 3.417 9.868 9.868 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63a9.936 9.936 0 002.46-2.548l-.047-.02z"
-                ></path>
-              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><g fill="none"><path d="M24 0v24H0V0h24ZM12.593 23.258l-.011.002l-.071.035l-.02.004l-.014-.004l-.071-.035c-.01-.004-.019-.001-.024.005l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427c-.002-.01-.009-.017-.017-.018Zm.265-.113l-.013.002l-.185.093l-.01.01l-.003.011l.018.43l.005.012l.008.007l.201.093c.012.004.023 0 .029-.008l.004-.014l-.034-.614c-.003-.012-.01-.02-.02-.022Zm-.715.002a.023.023 0 0 0-.027.006l-.006.014l-.034.614c0 .012.007.02.017.024l.015-.002l.201-.093l.01-.008l.004-.011l.017-.43l-.003-.012l-.01-.01l-.184-.092Z"/><path fill="currentColor" d="M10 3c4.071 0 7.7 2.67 7.982 6.368c2.304.862 4.018 2.81 4.018 5.26c0 1.867-1.026 3.472-2.52 4.493a2.28 2.28 0 0 0-.022.439l.014.44a1 1 0 0 1-1 1c-.758 0-1.46-.247-2.054-.71a7.84 7.84 0 0 1-1.105.078c-2.767 0-5.322-1.491-6.284-3.751a9.231 9.231 0 0 1-.454-.058c-.716.567-1.54.885-2.464.885a1 1 0 0 1-1-1l.005-.203l.018-.41a2.1 2.1 0 0 0-.058-.608C3.248 14.004 2 12.073 2 9.833C2 5.896 5.76 3 10 3Zm5.313 7.889c-2.768 0-4.688 1.837-4.688 3.74c0 1.902 1.92 3.74 4.688 3.74a5.8 5.8 0 0 0 1.078-.101c.434-.082.819.1 1.15.36c.099-.433.324-.842.706-1.088C19.363 16.82 20 15.753 20 14.629c0-1.903-1.92-3.74-4.688-3.74ZM10 5C6.508 5 4 7.327 4 9.833c0 1.477.837 2.858 2.264 3.777c.531.343.76.957.83 1.559l.482-.342c.308-.208.63-.366 1.05-.288c.056-3.287 3.203-5.65 6.687-5.65c.192 0 .383.007.573.021C15.361 6.784 13.059 5 10 5Zm3.62 8a1 1 0 1 1 0 2a1 1 0 0 1 0-2ZM17 13a1 1 0 1 1 0 2a1 1 0 0 1 0-2ZM8 7a1 1 0 1 1 0 2a1 1 0 0 1 0-2Zm4 0a1 1 0 1 1 0 2a1 1 0 0 1 0-2Z"/></g></svg>
             </a>
             <a rel="noopener noreferrer" href="#" title="Instagram" class="flex items-center p-1">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 32 32"
-                fill="currentColor"
-                class="w-5 h-5 fill-current"
-              >
-                <path
-                  d="M16 0c-4.349 0-4.891 0.021-6.593 0.093-1.709 0.084-2.865 0.349-3.885 0.745-1.052 0.412-1.948 0.959-2.833 1.849-0.891 0.885-1.443 1.781-1.849 2.833-0.396 1.020-0.661 2.176-0.745 3.885-0.077 1.703-0.093 2.244-0.093 6.593s0.021 4.891 0.093 6.593c0.084 1.704 0.349 2.865 0.745 3.885 0.412 1.052 0.959 1.948 1.849 2.833 0.885 0.891 1.781 1.443 2.833 1.849 1.020 0.391 2.181 0.661 3.885 0.745 1.703 0.077 2.244 0.093 6.593 0.093s4.891-0.021 6.593-0.093c1.704-0.084 2.865-0.355 3.885-0.745 1.052-0.412 1.948-0.959 2.833-1.849 0.891-0.885 1.443-1.776 1.849-2.833 0.391-1.020 0.661-2.181 0.745-3.885 0.077-1.703 0.093-2.244 0.093-6.593s-0.021-4.891-0.093-6.593c-0.084-1.704-0.355-2.871-0.745-3.885-0.412-1.052-0.959-1.948-1.849-2.833-0.885-0.891-1.776-1.443-2.833-1.849-1.020-0.396-2.181-0.661-3.885-0.745-1.703-0.077-2.244-0.093-6.593-0.093zM16 2.88c4.271 0 4.781 0.021 6.469 0.093 1.557 0.073 2.405 0.333 2.968 0.553 0.751 0.291 1.276 0.635 1.844 1.197 0.557 0.557 0.901 1.088 1.192 1.839 0.22 0.563 0.48 1.411 0.553 2.968 0.072 1.688 0.093 2.199 0.093 6.469s-0.021 4.781-0.099 6.469c-0.084 1.557-0.344 2.405-0.563 2.968-0.303 0.751-0.641 1.276-1.199 1.844-0.563 0.557-1.099 0.901-1.844 1.192-0.556 0.22-1.416 0.48-2.979 0.553-1.697 0.072-2.197 0.093-6.479 0.093s-4.781-0.021-6.48-0.099c-1.557-0.084-2.416-0.344-2.979-0.563-0.76-0.303-1.281-0.641-1.839-1.199-0.563-0.563-0.921-1.099-1.197-1.844-0.224-0.556-0.48-1.416-0.563-2.979-0.057-1.677-0.084-2.197-0.084-6.459 0-4.26 0.027-4.781 0.084-6.479 0.083-1.563 0.339-2.421 0.563-2.979 0.276-0.761 0.635-1.281 1.197-1.844 0.557-0.557 1.079-0.917 1.839-1.199 0.563-0.219 1.401-0.479 2.964-0.557 1.697-0.061 2.197-0.083 6.473-0.083zM16 7.787c-4.541 0-8.213 3.677-8.213 8.213 0 4.541 3.677 8.213 8.213 8.213 4.541 0 8.213-3.677 8.213-8.213 0-4.541-3.677-8.213-8.213-8.213zM16 21.333c-2.948 0-5.333-2.385-5.333-5.333s2.385-5.333 5.333-5.333c2.948 0 5.333 2.385 5.333 5.333s-2.385 5.333-5.333 5.333zM26.464 7.459c0 1.063-0.865 1.921-1.923 1.921-1.063 0-1.921-0.859-1.921-1.921 0-1.057 0.864-1.917 1.921-1.917s1.923 0.86 1.923 1.917z"
-                ></path>
-              </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M20.194 18.424c-.419.05-1.576-1.777-1.735-2.031c-.005-.009-.018-.004-.018.006c-.012 1.215-.639 2.787-1.98 3.93a.009.009 0 0 0 .003.016c.666.207 2.122.749 1.772 1.34c-.285.482-4.902.308-6.235.157c-1.333.15-5.95.324-6.236-.157c-.353-.595 1.126-1.14 1.786-1.344v-.002c-1.36-1.153-1.991-2.748-1.992-3.971v-.001h-.002c-.05.08-1.309 2.11-1.75 2.057c-.21-.026-.486-1.158.364-3.894c.4-1.29.86-2.363 1.568-4.132C5.62 5.83 7.507 2 12 2c4.443 0 6.373 3.755 6.261 8.397c.707 1.766 1.168 2.845 1.568 4.132c.85 2.736.576 3.869.366 3.894Z"/></svg>
             </a>
           </div>
         </div>
       </div>
     </div>
     <div class="py-6 text-sm text-center dark:text-gray-400">
-      © 1968 Company Co. All rights reserved.
+      Copyright © 2023 康德莱与南昌大学版权所有.
     </div>
   </footer>
 </template>
