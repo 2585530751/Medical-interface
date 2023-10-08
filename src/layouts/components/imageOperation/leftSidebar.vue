@@ -3,13 +3,16 @@ import biTextIndentRight from '@/assets/svg/BiTextIndentRight.svg?component'
 import files from '@iconify-icons/ep/files'
 import folder from '@iconify-icons/ep/folder'
 import type { IconifyIconOffline } from '@/components/ReIcon'
+import arrowRight from '@iconify-icons/ep/arrow-right'
+import { ref } from 'vue';
 defineOptions({
   name: ''
 })
+var display = ref(true)
 </script>
 
 <template>
-  <div class="divide-double divide-y-4 divide-slate-400/25 divide-x-0">
+  <div v-show="display" class="w-60 divide-double divide-y-4 divide-slate-400/25 divide-x-0 ">
     <div
       class="flex flex-nowrap justify-between items-center bg-stone-50 dark:border-gray-700 dark:bg-gray-800"
     >
@@ -21,7 +24,7 @@ defineOptions({
       </div>
 
       <div class="flex-none">
-        <el-button text type="small">
+        <el-button text type="small" @click="display = !display">
           <biTextIndentRight style="height: 25px; width: 25px"></biTextIndentRight>
         </el-button>
       </div>
@@ -142,6 +145,13 @@ defineOptions({
       </div>
       
     </div>
+  </div>
+  <div v-show="!display" @click="display = !display" class="cursor-pointer fixed top-80 left-0 h-10 w-4 flex items-center bg-gray-300 dark:bg-gray-600 rounded hover:dark:bg-gray-300 hover:bg-gray-600">
+    <IconifyIconOffline
+      class="hover:text-blue-500"
+      :icon="arrowRight"
+      :style="{ fontSize: '20px' }"
+    ></IconifyIconOffline>
   </div>
 </template>
 
