@@ -156,7 +156,7 @@ async function run() {
   const renderingEngine = new RenderingEngine(renderingEngineId)
 
   // Create a stack viewport
-  const viewportId = 'CT_STACK'
+  const viewportId = 'CT_SAGITTAL_STACK'
   const viewportInput = {
     viewportId,
     type: ViewportType.STACK,
@@ -193,6 +193,7 @@ onMounted(async () => {
   const dropZone = document.getElementById('cornerstone-element') as HTMLDivElement
   const metadata: HTMLDivElement = document.getElementById('metadata') as HTMLDivElement
   element = dropZone
+  console.log(content)
   createMetadataRow('Transfer Syntax', metadata)
   createMetadataRow('SOPClassUID', metadata)
   createMetadataRow('SOPInstanceUID', metadata)

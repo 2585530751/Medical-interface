@@ -41,6 +41,7 @@ export default async function createImageIdsAndCacheMetaData({
   };
 
   client = client || new api.DICOMwebClient({ url: wadoRsRoot });
+ 
   const instances = await client.retrieveSeriesMetadata(studySearchOptions);
   const modality = instances[0][MODALITY].Value[0];
   let imageIds = instances.map((instanceMetaData) => {
@@ -60,7 +61,7 @@ export default async function createImageIdsAndCacheMetaData({
       '/instances/' +
       SOPInstanceUIDToUse +
       '/frames/1';
-
+  
     cornerstoneDICOMImageLoader.wadors.metaDataManager.add(
       imageId,
       instanceMetaData
