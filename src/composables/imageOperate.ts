@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { getRenderingEngine, type Types } from "@cornerstonejs/core";
 
 function resetOriginal(renderingEngineId: string, viewportId: string) {
@@ -56,4 +57,64 @@ function invert(renderingEngineId: string, viewportId: string) {
     viewport.setProperties({ invert: !invert });
     viewport.render();
 }
+=======
+import { getRenderingEngine, type Types } from "@cornerstonejs/core";
+
+function resetOriginal(renderingEngineId: string, viewportId: string) {
+    // Get the rendering engine
+    const renderingEngine = getRenderingEngine(renderingEngineId);
+    // Get the stack viewport
+    const viewport = <Types.IStackViewport>(
+        renderingEngine!.getViewport(viewportId)
+    );
+    viewport.resetCamera();
+    viewport.render();
+}
+
+function flipH(renderingEngineId: string, viewportId: string) {
+    // Get the rendering engine
+    const renderingEngine = getRenderingEngine(renderingEngineId);
+    // Get the stack viewport
+    const viewport = <Types.IStackViewport>(
+        renderingEngine!.getViewport(viewportId)
+    );
+    const { flipHorizontal } = viewport.getCamera();
+    viewport.setCamera({ flipHorizontal: !flipHorizontal });
+    viewport.render();
+}
+
+function resetPan(renderingEngineId: string, viewportId: string) {
+    // Get the rendering engine
+    const renderingEngine = getRenderingEngine(renderingEngineId);
+    // Get the stack viewport
+    const viewport = <Types.IStackViewport>(
+        renderingEngine!.getViewport(viewportId)
+    );
+    viewport.resetCamera(true, false);
+    viewport.render();
+}
+
+function resetZoom(renderingEngineId: string, viewportId: string) {
+    // Get the rendering engine
+    const renderingEngine = getRenderingEngine(renderingEngineId);
+    // Get the stack viewport
+    const viewport = <Types.IStackViewport>(
+        renderingEngine!.getViewport(viewportId)
+    );
+    viewport.resetCamera(false, true);
+    viewport.render();
+}
+
+function invert(renderingEngineId: string, viewportId: string) {
+    const renderingEngine = getRenderingEngine(renderingEngineId);
+
+    // Get the stack viewport
+    const viewport = <Types.IStackViewport>(
+        renderingEngine!.getViewport(viewportId)
+    );
+    const { invert } = viewport.getProperties();
+    viewport.setProperties({ invert: !invert });
+    viewport.render();
+}
+>>>>>>> 0599ae1df3770c3501620d5da5f8323c5db6dcea
 export { resetOriginal, flipH, resetPan, resetZoom, invert }
