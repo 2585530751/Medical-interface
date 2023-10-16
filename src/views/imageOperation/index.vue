@@ -8,6 +8,7 @@ import 'splitpanes/dist/splitpanes.css'
 import navHeader from '@/layouts/components/imageOperation/header.vue'
 import navLeftSidebar from '@/layouts/components/imageOperation/leftSidebar.vue'
 import navRightSidebar from '@/layouts/components/imageOperation/rightSidebar.vue'
+import imageDisplay from '@/layouts/components/imageOperation/imageDisplay.vue';
 </script>
 
 <template>
@@ -27,8 +28,10 @@ import navRightSidebar from '@/layouts/components/imageOperation/rightSidebar.vu
               <span
                 ><div
                   class="bg-origin-border bg-no-repeat bg-center bg-contain h-full w-full"
-                  style="background-image: url('src/assets/images/{2AA25F20-AE72-4d6e-A136-A3BC0A02152B}.png')"
-                ></div>
+                  
+                >
+                <image-display></image-display>
+              </div>
               </span>
             </pane>
             <pane max-size="40" size="0">

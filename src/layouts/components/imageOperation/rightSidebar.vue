@@ -39,6 +39,25 @@ import videoCamera from '@iconify-icons/ep/video-camera'
 import refreshRight from '@iconify-icons/ep/refresh-right'
 import type { IconifyIconOffline } from '@/components/ReIcon'
 import imageOperation from '@/components/ReButton/imageOperation.vue'
+
+import * as cornerstoneTools from '@cornerstonejs/tools'
+import { useImageStateStore } from '@/stores/imageState'
+const {
+    LengthTool,
+    CrosshairsTool,
+    PlanarFreehandROITool,
+    ProbeTool,
+    RectangleROITool,
+    EllipticalROITool,
+    CircleROITool,
+    BidirectionalTool,
+    AngleTool,
+    CobbAngleTool,
+    ArrowAnnotateTool,
+    Enums: csToolsEnums,
+} = cornerstoneTools;
+const imageStateStore = useImageStateStore();
+
 defineOptions({
   name: ''
 })
@@ -46,7 +65,9 @@ defineOptions({
 
 <template>
   <div class="divide-double divide-y-4 divide-slate-400/25 divide-x-0">
-    <div class="flex flex-wrap justify-between items-center bg-stone-50 dark:border-gray-700 dark:bg-gray-800">
+    <div
+      class="flex flex-wrap justify-between items-center bg-stone-50 dark:border-gray-700 dark:bg-gray-800"
+    >
       <div>
         <el-button text size="small">
           <biTextIndentLeft style="height: 25px; width: 25px"></biTextIndentLeft>
@@ -54,12 +75,12 @@ defineOptions({
       </div>
       <div>
         <el-button-group>
-          <el-button text > 常用工具 </el-button>
-          <el-button text > 病灶 </el-button>
+          <el-button text> 常用工具 </el-button>
+          <el-button text> 病灶 </el-button>
         </el-button-group>
       </div>
     </div>
-    <div class="divide-slate-400/50 divide-y-2 divide-x-0 divide-solid  ">
+    <div class="divide-slate-400/50 divide-y-2 divide-x-0 divide-solid">
       <div class="flex flex-wrap justify-between bg-stone-50 dark:border-gray-700 dark:bg-gray-800">
         <div class="flex items-center">
           <p class="text-sm text-gray-600 ml-3 dark:text-white inline">序列间布局</p>
@@ -273,8 +294,10 @@ defineOptions({
           ></el-button>
         </el-button-group>
         <el-dropdown>
-          <div class="bg-stone-200 flex justify-center items-center rounded-md w-20 dark:bg-gray-700">
-            <span class="h-6 flex justify-center items-center ">默认速度</span>
+          <div
+            class="bg-stone-200 flex justify-center items-center rounded-md w-20 dark:bg-gray-700"
+          >
+            <span class="h-6 flex justify-center items-center">默认速度</span>
             <IconifyIconOffline
               class="hover:text-blue-500"
               :icon="arrowDown"
@@ -294,70 +317,73 @@ defineOptions({
         </el-dropdown>
       </div>
       <div class="flex flex-wrap gap-1 p-2 bg-stone-50 dark:border-gray-700 dark:bg-gray-800">
-        <imageOperation operation="箭头"
-          ><arrowUpDuotone style="height: 30px; width: 30px"></arrowUpDuotone>
+        <imageOperation operation="箭头" @click="imageStateStore.bindLeftMouse(ArrowAnnotateTool.toolName)"
+          ><arrowUpDuotone style="height: 30px; width: 30px" ></arrowUpDuotone>
         </imageOperation>
-        <imageOperation operation="直线">
+        <imageOperation operation="直线" @click="imageStateStore.bindLeftMouse(LengthTool.toolName)">
           <straightPipe style="height: 30px; width: 30px"></straightPipe>
         </imageOperation>
         <imageOperation operation="中点">
           <menuDotsLineDuotone style="height: 30px; width: 30px"></menuDotsLineDuotone>
         </imageOperation>
-        <imageOperation operation="十字线">
+        <imageOperation operation="十字线" @click="imageStateStore.bindLeftMouse(BidirectionalTool.toolName)">
           <addFill style="height: 30px; width: 30px"></addFill>
         </imageOperation>
-        <imageOperation operation="角度">
+        <imageOperation operation="角度" @click="imageStateStore.bindLeftMouse(AngleTool.toolName)">
           <angle style="height: 30px; width: 30px"></angle>
         </imageOperation>
-       <imageOperation operation="Cobb">
-          <cobb style="height: 30px; width: 30px;fill:currentColor"></cobb>
+        <imageOperation operation="Cobb" @click="imageStateStore.bindLeftMouse(CobbAngleTool.toolName)">
+          <cobb style="height: 30px; width: 30px; fill: currentColor"></cobb>
         </imageOperation>
-        <imageOperation operation="CT值">
+        <imageOperation operation="CT值" @click="imageStateStore.bindLeftMouse(PlanarFreehandROITool.toolName)">
           <iImagingAlternativeCt style="height: 30px; width: 30px"></iImagingAlternativeCt>
         </imageOperation>
         <imageOperation operation="心胸比">
-          <cardiopulmonary style="height: 30px; width: 30px;fill:currentColor"></cardiopulmonary>
+          <cardiopulmonary style="height: 30px; width: 30px; fill: currentColor"></cardiopulmonary>
         </imageOperation>
-        <imageOperation operation="椭圆">
-          <ellipses style="height: 30px; width: 30px;fill:currentColor"></ellipses>
+        <imageOperation operation="椭圆" @click="imageStateStore.bindLeftMouse(EllipticalROITool.toolName)">
+          <ellipses style="height: 30px; width: 30px; fill: currentColor"></ellipses>
         </imageOperation>
-        <imageOperation operation="圆心">
-          <circleCenter style="height: 30px; width: 30px;fill:currentColor"></circleCenter>
+        <imageOperation operation="圆心" @click="imageStateStore.bindLeftMouse(CircleROITool.toolName)">
+          <circleCenter style="height: 30px; width: 30px; fill: currentColor"></circleCenter>
         </imageOperation>
-        <imageOperation operation="矩形">
-          <rectangles style="height: 30px; width: 30px;fill:currentColor"></rectangles>
+        <imageOperation operation="矩形" @click="imageStateStore.bindLeftMouse(RectangleROITool.toolName)">
+          <rectangles style="height: 30px; width: 30px; fill: currentColor"></rectangles>
         </imageOperation>
         <imageOperation operation="钢笔">
           <pen style="height: 30px; width: 30px"></pen>
         </imageOperation>
         <imageOperation operation="铅笔">
-          <pencil style="height: 30px; width: 30px;fill:currentColor"></pencil>
+          <pencil style="height: 30px; width: 30px; fill: currentColor"></pencil>
         </imageOperation>
         <imageOperation operation="球体">
           <sphere style="height: 30px; width: 30px"></sphere>
         </imageOperation>
-        <imageOperation operation="长方体">
-          <cuboid style="height: 30px; width: 30px;fill:currentColor"></cuboid>
+        <imageOperation operation="长方体" @click="imageStateStore.bindLeftMouse(ProbeTool.toolName)">
+          <cuboid style="height: 30px; width: 30px; fill: currentColor"></cuboid>
         </imageOperation>
       </div>
       <div class="flex flex-wrap gap-1 p-2 bg-stone-50 dark:border-gray-700 dark:bg-gray-800">
         <imageOperation operation="3D探针">
-          <probes style="height: 30px; width: 30px;fill:currentColor"></probes>
+          <probes style="height: 30px; width: 30px; fill: currentColor"></probes>
         </imageOperation>
         <imageOperation operation="截屏">
-          <captureImage style="height: 30px; width: 30px;fill:currentColor"></captureImage>
+          <captureImage style="height: 30px; width: 30px; fill: currentColor"></captureImage>
         </imageOperation>
         <imageOperation operation="删除">
-          <remove style="height: 30px; width: 30px;fill:currentColor"></remove>
+          <remove style="height: 30px; width: 30px; fill: currentColor"></remove>
         </imageOperation>
         <imageOperation operation="清除">
-          <removals style="height: 30px; width: 30px;fill:currentColor"></removals>
+          <removals style="height: 30px; width: 30px; fill: currentColor"></removals>
         </imageOperation>
         <imageOperation operation="复制">
-          <copy style="height: 30px; width: 30px;fill:currentColor"></copy>
+          <copy style="height: 30px; width: 30px; fill: currentColor"></copy>
         </imageOperation>
         <imageOperation operation="拆图显示">
-          <separate style="height: 30px; width: 30px;fill:currentColor" class="dark:text-white"></separate>
+          <separate
+            style="height: 30px; width: 30px; fill: currentColor"
+            class="dark:text-white"
+          ></separate>
         </imageOperation>
       </div>
     </div>

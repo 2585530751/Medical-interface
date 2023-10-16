@@ -19,6 +19,7 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
       '@cornerstonejs/dicom-image-loader': '@cornerstonejs/dicom-image-loader/dist/dynamic-import/cornerstoneDICOMImageLoader.min.js',
+      '@cornerstone-nifti-image-loader': '@cornerstonejs/nifti-image-loader/dist/cornerstoneNIFTIImageLoader.min.js',
       '/src/index.worker.e62ecca63f1a2e124230.worker.js': path.resolve(__dirname, 'node_modules', '@cornerstonejs', 'dicom-image-loader', 'dist', 'dynamic-import', 'index.worker.e62ecca63f1a2e124230.worker.js')
     }
   },
