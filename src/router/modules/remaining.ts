@@ -48,6 +48,14 @@ export default [
     }
   },
   {
+    path: "/testGet",
+    name: "testGet",
+    component: () => import("@/views/testGet.vue"),
+    meta: {
+      showLink: false,
+    }
+  },
+  {
     path: "/imageOperation",
     name: "ImageOperation",
     component: () => import("@/views/imageOperation/index.vue"),
