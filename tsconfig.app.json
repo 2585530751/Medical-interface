@@ -1,10 +1,16 @@
-<<<<<<< HEAD
 {
   "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "tailwind.config.ts", "tailwind.config.ts", "types"],
+  "include": [
+    "env.d.ts",
+    "src/**/*",
+    "src/**/*.vue",
+    "tailwind.config.ts",
+    "tailwind.config.ts",
+    "types"
+  ],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
-    "allowJs":true,
+    "allowJs": true,
     "composite": true,
     "baseUrl": ".",
     "paths": {
@@ -13,19 +19,3 @@
     "moduleResolution": "node"
   }
 }
-=======
-{
-  "extends": "@vue/tsconfig/tsconfig.dom.json",
-  "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "tailwind.config.ts", "tailwind.config.ts", "types"],
-  "exclude": ["src/**/__tests__/*"],
-  "compilerOptions": {
-    "allowJs":true,
-    "composite": true,
-    "baseUrl": ".",
-    "paths": {
-      "@/*": ["./src/*"]
-    },
-    "moduleResolution": "node"
-  }
-}
->>>>>>> 0599ae1df3770c3501620d5da5f8323c5db6dcea

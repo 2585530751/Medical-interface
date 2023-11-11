@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 {
   "extends": "./tsconfig.app.json",
   "exclude": ["node_modules", "build/**/*"],
@@ -9,15 +8,3 @@
     "outDir": "build"
   }
 }
-=======
-{
-  "extends": "./tsconfig.app.json",
-  "exclude": ["node_modules", "build/**/*"],
-  "compilerOptions": {
-    "composite": true,
-    "lib": [],
-    "types": ["node", "jsdom"],
-    "outDir": "build"
-  }
-}
->>>>>>> 0599ae1df3770c3501620d5da5f8323c5db6dcea
