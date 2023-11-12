@@ -41,7 +41,7 @@ import type { IconifyIconOffline } from '@/components/ReIcon'
 import imageOperation from '@/components/ReButton/imageOperation.vue'
 
 import * as cornerstoneTools from '@cornerstonejs/tools'
-import { useImageStateStore } from '@/stores/imageState'
+import { useImageStateStore } from '@/store/imageState'
 import { resetOriginal, flipH, resetPan, resetZoom, invert } from '@/composables/imageOperate'
 import { ref } from 'vue'
 
@@ -492,3 +492,4 @@ const annotationTools = ref(true)
 
 <style lang="scss" scoped></style>
 
+@/store/imageState

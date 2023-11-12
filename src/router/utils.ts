@@ -1,25 +1,26 @@
-import type { RouteRecordRaw } from "vue-router";
-import { buildHierarchyTree } from "@/utils/tree";
-
+import type { RouteRecordRaw, RouteComponent } from 'vue-router'
+import { buildHierarchyTree } from '@/utils/tree'
+import { cloneDeep, intersection, storageSession } from '@pureadmin/utils'
+import { sessionKey, type DataInfo } from '@/utils/auth'
 function formatTwoStageRoutes(routesList: RouteRecordRaw[]) {
-    if (routesList.length === 0) return routesList;
-    const newRoutesList: RouteRecordRaw[] = [];
-    routesList.forEach((v: RouteRecordRaw) => {
-      if (v.path === "/") {
-        newRoutesList.push({
-          component: v.component,
-          name: v.name,
-          path: v.path,
-          redirect: v.redirect,
-          meta: v.meta,
-          children: []
-        });
-      } else {
-        newRoutesList[0]?.children?.push({ ...v });
-      }
-    });
-    return newRoutesList;
-  }
+  if (routesList.length === 0) return routesList
+  const newRoutesList: RouteRecordRaw[] = []
+  routesList.forEach((v: RouteRecordRaw) => {
+    if (v.path === '/') {
+      newRoutesList.push({
+        component: v.component,
+        name: v.name,
+        path: v.path,
+        redirect: v.redirect,
+        meta: v.meta,
+        children: []
+      })
+    } else {
+      newRoutesList[0]?.children?.push({ ...v })
+    }
+  })
+  return newRoutesList
+}
 
 /**
  * 将多级嵌套路由处理成一维数组
@@ -27,18 +28,53 @@ function formatTwoStageRoutes(routesList: RouteRecordRaw[]) {
  * @returns 返回处理后的一维路由
  */
 function formatFlatteningRoutes(routesList: RouteRecordRaw[]) {
-  if (routesList.length === 0) return routesList;
-  let hierarchyList = buildHierarchyTree(routesList);
+  if (routesList.length === 0) return routesList
+  let hierarchyList = buildHierarchyTree(routesList)
   for (let i = 0; i < hierarchyList.length; i++) {
     if (hierarchyList[i].children) {
       hierarchyList = hierarchyList
         .slice(0, i + 1)
-        .concat(hierarchyList[i].children, hierarchyList.slice(i + 1));
+        .concat(hierarchyList[i].children, hierarchyList.slice(i + 1))
     }
   }
-  return hierarchyList;
+  return hierarchyList
 }
 
+/** 过滤meta中showLink为false的菜单 */
+function filterTree(data: RouteComponent[]) {
+  const newTree = cloneDeep(data).filter(
+    (v: { meta: { showLink: boolean } }) => v.meta?.showLink !== false
+  )
+  newTree.forEach(
+    (v: { children: RouteComponent[] }) => v.children && (v.children = filterTree(v.children))
+  )
+  return newTree
+}
 
-  export { formatTwoStageRoutes,formatFlatteningRoutes};
+/** 从sessionStorage里取出当前登陆用户的角色roles，过滤无权限的菜单 */
+function filterNoPermissionTree(data: RouteComponent[]) {
+  const currentRoles = storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? []
+  const newTree = cloneDeep(data).filter((v: any) => isOneOfArray(v.meta?.roles, currentRoles))
+  newTree.forEach((v: any) => v.children && (v.children = filterNoPermissionTree(v.children)))
+  return filterChildrenTree(newTree)
+}
 
+/** 判断两个数组彼此是否存在相同值 */
+function isOneOfArray(a: Array<string>, b: Array<string>) {
+  return Array.isArray(a) && Array.isArray(b)
+    ? intersection(a, b).length > 0
+      ? true
+      : false
+    : true
+}
+
+/** 过滤children长度为0的的目录，当目录下没有菜单时，会过滤此目录，目录没有赋予roles权限，当目录下只要有一个菜单有显示权限，那么此目录就会显示 */
+function filterChildrenTree(data: RouteComponent[]) {
+  const newTree = cloneDeep(data).filter((v: any) => v?.children?.length !== 0)
+  newTree.forEach(
+    (v: { children: RouteComponent[] }) => v.children && (v.children = filterTree(v.children))
+  )
+  return newTree
+}
+
+export { formatTwoStageRoutes, formatFlatteningRoutes, filterTree, filterNoPermissionTree }

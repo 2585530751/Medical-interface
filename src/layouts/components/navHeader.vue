@@ -11,6 +11,8 @@ const activeIndex = ref('')
 const handleSelect = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
+
+const centerDialogVisible = ref(false)
 </script>
 
 <template>
@@ -25,15 +27,15 @@ const handleSelect = (key: string, keyPath: string[]) => {
     @select="handleSelect"
     ><el-menu-item index="/">
       <template #title>
-        <div class="dark:hidden flex items-center py-2">
-          <img src="@/assets/images/KDLWord1.png"  class="h-8" />
-          <img src="@/assets/images/KDLLogo1.png"  class="h-4 pr-5" />
-          <img src="@/assets/images/ncuLogo.png"  class="h-10" />
+        <div class="flex items-center py-2 dark:hidden">
+          <img src="@/assets/images/KDLWord1.png" class="h-8" />
+          <img src="@/assets/images/KDLLogo1.png" class="h-4 pr-5" />
+          <img src="@/assets/images/ncuLogo.png" class="h-10" />
         </div>
-        <div  class="dark:visible hidden dark:flex items-center py-2">
-          <img src="@/assets/images/KDLWord.png"  class="h-8" />
+        <div class="items-center hidden py-2 dark:visible dark:flex">
+          <img src="@/assets/images/KDLWord.png" class="h-8" />
           <img src="@/assets/images/KDLLogo.png" class="h-4 pr-5" />
-          <img src="@/assets/images/ncuLogo1.png"  class="h-10" />
+          <img src="@/assets/images/ncuLogo1.png" class="h-10" />
         </div>
       </template>
     </el-menu-item>
@@ -64,12 +66,21 @@ const handleSelect = (key: string, keyPath: string[]) => {
         :inactive-icon="darkIcon"
       />
     </div>
-    <div class="demo-type mx-5">
-      <el-avatar style="margin: auto" :size="30" src="https://empty" @error="errorHandler">
+    <div class="mx-5 demo-type">
+      <el-avatar style="margin: auto" :size="30" src="https://empty" @error="errorHandler" @click="centerDialogVisible = true">
         <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
       </el-avatar>
     </div>
   </el-menu>
+  <el-dialog v-model="centerDialogVisible" title="Warning" width="30%" center>
+    <span> It should be noted that the content will not be aligned in center by default </span>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button @click="centerDialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="centerDialogVisible = false"> Confirm </el-button>
+      </span>
+    </template>
+  </el-dialog>
 </template>
 
 <style lang="scss" scoped>

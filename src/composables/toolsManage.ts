@@ -1,6 +1,6 @@
 import * as cornerstoneTools from '@cornerstonejs/tools';
 import type { IToolGroup } from '@cornerstonejs/tools/dist/esm/types';
-import { useImageStateStore } from '@/stores/imageState'
+import { useImageStateStore } from '@/store/imageState'
 import { volumeLoader } from '@cornerstonejs/core'
 
 const imageStateStore = useImageStateStore();

@@ -3,6 +3,8 @@ import type { RouteRecordRaw } from 'vue-router'
 import { formatTwoStageRoutes,formatFlatteningRoutes } from './utils'
 import { buildHierarchyTree } from "@/utils/tree";
 import remainingRouter from './modules/remaining'
+import { usePermissionStoreHook } from "@/store/modules/permission";
+
 
 const modules: Record<string, any> = import.meta.glob(
   ["./modules/**/*.ts", "!./modules/**/remaining.ts"],
@@ -23,9 +25,26 @@ export const constantRoutes: Array<RouteRecordRaw> = formatTwoStageRoutes(
   formatFlatteningRoutes(buildHierarchyTree(routes.flat(Infinity)))
 );
 
-const router = createRouter({
+export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes:constantRoutes.concat(...(remainingRouter as any)),
+  
 })
+
+/** 重置路由 */
+export function resetRouter() {
+  router.getRoutes().forEach(route => {
+    const { name, meta } = route;
+    if (name && router.hasRoute(name) && meta?.backstage) {
+      router.removeRoute(name);
+      router.options.routes = formatTwoStageRoutes(
+        formatFlatteningRoutes(
+          buildHierarchyTree(routes.flat(Infinity))
+        )
+      );
+    }
+  });
+  usePermissionStoreHook().clearAllCachePage();
+}
 
 export default router
