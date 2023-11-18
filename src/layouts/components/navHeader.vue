@@ -4,7 +4,7 @@ import { ref } from 'vue'
 import dayIcon from '@/assets/svg/day.svg?component'
 import darkIcon from '@/assets/svg/dark.svg?component'
 import { isDark } from '@/composables'
-
+import login from './user/login.vue'
 const errorHandler = () => true
 
 const activeIndex = ref('')
@@ -72,15 +72,7 @@ const centerDialogVisible = ref(false)
       </el-avatar>
     </div>
   </el-menu>
-  <el-dialog v-model="centerDialogVisible" title="Warning" width="30%" center>
-    <span> It should be noted that the content will not be aligned in center by default </span>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="centerDialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="centerDialogVisible = false"> Confirm </el-button>
-      </span>
-    </template>
-  </el-dialog>
+  <login :login-window-open="centerDialogVisible" @login-window-close="centerDialogVisible = false"></login>
 </template>
 
 <style lang="scss" scoped>
