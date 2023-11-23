@@ -3,7 +3,7 @@ import type { RouteRecordRaw } from 'vue-router'
 import { formatTwoStageRoutes,formatFlatteningRoutes } from './utils'
 import { buildHierarchyTree } from "@/utils/tree";
 import remainingRouter from './modules/remaining'
-import { usePermissionStoreHook } from "@/store/modules/permission";
+
 
 
 const modules: Record<string, any> = import.meta.glob(
@@ -44,7 +44,7 @@ export function resetRouter() {
       );
     }
   });
-  usePermissionStoreHook().clearAllCachePage();
 }
+
 
 export default router

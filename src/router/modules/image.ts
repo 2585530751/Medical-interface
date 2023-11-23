@@ -10,7 +10,8 @@ export default {
         name: "影像列表",
         component: () => import("@/views/image/index.vue"),
         meta: {
-          title: "影像列表"
+          title: "影像列表",
+          roles: ['docter']
         }
       }
     ]

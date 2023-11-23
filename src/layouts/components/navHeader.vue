@@ -5,6 +5,8 @@ import dayIcon from '@/assets/svg/day.svg?component'
 import darkIcon from '@/assets/svg/dark.svg?component'
 import { isDark } from '@/composables'
 import login from './user/login.vue'
+import rolePermission from '@/components/rolePermission.vue'
+import watchTest from '@/components/watchTest.vue'
 const errorHandler = () => true
 
 const activeIndex = ref('')
@@ -41,9 +43,15 @@ const centerDialogVisible = ref(false)
     </el-menu-item>
 
     <div class="flex-grow" />
-    <el-menu-item index="/image">医学影像</el-menu-item>
-    <el-menu-item index="/model">算法模型</el-menu-item>
-    <el-menu-item index="/patient">患者详情</el-menu-item>
+    <role-permission :value="['doctor']">
+      <el-menu-item index="/image">医学影像</el-menu-item>
+    </role-permission>
+    <role-permission :value="['doctor']"
+      ><el-menu-item index="/model">算法模型</el-menu-item></role-permission
+    >
+    <role-permission :value="['doctor']">
+      <el-menu-item index="/patient">患者详情</el-menu-item></role-permission
+    >
     <el-sub-menu index="2">
       <template #title>设置</template>
       <el-menu-item index="2-1">关于</el-menu-item>
@@ -67,12 +75,21 @@ const centerDialogVisible = ref(false)
       />
     </div>
     <div class="mx-5 demo-type">
-      <el-avatar style="margin: auto" :size="30" src="https://empty" @error="errorHandler" @click="centerDialogVisible = true">
+      <el-avatar
+        style="margin: auto"
+        :size="30"
+        src="https://empty"
+        @error="errorHandler"
+        @click="centerDialogVisible = true"
+      >
         <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
       </el-avatar>
     </div>
   </el-menu>
-  <login :login-window-open="centerDialogVisible" @login-window-close="centerDialogVisible = false"></login>
+  <login
+    :login-window-open="centerDialogVisible"
+    @login-window-close="centerDialogVisible = false"
+  ></login>
 </template>
 
 <style lang="scss" scoped>

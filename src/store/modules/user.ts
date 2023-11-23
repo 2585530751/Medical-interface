@@ -12,7 +12,7 @@ export const useUserStore = defineStore({
   state: (): userType => ({
     // 用户名
     username:
-      storageSession().getItem<DataInfo<number>>(sessionKey)?.username ?? "",
+      storageSession().getItem<DataInfo<number>>(sessionKey)?.userName ?? "",
     // 页面级别权限
     roles: storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? []
   }),
@@ -31,6 +31,7 @@ export const useUserStore = defineStore({
         getLogin(data)
           .then(data => {
             if (data) {
+              console.log(data);
               setToken(data.data);
               resolve(data);
             }
