@@ -14,7 +14,6 @@ const userStore = useUserStoreHook()
 const unsubscribe = userStore.$subscribe((mutation,state) => {
       userRoles.value = userStore.roles;
       hasPermission();
-        console.log(mutation, state)
     });
 // 在组件卸载时取消订阅，防止内存泄漏
 onUnmounted(() => {
@@ -24,14 +23,12 @@ onUnmounted(() => {
 
 // 判断是否有权限显示
 const hasPermission = () => {
-  console.log(props.value.some((role) => userStore.roles?.includes(role)));
   return props.value.some((role) => userStore.roles?.includes(role));
 };
 
 function getUserRoles() {
   const userInfo = storageSession().getItem<DataInfo<number>>(sessionKey);
   if (userInfo) {
-    console.log(userInfo.roles);
     return userInfo.roles;
   } else {
     return [];

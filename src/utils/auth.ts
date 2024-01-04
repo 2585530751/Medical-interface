@@ -1,7 +1,7 @@
 import Cookies from 'js-cookie'
 import { storageSession } from '@pureadmin/utils'
 import { useUserStoreHook } from '@/store/modules/user'
-import { ref } from 'vue';
+import { ref } from 'vue'
 
 export interface DataInfo<T> {
   /** token */
@@ -37,7 +37,8 @@ export function setToken(data: DataInfo<Date>) {
   let expires = 0
   const { accessToken, refreshToken } = data
   expires = new Date(data.expires).getTime() // 如果后端直接设置时间戳，将此处代码改为expires = data.expires，然后把上面的DataInfo<Date>改成DataInfo<number>即可
-  const cookieString = JSON.stringify({ accessToken, expires })
+  console.log(expires)
+  const cookieString = JSON.stringify({ accessToken, refreshToken, expires })
 
   expires > 0
     ? Cookies.set(TokenKey, cookieString, {
@@ -49,7 +50,6 @@ export function setToken(data: DataInfo<Date>) {
     useUserStoreHook().SET_USERNAME(userName)
     useUserStoreHook().SET_ROLES(roles)
     storageSession().setItem(sessionKey, {
-      refreshToken,
       expires,
       userName,
       roles
@@ -77,21 +77,27 @@ export const formatToken = (token: string): string => {
   return 'Bearer ' + token
 }
 
+export const isLoggedIn = ref(false)
 export async function checkAuthStatus() {
   // 检查 'user-info' 是否存在于 sessionStorage 中
-  const userStorage = sessionStorage.getItem('user-info');
-  const isLoggedIn = ref(false);
+  const userStorage = sessionStorage.getItem('user-info')
   if (userStorage) {
     // 用户已登录；将 isLoggedIn 设置为 true 并填充 userInfo
     isLoggedIn.value = true
   } else {
     // 'user-info' 不存在；检查 cookie 中的 'authorized-token'
-    const authorizedToken = getToken;
-
+    const authorizedToken = Cookies.get(TokenKey);
     if (authorizedToken) {
       // 调用后端刷新令牌
       try {
-        const refreshedData = await refreshTokens(authorizedToken)
+        // const refreshedData = await refreshTokens(authorizedToken)
+        const refreshedData = {
+          expires: 1700729029536,
+          refreshToken:
+            'eyJ0eXAiOiJKV1QiLCJ0b2tlblR5cGUiOiJyZWZyZXNoVG9rZW4iLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySW5mbyI6ImFkbWluIiwiZXhwIjoxNzAwNzI5MzI5fQ.-vOw2SSKW0ktRU25xw0xh8vBxU79ekFTodH9GJyRHz8',
+          roles: ['doctor'],
+          userName: '1234'
+        }
         // 在 sessionStorage 中更新 'user-info'
         sessionStorage.setItem('user-info', JSON.stringify(refreshedData))
         isLoggedIn.value = true
@@ -99,7 +105,7 @@ export async function checkAuthStatus() {
         // 处理令牌刷新错误（例如，重定向到登录页）
         console.error('刷新令牌失败：', error)
       }
-    }else{
+    } else {
       // 如果在 cookie 中未找到 'authorized-token'，用户未登录
       isLoggedIn.value = false
     }

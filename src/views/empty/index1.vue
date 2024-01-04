@@ -55,7 +55,6 @@ async function run() {
 
   // Define a stack containing a single image
   const stack = [imageIds[0]]
-  console.log(imageIds[0])
   // Set the stack on the viewport
   viewport.setStack(convertMultiframeImageIds(stack))
 

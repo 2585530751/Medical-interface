@@ -31,7 +31,6 @@ export const useUserStore = defineStore({
         getLogin(data)
           .then(data => {
             if (data) {
-              console.log(data);
               setToken(data.data);
               resolve(data);
             }

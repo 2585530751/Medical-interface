@@ -27,7 +27,7 @@ const handleCurrentChange = (val: number) => {
         :small="false"
         :disabled="false"
         :background="true"
-        layout="total, sizes, prev, pager, next, jumper"
+        layout="total, sizes, prev, pager, next, jumper" 
         :total="400"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"

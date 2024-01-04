@@ -1,31 +1,33 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref,onBeforeMount } from 'vue'
 
 import dayIcon from '@/assets/svg/day.svg?component'
 import darkIcon from '@/assets/svg/dark.svg?component'
 import { isDark } from '@/composables'
 import login from './user/login.vue'
 import rolePermission from '@/components/rolePermission.vue'
-import watchTest from '@/components/watchTest.vue'
-const errorHandler = () => true
+import { isLoggedIn, checkAuthStatus } from '@/utils/auth'
 
+const errorHandler = () => true
 const activeIndex = ref('')
 const handleSelect = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
 
 const centerDialogVisible = ref(false)
+onBeforeMount(() => {
+  checkAuthStatus()
+})
 </script>
 
 <template>
   <el-menu
     :default-active="activeIndex"
-    class="el-menu-demo"
     mode="horizontal"
-    :ellipsis="false"
+    :ellipsis=false
     menu-trigger="hover"
-    unique-opened="true"
-    router="true"
+    :unique-opened=true
+    :router=true
     @select="handleSelect"
     ><el-menu-item index="/">
       <template #title>
@@ -74,16 +76,18 @@ const centerDialogVisible = ref(false)
         :inactive-icon="darkIcon"
       />
     </div>
-    <div class="mx-5 demo-type">
-      <el-avatar
-        style="margin: auto"
-        :size="30"
-        src="https://empty"
-        @error="errorHandler"
-        @click="centerDialogVisible = true"
-      >
-        <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
-      </el-avatar>
+    <div class="flex items-center mx-5 ">
+      <div v-if="isLoggedIn === true">
+        <el-avatar
+          style="margin: auto"
+          :size="30"
+          src="https://empty"
+          @error="errorHandler"
+        >
+          <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
+        </el-avatar>
+      </div>
+      <div v-else @click="centerDialogVisible = true"><el-button type="primary">登录</el-button></div>
     </div>
   </el-menu>
   <login
@@ -97,17 +101,4 @@ const centerDialogVisible = ref(false)
   flex-grow: 1;
 }
 
-//avatar
-.demo-type {
-  display: flex;
-}
-
-.demo-type > div {
-  flex: 1;
-  text-align: center;
-}
-
-.demo-type > div:not(:last-child) {
-  border-right: 1px solid var(--el-border-color);
-}
 </style>

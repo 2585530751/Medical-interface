@@ -31,7 +31,6 @@ export type RefreshTokenResult = {
 
 /** 登录 */
 export const getLogin = (data?: object) => {
-  console.log(baseUrlApi('login'))
   return http.request<UserResult>(
     'post',
     baseUrlApi('user/login'),

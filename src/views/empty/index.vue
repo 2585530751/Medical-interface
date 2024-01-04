@@ -35,13 +35,11 @@ function handleFileChange(e: Event) {
   if (target && target.files && target.files.length > 0) {
     file = target.files[0]
     const imageId = cornerstoneDICOMImageLoader.wadouri.fileManager.add(file)
-    console.log(imageId)
     loadAndViewImage('dicomweb:src/assets/dicom/1.dcm')
   }
 }
 
 function handleFileSelect(evt: DragEvent) {
-  console.log(evt)
   evt.stopPropagation()
   evt.preventDefault()
 
@@ -190,7 +188,6 @@ onMounted(async () => {
   const dropZone = document.getElementById('cornerstone-element') as HTMLDivElement
   const metadata: HTMLDivElement = document.getElementById('metadata') as HTMLDivElement
   element = dropZone
-  console.log(content)
   createMetadataRow('Transfer Syntax', metadata)
   createMetadataRow('SOPClassUID', metadata)
   createMetadataRow('SOPInstanceUID', metadata)

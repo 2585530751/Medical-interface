@@ -5,11 +5,11 @@ import { useUserStoreHook } from '@/store/modules/user'
 import { message } from '@/utils/message'
 import { loginRules } from '@/composables/user/rule'
 import { useRouter, useRoute } from 'vue-router'
+import { isLoggedIn } from '@/utils/auth'
+import { is } from '@babel/types'
 defineOptions({
   name: ''
 })
-const router = useRouter()
-const route = useRoute()
 
 const props = defineProps<{
   loginWindowOpen?: boolean
@@ -48,7 +48,7 @@ const onLogin = async (formEl: FormInstance | undefined) => {
             //获取后端路由
             message('登录成功', { type: 'success' })
             emits('loginWindowClose')
-            console.log(useUserStoreHook().roles)
+            isLoggedIn.value = true;
             loading.value = false
           } else {
             loading.value = false
