@@ -26,6 +26,7 @@ const imagesInfo = reactive({
   imagesDescription: '',
   imagingDevice: ''
 })
+//hello
 const handleRemove = (file: UploadFile) => {
   console.log(file)
   let index = imagesList.value.indexOf(file)
