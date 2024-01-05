@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storageSession } from '@pureadmin/utils'
-import { type DataInfo, sessionKey } from '@/utils/auth'
+import { type DataInfo, sessionKey,checkAuthStatus } from '@/utils/auth'
 import { computed, onMounted, onUnmounted, reactive, ref, watch } from 'vue'
 import { useUserStoreHook } from '@/store/modules/user'
 defineOptions({
@@ -14,6 +14,7 @@ const userStore = useUserStoreHook()
 const unsubscribe = userStore.$subscribe((mutation,state) => {
       userRoles.value = userStore.roles;
       hasPermission();
+      checkAuthStatus();
     });
 // 在组件卸载时取消订阅，防止内存泄漏
 onUnmounted(() => {

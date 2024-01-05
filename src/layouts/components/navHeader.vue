@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref,onBeforeMount } from 'vue'
+import { ref, onBeforeMount } from 'vue'
 
 import dayIcon from '@/assets/svg/day.svg?component'
 import darkIcon from '@/assets/svg/dark.svg?component'
@@ -7,6 +7,7 @@ import { isDark } from '@/composables'
 import login from './user/login.vue'
 import rolePermission from '@/components/rolePermission.vue'
 import { isLoggedIn, checkAuthStatus } from '@/utils/auth'
+import { useUserStoreHook } from '@/store/modules/user'
 
 const errorHandler = () => true
 const activeIndex = ref('')
@@ -24,10 +25,10 @@ onBeforeMount(() => {
   <el-menu
     :default-active="activeIndex"
     mode="horizontal"
-    :ellipsis=false
+    :ellipsis="false"
     menu-trigger="hover"
-    :unique-opened=true
-    :router=true
+    :unique-opened="true"
+    :router="true"
     @select="handleSelect"
     ><el-menu-item index="/">
       <template #title>
@@ -59,12 +60,6 @@ onBeforeMount(() => {
       <el-menu-item index="2-1">关于</el-menu-item>
       <el-menu-item index="2-2">帮助</el-menu-item>
       <el-menu-item index="2-3">问题反馈</el-menu-item>
-      <el-sub-menu index="2-4">
-        <template #title>用户管理</template>
-        <el-menu-item index="2-4-1">注销</el-menu-item>
-        <el-menu-item index="2-4-2">个人中心</el-menu-item>
-        <el-menu-item index="2-4-3">锁屏</el-menu-item>
-      </el-sub-menu>
     </el-sub-menu>
 
     <div style="display: flex" class="mx-5">
@@ -76,19 +71,24 @@ onBeforeMount(() => {
         :inactive-icon="darkIcon"
       />
     </div>
-    <div class="flex items-center mx-5 ">
-      <div v-if="isLoggedIn === true">
-        <el-avatar
-          style="margin: auto"
-          :size="30"
-          src="https://empty"
-          @error="errorHandler"
-        >
-          <img src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png" />
-        </el-avatar>
+
+    <el-sub-menu index="3" v-if="isLoggedIn === true">
+      <template #title
+        ><el-avatar style="margin: auto" :size="30" src="https://empty" @error="errorHandler">
+          <img
+            src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"
+          /> </el-avatar
+      ></template>
+      <el-menu-item index="3-1">个人中心</el-menu-item>
+      <el-menu-item index="3-2">锁定屏幕</el-menu-item>
+      <el-menu-item index="3-3" @click="useUserStoreHook().logOut">退出登录</el-menu-item>
+    </el-sub-menu>
+    <div v-else class="flex items-center mx-5">
+      <div @click="centerDialogVisible = true">
+        <el-button type="primary">登录</el-button>
       </div>
-      <div v-else @click="centerDialogVisible = true"><el-button type="primary">登录</el-button></div>
     </div>
+    
   </el-menu>
   <login
     :login-window-open="centerDialogVisible"
@@ -100,5 +100,4 @@ onBeforeMount(() => {
 .flex-grow {
   flex-grow: 1;
 }
-
 </style>

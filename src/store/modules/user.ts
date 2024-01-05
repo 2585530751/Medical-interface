@@ -46,7 +46,7 @@ export const useUserStore = defineStore({
       this.roles = [];
       removeToken();
       resetRouter();
-      router.push("/login");
+      router.push("/welcome");
     },
     /** 刷新`token` */
     async handRefreshToken(data:any) {
