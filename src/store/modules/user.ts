@@ -18,11 +18,11 @@ export const useUserStore = defineStore({
   }),
   actions: {
     /** 存储用户名 */
-    SET_USERNAME(username: string) {
+    SET_USERNAME(username: string|undefined) {
       this.username = username;
     },
     /** 存储角色 */
-    SET_ROLES(roles: Array<string>) {
+    SET_ROLES(roles: Array<string>|undefined) {
       this.roles = roles;
     },
     /** 登入 */

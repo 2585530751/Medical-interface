@@ -5,7 +5,8 @@ defineOptions({
 import { reactive, ref, watch } from 'vue'
 import { Delete, ZoomIn } from '@element-plus/icons-vue'
 import { UploadFilled } from '@element-plus/icons-vue'
-import type { UploadFile } from 'element-plus'
+import {  type UploadFile } from 'element-plus'
+import { message } from '@/utils/message'
 import type { UploadUserFile } from 'element-plus'
 import type { UploadInstance } from 'element-plus'
 import { uploadImages } from '@/api/image'
@@ -76,11 +77,18 @@ function submitFileForm() {
   })
   // 文件名
   formData.append('imagesInfo', JSON.stringify(imagesInfo))
-  console.log('提交前', formData.getAll('imagesInfo'))
-  console.log(formData)
-  uploadImages(formData).then((res) => {
-    console.log(res)
-  })
+  uploadImages(formData)
+    .then((res) => {
+      if (res.success) {
+        message(res.msg, { type: 'success' })
+        emits('uploadWindowClose')
+      } else {
+        message(res.msg, { type: 'error' })
+      }
+    })
+    .catch((error) => {
+      message(error, { type: 'error' })
+    })
 }
 </script>
 

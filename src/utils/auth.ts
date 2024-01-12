@@ -2,6 +2,7 @@ import Cookies from 'js-cookie'
 import { storageSession } from '@pureadmin/utils'
 import { useUserStoreHook } from '@/store/modules/user'
 import { ref } from 'vue'
+import { message } from '@/utils/message'
 
 export interface DataInfo<T> {
   /** token */
@@ -24,7 +25,7 @@ export function getToken(): DataInfo<number> {
   // 此处与`TokenKey`相同，此写法解决初始化时`Cookies`中不存在`TokenKey`报错
   return Cookies.get(TokenKey)
     ? JSON.parse(Cookies.get(TokenKey)!)
-    : storageSession().getItem(sessionKey)
+    : null
 }
 
 /**
@@ -33,37 +34,30 @@ export function getToken(): DataInfo<number> {
  * 将`accessToken`、`expires`这两条信息放在key值为authorized-token的cookie里（过期自动销毁）
  * 将`userName`、`roles`、`refreshToken`、`expires`这四条信息放在key值为`user-info`的sessionStorage里（浏览器关闭自动销毁）
  */
-export function setToken(data: DataInfo<Date>) {
+export function setToken(data: DataInfo<number>) {
   let expires = 0
   const { accessToken, refreshToken } = data
-  expires = new Date(data.expires).getTime() // 如果后端直接设置时间戳，将此处代码改为expires = data.expires，然后把上面的DataInfo<Date>改成DataInfo<number>即可
-  console.log(expires)
+  expires = data.expires // 如果后端直接设置时间戳，将此处代码改为expires = data.expires，然后把上面的DataInfo<Date>改成DataInfo<number>即可
   const cookieString = JSON.stringify({ accessToken, refreshToken, expires })
-
   expires > 0
     ? Cookies.set(TokenKey, cookieString, {
         expires: (expires - Date.now()) / 86400000
       })
     : Cookies.set(TokenKey, cookieString)
 
-  function setSessionKey(userName: string, roles: Array<string>) {
+  function setSessionKey(userName: string|undefined, roles: Array<string>|undefined,expired: number) {
     useUserStoreHook().SET_USERNAME(userName)
     useUserStoreHook().SET_ROLES(roles)
     storageSession().setItem(sessionKey, {
-      expires,
+      expired,
       userName,
-      roles
+      roles,
     })
   }
 
-  if (data.userName && data.roles) {
-    const { userName, roles } = data
-    setSessionKey(userName, roles)
-  } else {
-    const userName = storageSession().getItem<DataInfo<number>>(sessionKey)?.userName ?? ''
-    const roles = storageSession().getItem<DataInfo<number>>(sessionKey)?.roles ?? []
-    setSessionKey(userName, roles)
-  }
+  const { userName, roles } = data
+  setSessionKey(userName, roles, expires)
+
 }
 
 /** 删除`token`以及key值为`user-info`的session信息 */
@@ -80,7 +74,7 @@ export const formatToken = (token: string): string => {
 export const isLoggedIn = ref(false)
 export async function checkAuthStatus() {
   // 检查 'user-info' 是否存在于 sessionStorage 中
-  const userStorage = sessionStorage.getItem('user-info')
+  const userStorage = sessionStorage.getItem(sessionKey)
   if (userStorage) {
     // 用户已登录；将 isLoggedIn 设置为 true 并填充 userInfo
     isLoggedIn.value = true

@@ -6,7 +6,7 @@ import { message } from '@/utils/message'
 import { loginRules } from '@/composables/user/rule'
 import { useRouter, useRoute } from 'vue-router'
 import { isLoggedIn } from '@/utils/auth'
-import { is } from '@babel/types'
+
 defineOptions({
   name: ''
 })
@@ -46,16 +46,29 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         .then((res) => {
           if (res.success) {
             //获取后端路由
-            message('登录成功', { type: 'success' })
+            message(res.msg, { type: 'success' })
             emits('loginWindowClose')
-            isLoggedIn.value = true;
-            loading.value = false
+            isLoggedIn.value = true
           } else {
-            loading.value = false
-            message('登录失败', { type: 'error' })
-            return fields
+            message(res.msg, { type: 'error' })
           }
         })
+        .catch((err) => {
+          message(err, { type: 'error' })
+        })
+        .finally(() => {
+          loading.value = false
+        })
+    } else {
+      Object.keys(fields as object).forEach((key,i) => {
+                    const propName=fields![key][0].field
+                    const propMessage=fields![key][0].message as string
+                    if(i==0){
+                        formEl.resetFields(propName)
+                        message(propMessage, { type: 'error' })
+                    }
+                })
+      loading.value = false
     }
   })
 }
@@ -86,7 +99,7 @@ const onLogin = async (formEl: FormInstance | undefined) => {
         <el-input clearable show-password v-model="ruleForm.password" placeholder="密码" />
       </el-form-item>
     </el-form>
-    <div class="flex justify-between py-3 ">
+    <div class="flex justify-between py-3">
       <div class="text-blue-300 cursor-pointer hover:text-red-400">忘记密码</div>
       <div class="text-blue-300 cursor-pointer hover:text-red-400">注册</div>
     </div>
