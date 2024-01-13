@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import { RenderingEngine, Enums, metaData, volumeLoader } from '@cornerstonejs/core'
-import type { Types } from '@cornerstonejs/core'
-
-import {
-  initDemo,
-  setCtTransferFunctionForVolumeActor
-} from '@/utils/helpers/index.js'
+import { RenderingEngine, Enums } from '@cornerstonejs/core'
+import type IStackViewport from '@cornerstonejs/core/src/types/IStackViewport'
+import { initDemo, setCtTransferFunctionForVolumeActor } from '@/utils/helpers/index.js'
 import { onMounted } from 'vue'
 import type { RGB } from '@cornerstonejs/core/src/types/'
-import OrientationAxis from '@cornerstonejs/core/src/enums/OrientationAxis'
 import createTools from '@/composables/toolsManage'
+import { convertMultiframeImageIds } from '@/utils/helpers/convertMultiframeImageIds';
 
 defineOptions({
   name: ''
@@ -54,45 +50,31 @@ onMounted(async () => {
     'wadouri:src/assets/dicom/1-30.dcm'
   ]
   // Instantiate a rendering engine
-  const renderingEngineId = 'firstRenderingEngine'
+  const renderingEngineId = 'stackImagesRenderingEngine'
   const renderingEngine = new RenderingEngine(renderingEngineId)
+
   // Create a stack viewport
   const viewportId = 'CT_SAGITTAL_STACK'
   const viewportInput = {
     viewportId,
-    type: ViewportType.ORTHOGRAPHIC,
+    type: ViewportType.STACK,
     element: element as HTMLDivElement,
     defaultOptions: {
       background: [0.2, 0, 0.2] as RGB,
-      orientation: OrientationAxis.AXIAL
     }
   }
   renderingEngine.enableElement(viewportInput)
+
   // Get the stack viewport that was created
-  const viewport = <Types.IVolumeViewport>renderingEngine.getViewport(viewportInput.viewportId)
-  // Define a unique id for the volume
-  const volumeName = 'CT_VOLUME_ID' // Id of the volume less loader prefix
-  const volumeLoaderScheme = 'cornerstoneStreamingImageVolume' // Loader id which defines which volume loader to use
-  const volumeId = `${volumeLoaderScheme}:${volumeName}` // VolumeId with loader id + volume id
-
-  // Define a volume in memory
-  const volume = await volumeLoader.createAndCacheVolume(volumeId, {
-    imageIds
+  const viewport1  =renderingEngine.getViewport(viewportInput.viewportId) as IStackViewport
+  viewport1.setStack(imageIds).then(() => {
+    viewport1.render()
   })
-
-  // Set the volume to load
-  volume.load()
-
-  // Set the volume on the viewport
-  viewport.setVolumes([{ volumeId, callback: setCtTransferFunctionForVolumeActor }])
-  // viewport.setStack(convertMultiframeImageIds(imageIds))
+ 
   window.addEventListener('resize', () => {
     renderingEngine.resize(true, true)
   })
-  viewport.render()
-  console.log(viewport.getDisplayArea())
-
-  createTools(viewportId, renderingEngineId, 'firstGroupToolsId', 'segmentationId', volumeId)
+  console.log(viewport1.getDisplayArea())
 
   // 创建一个新的 ResizeObserver 实例
   let ro = new ResizeObserver((entries) => {

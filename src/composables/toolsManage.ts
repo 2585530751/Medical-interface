@@ -1,5 +1,5 @@
 import * as cornerstoneTools from '@cornerstonejs/tools';
-import type { IToolGroup } from '@cornerstonejs/tools/dist/esm/types';
+import type IToolGroup from '@cornerstonejs/tools/src/types/IToolGroup';
 import { useImageStateStore } from '@/store/imageState'
 import { volumeLoader } from '@cornerstonejs/core'
 

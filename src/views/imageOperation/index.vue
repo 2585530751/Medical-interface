@@ -10,10 +10,11 @@ import navHeader from '@/layouts/components/imageOperation/header.vue'
 import navLeftSidebar from '@/layouts/components/imageOperation/leftSidebar.vue'
 import navRightSidebar from '@/layouts/components/imageOperation/rightSidebar.vue'
 import imageDisplay from '@/layouts/components/imageOperation/imageDisplay.vue'
+import stackImagesView from '@/layouts/components/imageOperation/stackImagesView.vue';
 </script>
 
 <template>
-  <div class="h-screen w-screen flex flex-col">
+  <div class="flex flex-col w-screen h-screen">
     <div class="w-full h-12">
       <nav-header></nav-header>
     </div>
@@ -27,7 +28,7 @@ import imageDisplay from '@/layouts/components/imageOperation/imageDisplay.vue'
           <splitpanes horizontal="horizontal">
             <pane dark:border-gray-700 dark:bg-gray-800 size="100">
               <span
-                ><div class="bg-origin-border bg-no-repeat bg-center bg-contain h-full w-full">
+                ><div class="w-full h-full bg-center bg-no-repeat bg-contain bg-origin-border">
                   <image-display></image-display>
                 </div>
               </span>
@@ -43,22 +44,22 @@ import imageDisplay from '@/layouts/components/imageOperation/imageDisplay.vue'
       </splitpanes>
     </div> -->
     <div class="grow">
-      <div class="h-full w-full flex flex-row gap-1">
+      <div class="flex flex-row w-full h-full gap-1">
         <div
-          class="z-10 flex-none border-r-2 border-t-2 border-b-0 border-l-0 border-solid dark:border-stone-900 border-stone-200"
+          class="z-10 flex-none border-t-2 border-b-0 border-l-0 border-r-2 border-solid dark:border-stone-900 border-stone-200"
         >
           <nav-left-sidebar></nav-left-sidebar>
         </div>
-        <div class="w-full border-r-2 border-t-2 border-b-0 border-l-2 border-solid dark:border-stone-900 border-stone-200">
-          <splitpanes class="default-theme h-full" horizontal>
-            <pane size="100"><image-display></image-display> </pane>
+        <div class="w-full border-t-2 border-b-0 border-l-2 border-r-2 border-solid dark:border-stone-900 border-stone-200">
+          <splitpanes class="h-full default-theme" horizontal>
+            <pane size="100"><stack-images-view></stack-images-view> </pane>
             <pane size="0">
               <span>2</span>
             </pane>
           </splitpanes>
         </div>
         <div
-          class=" overflow-y-auto overflow-x-hidden navHeight flex-none border-r-0 border-t-2 border-b-0 border-l-2 border-solid dark:border-stone-900 border-stone-200">
+          class="flex-none overflow-x-hidden overflow-y-auto border-t-2 border-b-0 border-l-2 border-r-0 border-solid  navHeight dark:border-stone-900 border-stone-200">
           <nav-right-sidebar></nav-right-sidebar>
         </div>
       </div>
