@@ -18,14 +18,14 @@ const imagesList = ref<UploadUserFile[]>([])
 const isShow = ref(true)
 const imagesInfo = reactive({
   patientName: '',
-  patientIdCards: '',
+  patientIdCardNumber: '',
   patientGender: '',
   patientWeight: '',
   patientAge: '',
-  imagesCheckPart: '',
-  imagesCheckTime: '',
-  imagesDescription: '',
-  imagingDevice: ''
+  imageCheckPart: '',
+  imageCheckTime: '',
+  imageDesc: '',
+  imageEquipment: ''
 })
 //hello
 const handleRemove = (file: UploadFile) => {
@@ -109,8 +109,8 @@ function submitFileForm() {
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="身份证号" prop="patientIdCards">
-              <el-input v-model="imagesInfo.patientIdCards" placeholder="请输入患者身份证号" />
+            <el-form-item label="身份证号" prop="patientIdCardNumber">
+              <el-input v-model="imagesInfo.patientIdCardNumber" placeholder="请输入患者身份证号" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -124,9 +124,9 @@ function submitFileForm() {
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="检查时间" prop="imagesCheckTime">
+            <el-form-item label="检查时间" prop="imageCheckTime">
               <el-date-picker
-                v-model="imagesInfo.imagesCheckTime"
+                v-model="imagesInfo.imageCheckTime"
                 type="date"
                 placeholder="请输入成像时间"
                 clearable
@@ -150,20 +150,20 @@ function submitFileForm() {
 
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="检查部位" prop="imagesCheckPart">
-              <el-input v-model="imagesInfo.imagesCheckPart" placeholder="请输入成像部位" />
+            <el-form-item label="检查部位" prop="imageCheckPart">
+              <el-input v-model="imagesInfo.imageCheckPart" placeholder="请输入成像部位" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="成像设备" prop="imagingDevice">
-              <el-input v-model="imagesInfo.imagingDevice" placeholder="请输入成像设备" />
+            <el-form-item label="成像设备" prop="imageEquipment">
+              <el-input v-model="imagesInfo.imageEquipment" placeholder="请输入成像设备" />
             </el-form-item>
           </el-col>
         </el-row>
 
-        <el-form-item label="图像描述" prop="imagesDescription">
+        <el-form-item label="图像描述" prop="imageDesc">
           <el-input
-            v-model="imagesInfo.imagesDescription"
+            v-model="imagesInfo.imageDesc"
             type="textarea"
             placeholder="请输入成像描述"
           />
