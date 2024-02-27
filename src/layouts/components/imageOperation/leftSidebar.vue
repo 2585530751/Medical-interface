@@ -24,7 +24,7 @@ var display = ref(true)
       </div>
 
       <div class="flex-none">
-        <el-button text type="small" @click="display = !display">
+        <el-button text size="small" @click="display = !display">
           <biTextIndentRight style="height: 25px; width: 25px"></biTextIndentRight>
         </el-button>
       </div>

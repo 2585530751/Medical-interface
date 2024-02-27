@@ -27,3 +27,4 @@ export const getImagePageByDoctorId = (data?: object) => {
     }
   )
 }
+

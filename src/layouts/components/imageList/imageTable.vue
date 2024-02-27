@@ -5,11 +5,15 @@ import editPen from '@iconify-icons/ep/edit-pen'
 import deleteUser from '@iconify-icons/ep/delete'
 import IonEllipsisHorizontal from '@/assets/svg/IonEllipsisHorizontal.svg?component'
 import { getImagePageByDoctorId } from '@/api/image'
+import router from '@/router'
+import { imageUrl } from '@/api/utils'
+import { useImageStateStore } from '@/store/imageState'
 
 defineProps<{
   tableSize: string
 }>()
 
+const imageStateStore = useImageStateStore()
 const tableRef = ref<TableInstance>()
 const tableData = reactive([
   {
@@ -217,22 +221,28 @@ async function getImagesListData() {
     .then((data) => {
       data = data.data
       if (data.records) {
-        console.log(data.records)
         let records = data.records
         records.forEach((item: any) => {
-          console.log(item)
-          item.image["singleImageList"]=item.singleImageList
+          item.image['singleImageList'] = item.singleImageList
           tableData.push(item.image)
         })
       }
     })
-    .catch((error) => {console.log(error)})
+    .catch((error) => {
+      console.log(error)
+    })
 }
 
 onMounted(async () => {
   await getImagesListData()
   console.log(tableRef.value)
 })
+function imageOperation(imageList:Object,imagesList:Object) {
+  imageStateStore.bindImageList(imageList)
+  imageStateStore.bindImagesList(imagesList)
+  imageStateStore.checkSingleImage=true
+  router.push('/imageOperation')
+}
 </script>
 
 <template>
@@ -251,8 +261,35 @@ onMounted(async () => {
           <div m="4">
             <h3>随访记录</h3>
             <el-table :data="props.row.singleImageList">
-              <el-table-column label="随访日期" prop="imageId" />
-              <el-table-column label="随访结果" prop="followUpResult" />
+              <el-table-column label="图片" width="150px">
+                <template #default="scope">
+                  <el-image :src="imageUrl+scope.row.singleImagePath" :crossorigin="'anonymous'"/>
+                </template>
+              </el-table-column>
+              <el-table-column label="图像ID" prop="imageId" />
+              <el-table-column label="图像名称" prop="singleImageName" />
+              <el-table-column fixed="right" label="操作" width="200">
+                <template #default="scope">
+                  <el-button link type="primary" size="small" @click="imageOperation(scope.row,props.row)" 
+                    ><template #icon>
+                      <IconifyIconOffline :icon="editPen"></IconifyIconOffline>
+                    </template>
+                    编辑</el-button
+                  >
+                  <el-popconfirm title="你确定要删除他吗?">
+                    <template #reference>
+                      <el-button link type="primary" size="small">
+                        <template #icon>
+                          <IconifyIconOffline :icon="deleteUser"></IconifyIconOffline>
+                        </template>
+                        删除</el-button
+                      >
+                    </template>
+                  </el-popconfirm>
+
+                  <el-button :icon="IonEllipsisHorizontal" link type="primary" />
+                </template>
+              </el-table-column>
             </el-table>
           </div>
         </template>

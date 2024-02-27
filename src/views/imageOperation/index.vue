@@ -11,6 +11,7 @@ import navLeftSidebar from '@/layouts/components/imageOperation/leftSidebar.vue'
 import navRightSidebar from '@/layouts/components/imageOperation/rightSidebar.vue'
 import imageDisplay from '@/layouts/components/imageOperation/imageDisplay.vue'
 import stackImagesView from '@/layouts/components/imageOperation/stackImagesView.vue';
+import pngjpgImageDisplay from '@/layouts/components/imageOperation/pngjpgImageDisplay.vue';
 </script>
 
 <template>
@@ -52,14 +53,14 @@ import stackImagesView from '@/layouts/components/imageOperation/stackImagesView
         </div>
         <div class="w-full border-t-2 border-b-0 border-l-2 border-r-2 border-solid dark:border-stone-900 border-stone-200">
           <splitpanes class="h-full default-theme" horizontal>
-            <pane size="100"><stack-images-view></stack-images-view> </pane>
+            <pane size="100"><pngjpgImageDisplay></pngjpgImageDisplay></pane>
             <pane size="0">
               <span>2</span>
             </pane>
           </splitpanes>
         </div>
         <div
-          class="flex-none overflow-x-hidden overflow-y-auto border-t-2 border-b-0 border-l-2 border-r-0 border-solid  navHeight dark:border-stone-900 border-stone-200">
+          class="flex-none overflow-x-hidden overflow-y-auto border-t-2 border-b-0 border-l-2 border-r-0 border-solid navHeight dark:border-stone-900 border-stone-200">
           <nav-right-sidebar></nav-right-sidebar>
         </div>
       </div>
