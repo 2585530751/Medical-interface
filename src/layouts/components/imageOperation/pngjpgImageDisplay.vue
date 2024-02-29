@@ -24,6 +24,10 @@ const imagesLists = reactive([])
 const imageIds: string[] = reactive([])
 if(imageStateStore.checkSingleImage) {
   imageIds.push(generateImageUrl(imageStateStore.imageList.singleImagePath))
+}else {
+  imageStateStore.imagesList.singleImageList.forEach((item: any) => {
+    imageIds.push(generateImageUrl(item.singleImagePath))
+  })
 }
 
 function generateImageUrl(imagePath:String){

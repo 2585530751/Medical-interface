@@ -10,6 +10,10 @@ import { message } from '@/utils/message'
 import type { UploadUserFile } from 'element-plus'
 import type { UploadInstance } from 'element-plus'
 import { uploadImages } from '@/api/image'
+import { useImageStateStore } from '@/store/imageState'
+
+const imageStateStore = useImageStateStore()
+
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
 const disabled = ref(false)
@@ -80,7 +84,8 @@ function submitFileForm() {
   uploadImages(formData)
     .then((res) => {
       if (res.success) {
-        message(res.msg, { type: 'success' })
+        imageStateStore.tableData.length = 0
+        imageStateStore.getImagesListData()
         emits('uploadWindowClose')
       } else {
         message(res.msg, { type: 'error' })
