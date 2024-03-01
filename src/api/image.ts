@@ -31,3 +31,4 @@ export const getImagePageByDoctorId = (data?: object) => {
 export const deleteSingleImageById = (params?: object) => {
   return http.request<any>('get', baseUrlApi('singleImage/deleteSingleImageById'), { params })
 }
+

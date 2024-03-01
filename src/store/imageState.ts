@@ -4,6 +4,18 @@ import * as cornerstoneTools from '@cornerstonejs/tools'
 import type { IToolGroup } from '@cornerstonejs/tools/src/types'
 import { getImagePageByDoctorId, deleteSingleImageById } from '@/api/image'
 import { message } from '@/utils/message'
+import {
+  RenderingEngine,
+  Enums,
+  imageLoader,
+  metaData,
+  getRenderingEngine,
+  volumeLoader,
+  BaseVolumeViewport,
+  VideoViewport,
+  StackViewport
+} from '@cornerstonejs/core'
+import type { IStackViewport } from '@cornerstonejs/core/src/types'
 
 const { Enums: csToolsEnums } = cornerstoneTools
 const { MouseBindings } = csToolsEnums
@@ -213,6 +225,10 @@ export const useImageStateStore = defineStore('imageState', () => {
     userId: 1
   })
   const checkSingleImage = ref(false)
+
+  const renderingEngine: Ref<RenderingEngine> = ref() as Ref<RenderingEngine>
+  const viewports: Ref<BaseVolumeViewport[]|IStackViewport[]|VideoViewport[]> = ref([]) as Ref<BaseVolumeViewport[]|IStackViewport[]|VideoViewport[]>
+
   const leftMouseActive = ref('')
   const toolGroup: Ref<IToolGroup> = ref() as Ref<IToolGroup>
 
@@ -271,6 +287,10 @@ export const useImageStateStore = defineStore('imageState', () => {
     leftMouseActive,
     toolGroup,
     checkSingleImage,
+
+    renderingEngine,
+    viewports,
+
     bindLeftMouse,
     bindImageList,
     bindImagesList,

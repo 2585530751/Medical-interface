@@ -42,7 +42,7 @@ import imageOperation from '@/components/ReButton/imageOperation.vue'
 
 import * as cornerstoneTools from '@cornerstonejs/tools'
 import { useImageStateStore } from '@/store/imageState'
-import { resetOriginal, flipH, resetPan, resetZoom, invert } from '@/composables/imageOperate'
+import { resetOriginal, flipH, resetPan, resetZoom, invert } from '@/composables/image/imageOperate'
 import { ref } from 'vue'
 
 const {
@@ -96,10 +96,10 @@ const annotationTools = ref(true)
 </script>
 
 <template>
-  <div class="divide-slate-400/50 divide-y-2 divide-x-0 divide-solid">
+  <div class="divide-x-0 divide-y-2 divide-slate-400/50 divide-solid">
     <div class="flex flex-wrap justify-between bg-stone-50 dark:border-gray-700 dark:bg-gray-800">
       <div class="flex items-center">
-        <p class="text-sm text-gray-600 ml-3 dark:text-white inline">序列间布局</p>
+        <p class="inline ml-3 text-sm text-gray-600 dark:text-white">序列间布局</p>
         <el-dropdown trigger="click">
           <el-button text size="small">
             <IconifyIconOffline
@@ -120,7 +120,7 @@ const annotationTools = ref(true)
         </el-dropdown>
       </div>
       <div class="flex items-center">
-        <p class="text-sm text-gray-600 dark:text-white inline ml-3">序列内布局</p>
+        <p class="inline ml-3 text-sm text-gray-600 dark:text-white">序列内布局</p>
         <el-dropdown trigger="click">
           <el-button text size="small">
             <IconifyIconOffline
@@ -143,7 +143,7 @@ const annotationTools = ref(true)
     </div>
     <div class="flex flex-wrap justify-between bg-stone-50 dark:border-gray-700 dark:bg-gray-800">
       <div class="flex items-center">
-        <p class="text-sm text-gray-600 ml-3 dark:text-white inline">预设窗位值</p>
+        <p class="inline ml-3 text-sm text-gray-600 dark:text-white">预设窗位值</p>
         <el-dropdown trigger="click">
           <el-button text size="small">
             <IconifyIconOffline
@@ -164,7 +164,7 @@ const annotationTools = ref(true)
         </el-dropdown>
       </div>
       <div class="flex items-center">
-        <p class="text-sm text-gray-600 dark:text-white inline ml-3">伪彩色方案</p>
+        <p class="inline ml-3 text-sm text-gray-600 dark:text-white">伪彩色方案</p>
         <el-dropdown trigger="click">
           <el-button text size="small">
             <IconifyIconOffline
@@ -185,9 +185,9 @@ const annotationTools = ref(true)
         </el-dropdown>
       </div>
     </div>
-    <div class="p-2 bg-stone-50 dark:border-gray-700 dark:bg-gray-800  ">
-      <div class="flex pl-2 items-center justify-between h-5 py-1 rounded-md bg-gray-100 dark:bg-gray-700 ">
-        <a class="text- text-gray-600 dark:text-white inline tracking-widest">操作工具</a>
+    <div class="p-2 bg-stone-50 dark:border-gray-700 dark:bg-gray-800 ">
+      <div class="flex items-center justify-between h-5 py-1 pl-2 bg-gray-100 rounded-md dark:bg-gray-700 ">
+        <a class="inline tracking-widest text-gray-600 text- dark:text-white">操作工具</a>
         <el-button text size="small" @click="operateTools = !operateTools">
           <IconifyIconOffline
             class="hover:text-blue-500"
@@ -212,24 +212,24 @@ const annotationTools = ref(true)
         <imageOperation operation="移动" @click="imageStateStore.bindLeftMouse(PanTool.toolName)">
           <dragOutlined style="height: 30px; width: 30px"></dragOutlined>
         </imageOperation>
-        <div class="w-14 h-16 flex items-center rounded-lg bg-gray-100 dark:bg-gray-700">
+        <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
           <div
-            class="cursor-pointer rounded-sm w-10 h-16 justify-center flex-col items-center flex hover:bg-gray-300 dark:hover:bg-cyan-900"
+            class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
             @click="imageStateStore.bindLeftMouse(ZoomTool.toolName)"
           >
             <zoom style="height: 30px; width: 30px"></zoom>
-            <span class="text-gray-500 text-sm dark:text-white">缩放</span>
+            <span class="text-sm text-gray-500 dark:text-white">缩放</span>
           </div>
-          <div class="flex h-full items-center flex-col font-extrabold text-lg">
+          <div class="flex flex-col items-center h-full text-lg font-extrabold">
             <div
               style="border-left-width: 1px; border-bottom-width: 1px"
-              class="w-full border-slate-300 border-0 border-solid flex h-8 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
+              class="flex w-full h-8 border-0 border-solid rounded-sm cursor-pointer border-slate-300 hover:bg-gray-300 dark:hover:bg-cyan-900"
             >
               <a class="self-center">+</a>
             </div>
             <div
               style="border-left-width: 1px; border-top-width: 1px"
-              class="w-full border-slate-300 border-0 border-solid flex justify-center h-8 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
+              class="flex justify-center w-full h-8 border-0 border-solid rounded-sm cursor-pointer border-slate-300 hover:bg-gray-300 dark:hover:bg-cyan-900"
             >
               <a class="self-center">-</a>
             </div>
@@ -253,16 +253,16 @@ const annotationTools = ref(true)
         <imageOperation operation="三维">
           <cube3d style="height: 30px; width: 30px"></cube3d>
         </imageOperation>
-        <div class="w-14 h-16 flex items-center rounded-lg bg-gray-100 dark:bg-gray-700">
+        <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
           <div
-            class="cursor-pointer rounded-sm w-10 h-16 justify-center flex-col items-center flex hover:bg-gray-300 dark:hover:bg-cyan-900"
+            class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
           >
             <layer style="height: 30px; width: 30px"></layer>
-            <span class="text-gray-500 text-sm dark:text-white">融合</span>
+            <span class="text-sm text-gray-500 dark:text-white">融合</span>
           </div>
           <div
             style="border-left-width: 1px"
-            class="flex h-full items-center font-extrabold text-lg hover:bg-gray-300 border-slate-300 border-0 border-solid cursor-pointer rounded-sm"
+            class="flex items-center h-full text-lg font-extrabold border-0 border-solid rounded-sm cursor-pointer hover:bg-gray-300 border-slate-300"
           >
             <el-dropdown trigger="click">
               <IconifyIconOffline
@@ -290,17 +290,17 @@ const annotationTools = ref(true)
         <imageOperation operation="会诊">
           <diagnosisOutline style="height: 30px; width: 30px"></diagnosisOutline>
         </imageOperation>
-        <div class="w-14 h-16 flex items-center rounded-lg bg-gray-100 dark:bg-gray-700">
+        <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
           <div
-            class="cursor-pointer rounded-sm w-10 h-16 justify-center flex-col items-center flex hover:bg-gray-300 dark:hover:bg-cyan-900"
+            class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
             @click="resetOriginal('firstRenderingEngine', 'CT_SAGITTAL_STACK')"
           >
             <resetWrench style="height: 30px; width: 30px"></resetWrench>
-            <span class="text-gray-500 text-sm dark:text-white">重置</span>
+            <span class="text-sm text-gray-500 dark:text-white">重置</span>
           </div>
           <div
             style="border-left-width: 1px"
-            class="flex h-full items-center font-extrabold text-lg hover:bg-gray-300 border-slate-300 border-0 border-solid cursor-pointer rounded-sm"
+            class="flex items-center h-full text-lg font-extrabold border-0 border-solid rounded-sm cursor-pointer hover:bg-gray-300 border-slate-300"
           >
             <el-dropdown trigger="click">
               <IconifyIconOffline
@@ -330,7 +330,7 @@ const annotationTools = ref(true)
     </div>
 
     <div
-      class="flex justify-center items-center bg-stone-50 dark:border-gray-700 dark:bg-gray-800 h-10"
+      class="flex items-center justify-center h-10 bg-stone-50 dark:border-gray-700 dark:bg-gray-800"
     >
       <el-button-group>
         <el-button text size="small"
@@ -344,8 +344,8 @@ const annotationTools = ref(true)
         ></el-button>
       </el-button-group>
       <el-dropdown>
-        <div class="bg-stone-200 flex justify-center items-center rounded-md w-20 dark:bg-gray-700">
-          <span class="h-6 flex justify-center items-center">默认速度</span>
+        <div class="flex items-center justify-center w-20 rounded-md bg-stone-200 dark:bg-gray-700">
+          <span class="flex items-center justify-center h-6">默认速度</span>
           <IconifyIconOffline
             class="hover:text-blue-500"
             :icon="arrowDown"
@@ -367,8 +367,8 @@ const annotationTools = ref(true)
     <div
       class="p-2 bg-stone-50 dark:border-gray-700 dark:bg-gray-800 "
     >
-      <div class="flex pl-2 items-center justify-between h-5 py-1 rounded-md bg-gray-100 dark:bg-gray-700 ">
-        <a class="text-base text-gray-600 dark:text-white inline tracking-widest">注释工具</a>
+      <div class="flex items-center justify-between h-5 py-1 pl-2 bg-gray-100 rounded-md dark:bg-gray-700 ">
+        <a class="inline text-base tracking-widest text-gray-600 dark:text-white">注释工具</a>
         <el-button text size="small" @click="annotationTools = !annotationTools">
           <IconifyIconOffline
             class="hover:text-blue-500"
@@ -455,8 +455,8 @@ const annotationTools = ref(true)
     <div
       class="p-2 bg-stone-50 dark:bg-gray-800 "
     >
-      <div class="flex pl-2 items-center justify-between h-5 py-1 rounded-md bg-gray-100 dark:bg-gray-700 ">
-        <a class="text-base text-gray-600 dark:text-white inline tracking-widest">分割工具</a>
+      <div class="flex items-center justify-between h-5 py-1 pl-2 bg-gray-100 rounded-md dark:bg-gray-700 ">
+        <a class="inline text-base tracking-widest text-gray-600 dark:text-white">分割工具</a>
 
         <el-button text size="small" @click="segmentationTools = !segmentationTools">
           <IconifyIconOffline

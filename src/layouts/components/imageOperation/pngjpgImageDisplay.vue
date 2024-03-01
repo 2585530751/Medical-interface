@@ -17,22 +17,22 @@ import createTools from '@/composables/toolsManage'
 import hardcodedMetaDataProvider from '@/utils/helpers//hardcodedMetaDataProvider'
 import registerWebImageLoader from '@/utils/helpers/registerWebImageLoader'
 import { useImageStateStore } from '@/store/imageState'
-import { imageUrl } from '@/api/utils'
+import { generateImageUrl } from '@/composables/image/utils'
+import {imageKeyValueStore} from '@/composables/image/imageKeyValueStore'
 
 const imageStateStore = useImageStateStore()
 const imagesLists = reactive([])
 const imageIds: string[] = reactive([])
-if(imageStateStore.checkSingleImage) {
+if (imageStateStore.checkSingleImage) {
   imageIds.push(generateImageUrl(imageStateStore.imageList.singleImagePath))
-}else {
+} else {
   imageStateStore.imagesList.singleImageList.forEach((item: any) => {
-    imageIds.push(generateImageUrl(item.singleImagePath))
+    const temporarySingleImagePath = generateImageUrl(item.singleImagePath)
+    imageKeyValueStore.set(temporarySingleImagePath,item)
+    imageIds.push(temporarySingleImagePath)
   })
 }
 
-function generateImageUrl(imagePath:String){
-  return 'web:'+imageUrl+imagePath
-}
 onMounted(async () => {
   const element: HTMLDivElement = document.getElementById('cornerstone-element') as HTMLDivElement
   // Disable right click context menu so we can have right click tools
@@ -60,14 +60,32 @@ onMounted(async () => {
   renderingEngine.setViewports(viewportInputArray)
 
   // render stack viewport
-  renderingEngine.getStackViewports()[0].setStack(imageIds)
+  const stackViewports = renderingEngine.getStackViewports()[0]
+  stackViewports.setStack(imageIds)
+  // renderingEngine.getStackViewports()[0].setStack(imageIds)
 
-  // render volume viewports
-  renderingEngine.render()
-  
+  // // render volume viewports
+  // renderingEngine.render()
+  stackViewports.render()
   createTools(viewportId, renderingEngineId, 'firstGroupToolsId')
-})
 
+  window.addEventListener('resize', () => {
+    renderingEngine.resize(true, true)
+  })
+
+  // 创建一个新的 ResizeObserver 实例
+  let ro = new ResizeObserver((entries) => {
+    setTimeout(() => {  
+      stackViewports.resize()
+    renderingEngine.resize(true, true);  
+  }, 100); // 延迟1000毫秒后调用  
+  })
+  ro.observe(element)
+
+  imageStateStore.renderingEngine = renderingEngine
+  imageStateStore.viewports[0] = stackViewports
+  console.log(imageStateStore.viewports[0])
+})
 </script>
 
 <template>
