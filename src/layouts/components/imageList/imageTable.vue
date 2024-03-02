@@ -151,7 +151,7 @@ function imageDelete(imageId: number) {
       <el-table-column label="检查部位" prop="imageCheckPart" />
       <el-table-column label="成像设备" prop="imageEquipment" />
       <el-table-column label="图像描述" prop="imageDesc" />
-      <el-table-column label="序列数量" prop="imagesCount" />
+      <el-table-column label="序列数量" prop="imageCount" />
       <el-table-column label="上传医生" prop="creatorName" />
       <el-table-column label="上传时间" prop="createTime" />
       <el-table-column fixed="right" label="操作" width="200">

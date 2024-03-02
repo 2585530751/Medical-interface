@@ -16,20 +16,59 @@ import {
   StackViewport
 } from '@cornerstonejs/core'
 import type { IStackViewport } from '@cornerstonejs/core/src/types'
+import { formatDate } from '@/composables/image/utils'
 
 const { Enums: csToolsEnums } = cornerstoneTools
 const { MouseBindings } = csToolsEnums
 
 export const useImageStateStore = defineStore('imageState', () => {
-  let imageList = reactive({ singleImageId: '', singleImagePath: '' })
-  let imagesList = reactive({singleImageList: []})
+  let imageList = reactive<SingleImage>({
+    imageId: 0,
+    isDeleted: 0,
+    operateId: 0,
+    operateName: '',
+    operateTime: '', // ISO 8601 日期字符串
+    patientId: 0,
+    patientName: '',
+    singleImageCheckPart: '',
+    singleImageCheckTime: '', // ISO 8601 日期字符串
+    singleImageDesc: '',
+    singleImageEquipment: '',
+    singleImageFormat: '',
+    singleImageId: 0,
+    singleImageRel: 0,
+    singleImageName: '',
+    singleImagePath: '',
+    status: 0,
+    type: ''
+  })
+  let imagesList = reactive<ImageInfo>({
+    creatorId: 0,
+    creatorName: '',
+    createTime: '', // ISO 8601 日期字符串
+    imageCheckTime: '', // ISO 8601 日期字符串
+    imageCount: 0, // 假设这是一个数字，如果后端返回的是字符串，则保持为string
+    imageCheckPart: '',
+    imageDesc: '',
+    imageEquipment: '',
+    imageId: 0,
+    imageName: '',
+    imagePath: '',
+    imageStatus: '',
+    isDeleted: 0,
+    patientId: 0,
+    patientName: '',
+    imageFormat: '',
+    singleImageList: [],
+    
+  })
   const tableData = reactive([
     {
       creatorId: 2,
       creatorName: '王老八',
       createTime: '2023-09-03',
       imageCheckTime: '2023-05-03',
-      imagesCount: '32',
+      imageCount: '32',
       imageCheckPart: '肺部',
       imageDesc: '疑似肺部肿瘤',
       imageEquipment: 'CT',
@@ -96,7 +135,7 @@ export const useImageStateStore = defineStore('imageState', () => {
       imageCheckPart: '胸部',
       imageEquipment: 'CT',
       imageDesc: '疑似肿瘤',
-      imagesCount: 32,
+      imageCount: 32,
       creatorId: 1,
       creatorName: '医生1',
       createTime: '2023-09-03'
@@ -109,7 +148,7 @@ export const useImageStateStore = defineStore('imageState', () => {
       imageCheckPart: '头部',
       imageEquipment: 'MRI',
       imageDesc: '疑似炎症',
-      imagesCount: 45,
+      imageCount: 45,
       creatorId: 2,
       creatorName: '医生2',
       createTime: '2023-09-03'
@@ -122,7 +161,7 @@ export const useImageStateStore = defineStore('imageState', () => {
       imageCheckPart: '四肢',
       imageEquipment: 'X射线',
       imageDesc: '疑似损伤',
-      imagesCount: 27,
+      imageCount: 27,
       creatorId: 3,
       creatorName: '医生3',
       createTime: '2023-09-03'
@@ -135,7 +174,7 @@ export const useImageStateStore = defineStore('imageState', () => {
       imageCheckPart: '全身',
       imageEquipment: '超声波',
       imageDesc: '疑似结石',
-      imagesCount: 18,
+      imageCount: 18,
       creatorId: 4,
       creatorName: '医生4',
       createTime: '2023-09-03'
@@ -148,7 +187,7 @@ export const useImageStateStore = defineStore('imageState', () => {
       imageCheckPart: '颈部',
       imageEquipment: 'CT',
       imageDesc: '疑似畸形',
-      imagesCount: 50,
+      imageCount: 50,
       creatorId: 5,
       creatorName: '医生5',
       createTime: '2023-09-03'
@@ -161,7 +200,7 @@ export const useImageStateStore = defineStore('imageState', () => {
       imageCheckPart: '腹部',
       imageEquipment: 'MRI',
       imageDesc: '疑似炎症',
-      imagesCount: 36,
+      imageCount: 36,
       creatorId: 6,
       creatorName: '医生6',
       createTime: '2023-09-03'
@@ -174,7 +213,7 @@ export const useImageStateStore = defineStore('imageState', () => {
       imageCheckPart: '骨盆',
       imageEquipment: 'X射线',
       imageDesc: '疑似损伤',
-      imagesCount: 22,
+      imageCount: 22,
       creatorId: 7,
       creatorName: '医生7',
       createTime: '2023-09-03'
@@ -187,7 +226,7 @@ export const useImageStateStore = defineStore('imageState', () => {
       imageCheckPart: '头部',
       imageEquipment: '超声波',
       imageDesc: '疑似肿瘤',
-      imagesCount: 15,
+      imageCount: 15,
       creatorId: 8,
       creatorName: '医生8',
       createTime: '2023-09-03'
@@ -200,7 +239,7 @@ export const useImageStateStore = defineStore('imageState', () => {
       imageCheckPart: '颈部',
       imageEquipment: 'CT',
       imageDesc: '疑似结石',
-      imagesCount: 40,
+      imageCount: 40,
       creatorId: 9,
       creatorName: '医生9',
       createTime: '2023-09-03'
@@ -213,7 +252,7 @@ export const useImageStateStore = defineStore('imageState', () => {
       imageCheckPart: '腰部',
       imageEquipment: 'MRI',
       imageDesc: '疑似畸形',
-      imagesCount: 28,
+      imageCount: 28,
       creatorId: 10,
       creatorName: '医生10',
       createTime: '2023-09-03'
@@ -227,7 +266,9 @@ export const useImageStateStore = defineStore('imageState', () => {
   const checkSingleImage = ref(false)
 
   const renderingEngine: Ref<RenderingEngine> = ref() as Ref<RenderingEngine>
-  const viewports: Ref<BaseVolumeViewport[]|IStackViewport[]|VideoViewport[]> = ref([]) as Ref<BaseVolumeViewport[]|IStackViewport[]|VideoViewport[]>
+  const viewports: Ref<BaseVolumeViewport[] | IStackViewport[] | VideoViewport[]> = ref([]) as Ref<
+    BaseVolumeViewport[] | IStackViewport[] | VideoViewport[]
+  >
 
   const leftMouseActive = ref('')
   const toolGroup: Ref<IToolGroup> = ref() as Ref<IToolGroup>
@@ -248,16 +289,17 @@ export const useImageStateStore = defineStore('imageState', () => {
   function bindImageList(imageObject: Record<string, any>) {
     // 遍历普通对象，并将值复制到响应式对象中
     Object.keys(imageObject).forEach((key) => {
-      imageList[key as keyof typeof imageList] = imageObject[key]
+      (imageList as Record<string, any>)[key as keyof typeof imageList] = imageObject[key]
     })
-    console.log(imageList)
+    
   }
 
   function bindImagesList(imagesObject: Record<string, any>) {
     // 遍历普通对象，并将值复制到响应式对象中
     Object.keys(imagesObject).forEach((key) => {
-      imagesList[key as keyof typeof imagesList] = imagesObject[key]
+      (imagesList as Record<string, any>)[key as keyof typeof imagesList] = imagesObject[key]
     })
+    console.log(imagesList)
   }
 
   async function getImagesListData() {
@@ -269,8 +311,15 @@ export const useImageStateStore = defineStore('imageState', () => {
             let records = data.records
             records.forEach((item: any) => {
               item.image['singleImageList'] = item.singleImageList
+              if (item.image.imageCheckTime) {
+                item.image.imageCheckTime = formatDate(new Date(item.image.imageCheckTime))
+              }
+              if (item.image.createTime) {
+                item.image.createTime = formatDate(new Date(item.image.createTime))
+              }
               tableData.push(item.image)
             })
+            console.log(records)
           }
         } else {
           message(res.msg, { type: 'error' })

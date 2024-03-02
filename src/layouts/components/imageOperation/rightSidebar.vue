@@ -5,7 +5,7 @@ import algorithmModel from '@/layouts/components/imageOperation/algorithmModel.v
 import { ref, shallowRef } from 'vue'
 import arrowLeft from '@iconify-icons/ep/arrow-left'
 
-var currentComp = ref(commonTools)
+var currentComp = shallowRef(commonTools)
 var display = ref(true)
 
 function changeCurrentComp(comp: any): void {

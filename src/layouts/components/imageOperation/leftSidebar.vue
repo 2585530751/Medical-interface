@@ -5,9 +5,13 @@ import folder from '@iconify-icons/ep/folder'
 import type { IconifyIconOffline } from '@/components/ReIcon'
 import arrowRight from '@iconify-icons/ep/arrow-right'
 import { ref } from 'vue';
+import imagesListDisplay from '@/components/ReImage/imagesListDisplay.vue'
+import { useImageStateStore } from '@/store/imageState'
+
 defineOptions({
   name: ''
 })
+const imagesList = useImageStateStore().imagesList
 var display = ref(true)
 </script>
 
@@ -141,7 +145,7 @@ var display = ref(true)
             </div>
           </div>
         </div>
-        
+        <imagesListDisplay :imagesList="imagesList"></imagesListDisplay>
       </div>
       
     </div>

@@ -156,7 +156,7 @@ async function createTools(
 
   // Add the tools to the tool group
   toolGroup.addTool(AnnotationDisplayTool.toolName)
-  toolGroup.addTool(ReferenceCursors.toolName)
+  // toolGroup.addTool(ReferenceCursors.toolName)
   toolGroup.addTool(ReferenceLines.toolName)
   // toolGroup.addTool(ScaleOverlayTool.toolName);
 
@@ -223,7 +223,7 @@ async function createTools(
   })
 
   toolGroup.setToolPassive(AnnotationDisplayTool.toolName)
-  toolGroup.setToolPassive(ReferenceCursors.toolName)
+  // toolGroup.setToolPassive(ReferenceCursors.toolName)
   toolGroup.setToolPassive(ReferenceLines.toolName)
   // toolGroup.setToolPassive(ScaleOverlayTool.toolName);
   // Set the initial state of the tools, here we set one tool active on left click.
