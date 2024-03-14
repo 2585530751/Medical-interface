@@ -4,6 +4,12 @@ declare module '*.vue' {
   export default componentOptions
 }
 
+declare module '*.svg?component' {
+  import { FunctionalComponent, SVGAttributes } from 'vue'
+  const src: FunctionalComponent<SVGAttributes>
+  export default src
+}
+
 declare module '@cornerstonejs/dicom-image-loader'
 interface RouteConfigsTable {
   /** 路由地址 `必填` */

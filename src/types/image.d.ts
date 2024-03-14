@@ -1,3 +1,6 @@
+import type image from "@/router/modules/image"
+import type { Interface } from "readline"
+
 interface SingleImage {
   imageId: number
   isDeleted: number // 通常，布尔值使用boolean类型，但如果你的后端返回的是0和1，也可以保持为number
@@ -37,4 +40,9 @@ interface ImageInfo {
   patientId: number
   patientName: string
   singleImageList: SingleImage[] // 如果singleImageList是一个包含相同结构对象的数组，则定义其类型
+}
+
+interface ImageInfoWindows{
+  imageInfo: ImageInfo,
+  singleImage: SingleImage
 }

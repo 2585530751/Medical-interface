@@ -4,6 +4,9 @@ import * as cornerstoneTools from '@cornerstonejs/tools'
 import type { IToolGroup } from '@cornerstonejs/tools/src/types'
 import { getImagePageByDoctorId, deleteSingleImageById } from '@/api/image'
 import { message } from '@/utils/message'
+import { storageSession } from '@pureadmin/utils'
+import { imagesListsSession, imagesListWindowsSession } from '@/composables/image/utils'
+
 import {
   RenderingEngine,
   Enums,
@@ -17,12 +20,18 @@ import {
 } from '@cornerstonejs/core'
 import type { IStackViewport } from '@cornerstonejs/core/src/types'
 import { formatDate } from '@/composables/image/utils'
+import type { ImageInfo, ImageInfoWindows, SingleImage } from '@/types/image'
+import { initDemo } from '@/utils/helpers/index.js'
+import createTools from '@/composables/toolsManage'
+import { utilities as csUtils } from '@cornerstonejs/core'
+import {type ViewportColorbar} from '@cornerstonejs/tools/src/utilities/voi/colorbar/ViewportColorbar'
 
 const { Enums: csToolsEnums } = cornerstoneTools
 const { MouseBindings } = csToolsEnums
+await initDemo()
 
 export const useImageStateStore = defineStore('imageState', () => {
-  let imageList = reactive<SingleImage>({
+  const imageList = reactive<SingleImage>({
     imageId: 0,
     isDeleted: 0,
     operateId: 0,
@@ -42,7 +51,7 @@ export const useImageStateStore = defineStore('imageState', () => {
     status: 0,
     type: ''
   })
-  let imagesList = reactive<ImageInfo>({
+  const imagesList = reactive<ImageInfo>({
     creatorId: 0,
     creatorName: '',
     createTime: '', // ISO 8601 日期字符串
@@ -59,9 +68,19 @@ export const useImageStateStore = defineStore('imageState', () => {
     patientId: 0,
     patientName: '',
     imageFormat: '',
-    singleImageList: [],
-    
+    singleImageList: []
   })
+  const imagesLists = reactive<ImageInfo[]>(
+    storageSession().getItem<ImageInfo[]>(imagesListsSession)
+      ? storageSession().getItem<ImageInfo[]>(imagesListsSession)
+      : []
+  )
+  const imagesListWindows = reactive<(0 | ImageInfoWindows)[]>(
+    storageSession().getItem<(0 | ImageInfoWindows)[]>(imagesListWindowsSession)
+      ? storageSession().getItem<(0 | ImageInfoWindows)[]>(imagesListWindowsSession)
+      : [0, 0, 0, 0, 0, 0, 0, 0, 0]
+  )
+
   const tableData = reactive([
     {
       creatorId: 2,
@@ -81,30 +100,6 @@ export const useImageStateStore = defineStore('imageState', () => {
       patientId: 4,
       patientName: '王老五',
       singleImageList: [
-        // {
-        //   imageId: 1,
-        //   imageIndex: 1,
-        //   imagePath: 'src/assets/dicom/1-01.dcm',
-        //   imageWidth: 512,
-        //   imageHeight: 512,
-        //   imagePixelSpacing: 0.5,
-        //   imageSliceThickness: 1,
-        //   imageSliceLocation: 0,
-        //   imageWindowWidth: 400,
-        //   imageWindowCenter: 40,
-        //   imageMinGray: 0,
-        //   imageMaxGray: 255,
-        //   imageBitsAllocated: 8,
-        //   imageBitsStored: 8,
-        //   imageHighBit: 7,
-        //   imagePhotometricInterpretation: 'MONOCHROME2',
-        //   imagePixelRepresentation: 0,
-        //   imagePlanarConfiguration: 0,
-        //   imageSamplesPerPixel: 1,
-        //   imagePixelData: 'base64',
-        //   imageTransferSyntaxUID: '1.2.840.10008.1.2.1',
-        //   imageSOPClassUID: '1.2.840.10008'
-        // },
         {
           imageId: 2,
           isDeleted: 0,
@@ -263,15 +258,23 @@ export const useImageStateStore = defineStore('imageState', () => {
     pageSize: 10,
     userId: 1
   })
-  const checkSingleImage = ref(false)
+  const windowRowsColumns = reactive({ rows: 1, columns: 1 })
 
-  const renderingEngine: Ref<RenderingEngine> = ref() as Ref<RenderingEngine>
+  const renderingEngine: Ref<RenderingEngine> = ref(
+    new RenderingEngine('stackRenderingEngine')
+  ) as Ref<RenderingEngine>
   const viewports: Ref<BaseVolumeViewport[] | IStackViewport[] | VideoViewport[]> = ref([]) as Ref<
     BaseVolumeViewport[] | IStackViewport[] | VideoViewport[]
   >
+  const viewportColorbar: Ref<ViewportColorbar[]> = ref([])
 
-  const leftMouseActive = ref('')
-  const toolGroup: Ref<IToolGroup> = ref() as Ref<IToolGroup>
+  const leftMouseActive: Ref<string> = ref('')
+  const toolGroup: Ref<IToolGroup> = ref(
+    cornerstoneTools.ToolGroupManager.createToolGroup('GroupToolsId') as unknown as IToolGroup
+  ) as Ref<IToolGroup>
+
+  const selectImagesList = ref()
+  const selectImagesListWindows = ref(0)
 
   function bindLeftMouse(newLeftMouseActive: string) {
     toolGroup!.value.setToolPassive(leftMouseActive.value)
@@ -283,23 +286,31 @@ export const useImageStateStore = defineStore('imageState', () => {
         }
       ]
     })
-    console.log(leftMouseActive.value)
   }
 
   function bindImageList(imageObject: Record<string, any>) {
     // 遍历普通对象，并将值复制到响应式对象中
     Object.keys(imageObject).forEach((key) => {
-      (imageList as Record<string, any>)[key as keyof typeof imageList] = imageObject[key]
+      ;(imageList as Record<string, any>)[key as keyof typeof imageList] = imageObject[key]
     })
-    
   }
 
   function bindImagesList(imagesObject: Record<string, any>) {
     // 遍历普通对象，并将值复制到响应式对象中
     Object.keys(imagesObject).forEach((key) => {
-      (imagesList as Record<string, any>)[key as keyof typeof imagesList] = imagesObject[key]
+      ;(imagesList as Record<string, any>)[key as keyof typeof imagesList] = imagesObject[key]
     })
-    console.log(imagesList)
+  }
+
+  function pushImagesList(imagesList: ImageInfo) {
+    let existingElement = imagesLists.find((element) => element.imageId === imagesList.imageId)
+    if (existingElement) {
+      const index = imagesLists.indexOf(existingElement)
+      imagesLists.splice(index, 1)
+      imagesLists.push(imagesList)
+    } else {
+      imagesLists.push(imagesList)
+    }
   }
 
   async function getImagesListData() {
@@ -332,17 +343,25 @@ export const useImageStateStore = defineStore('imageState', () => {
   return {
     imageList,
     imagesList,
+    imagesLists,
+    imagesListWindows,
+
     tableData,
     leftMouseActive,
     toolGroup,
-    checkSingleImage,
+    selectImagesList,
+    selectImagesListWindows,
+
+    windowRowsColumns,
 
     renderingEngine,
     viewports,
+    viewportColorbar,
 
     bindLeftMouse,
     bindImageList,
     bindImagesList,
-    getImagesListData
+    getImagesListData,
+    pushImagesList
   }
 })

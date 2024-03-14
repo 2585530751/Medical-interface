@@ -3,9 +3,9 @@ defineOptions({
   name: ''
 })
 import { reactive, ref, watch } from 'vue'
-import { Delete, ZoomIn } from '@element-plus/icons-vue'
+import { Delete, ZoomIn, Download } from '@element-plus/icons-vue'
 import { UploadFilled } from '@element-plus/icons-vue'
-import {  type UploadFile } from 'element-plus'
+import { type UploadFile } from 'element-plus'
 import { message } from '@/utils/message'
 import type { UploadUserFile } from 'element-plus'
 import type { UploadInstance } from 'element-plus'
@@ -95,6 +95,15 @@ function submitFileForm() {
       message(error, { type: 'error' })
     })
 }
+
+function handleDownload(file: UploadFile) {
+  console.log('file', file)
+  var link = document.createElement('a') //定义一个a标签
+  link.download = file.name //下载后的文件名称
+  link.href = file.url ?? '' //需要生成一个 URL 来实现下载
+  link.click() //模拟在按钮上实现一次鼠标点击
+  window.URL.revokeObjectURL(link.href)
+}
 </script>
 
 <template>
@@ -167,11 +176,7 @@ function submitFileForm() {
         </el-row>
 
         <el-form-item label="图像描述" prop="imageDesc">
-          <el-input
-            v-model="imagesInfo.imageDesc"
-            type="textarea"
-            placeholder="请输入成像描述"
-          />
+          <el-input v-model="imagesInfo.imageDesc" type="textarea" placeholder="请输入成像描述" />
         </el-form-item>
       </el-form>
     </div>
@@ -192,11 +197,19 @@ function submitFileForm() {
           <div class="el-upload__tip">jpg/png files with a size less than 500kb</div>
         </template>
         <template #file="{ file }">
-          <div>
-            <img class="el-upload-list__item-thumbnail" :src="file.url" alt="" />
+          <div @click="console.log(file.raw)">
+            <img class="el-upload-list__item-thumbnail" :src="file.url" :alt="file.name" v-show="!file.name.endsWith('dcm')"/>
+            <div class="text-lg text-justify pt-14 ">{{ file.name }}</div>
             <span class="el-upload-list__item-actions">
-              <span class="el-upload-list__item-preview" @click="handlePictureCardPreview(file)">
+              <span class="el-upload-list__item-preview" v-show="!file.name.endsWith('dcm')" @click="handlePictureCardPreview(file)">
                 <el-icon><zoom-in /></el-icon>
+              </span>
+              <span
+                v-if="!disabled"
+                class="el-upload-list__item-delete"
+                @click="handleDownload(file)"
+              >
+                <el-icon><Download /></el-icon>
               </span>
               <span
                 v-if="!disabled"

@@ -32,3 +32,6 @@ export const deleteSingleImageById = (params?: object) => {
   return http.request<any>('get', baseUrlApi('singleImage/deleteSingleImageById'), { params })
 }
 
+export const singleImageSegmentationOfThyroidNodulesApi = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('modelApi/singleSegment'), { params })
+}

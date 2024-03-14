@@ -11,8 +11,11 @@ import { useImageStateStore } from '@/store/imageState'
 defineOptions({
   name: ''
 })
-const imagesList = useImageStateStore().imagesList
+const imageStateStore = useImageStateStore()
+const imagesList = imageStateStore.imagesList
+const imagesLists = imageStateStore.imagesLists
 var display = ref(true)
+console.log(imageStateStore.imagesLists)
 </script>
 
 <template>
@@ -145,7 +148,8 @@ var display = ref(true)
             </div>
           </div>
         </div>
-        <imagesListDisplay :imagesList="imagesList"></imagesListDisplay>
+        <!-- <imagesListDisplay :imagesList="imagesList"></imagesListDisplay> -->
+        <imagesListDisplay v-for="(item,index) in imagesLists" :imagesList="item" :key="index" :index="index"></imagesListDisplay>
       </div>
       
     </div>

@@ -8,6 +8,9 @@ import { getImagePageByDoctorId, deleteSingleImageById } from '@/api/image'
 import router from '@/router'
 import { imageUrl } from '@/api/utils'
 import { useImageStateStore } from '@/store/imageState'
+import { changeImagesListWindowsToSession, pushImageListToSession } from '@/composables/image/utils'
+import type { ImageInfo, ImageInfoWindows, SingleImage } from '@/types/image'
+import imageDicom from '@/components/ReImage/imageDicom.vue'
 
 defineProps<{
   tableSize: string
@@ -17,26 +20,38 @@ const imageStateStore = useImageStateStore()
 imageStateStore.getImagesListData()
 const tableRef = ref<TableInstance>()
 
-onMounted(async () => {
-  
-})
-function imageOperation(imageList: Object, imagesList: Object) {
+onMounted(async () => {})
+function imageOperation(imageList: SingleImage, imagesList: ImageInfo) {
   imageStateStore.bindImageList(imageList)
   imageStateStore.bindImagesList(imagesList)
-  imageStateStore.checkSingleImage = true
+  imageStateStore.pushImagesList(imagesList)
+  const imageInfoWindows: ImageInfoWindows = {
+    imageInfo: imagesList,
+    singleImage: imageList
+  }
+  imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows] = imageInfoWindows
+  changeImagesListWindowsToSession(imageInfoWindows, imageStateStore.selectImagesListWindows)
+  pushImageListToSession(imagesList)
   router.push('/imageOperation')
 }
 
-function imagesOperation(imagesList: Object) {
+function imagesOperation(imagesList: ImageInfo) {
   imageStateStore.bindImagesList(imagesList)
   imageStateStore.bindImageList((imagesList as { singleImageList: any }).singleImageList[0])
-  imageStateStore.checkSingleImage = false
+  imageStateStore.pushImagesList(imagesList)
+  const imageInfoWindows: ImageInfoWindows = {
+    imageInfo: imagesList,
+    singleImage: imagesList.singleImageList[0]
+  }
+  imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows] = imageInfoWindows
+  changeImagesListWindowsToSession(imageInfoWindows, imageStateStore.selectImagesListWindows)
+  pushImageListToSession(imagesList)
   router.push('/imageOperation')
 }
 
 async function singleImageDelete(imageRow: object, singleImageId: number) {
   const params = { singleImageId: singleImageId }
-  const imageId = (imageRow as { imageId: number }).imageId;
+  const imageId = (imageRow as { imageId: number }).imageId
   await deleteSingleImageById(params)
     .then((data) => {
       let index = 0
@@ -58,15 +73,13 @@ async function singleImageDelete(imageRow: object, singleImageId: number) {
         }
       }
       //imageStateStore.tableData[imagesIndex].singleImageList!.splice(imageIndex,1)
-      console.log(data)
-      
     })
     .catch((error) => {
       console.log(error)
     })
-    setTimeout(() => {
-      tableRef.value!.toggleRowExpansion(imageRow, true)
-    }, 100);
+  setTimeout(() => {
+    tableRef.value!.toggleRowExpansion(imageRow, true)
+  }, 100)
 }
 
 function imageDelete(imageId: number) {
@@ -84,7 +97,6 @@ function imageDelete(imageId: number) {
     }
   }
 }
-
 </script>
 
 <template>
@@ -108,10 +120,12 @@ function imageDelete(imageId: number) {
                   <el-image
                     :src="imageUrl + scope.row.singleImagePath"
                     :crossorigin="'anonymous'"
+                    v-show="scope.row.singleImagePath.endsWith('.png')||scope.row.singleImagePath.endsWith('.jpg')||scope.row.singleImagePath.endsWith('.jpeg')"
                   />
+                  <imageDicom :singleImage="scope.row" v-show="scope.row.singleImagePath.endsWith('.dcm')"/>
                 </template>
               </el-table-column>
-              <el-table-column label="图像ID" prop="imageId" />
+              <el-table-column label="图像ID" prop="singleImageId" />
               <el-table-column label="图像名称" prop="singleImageName" />
               <el-table-column fixed="right" label="操作" width="200">
                 <template #default="scope">
@@ -123,7 +137,7 @@ function imageDelete(imageId: number) {
                     ><template #icon>
                       <IconifyIconOffline :icon="editPen"></IconifyIconOffline>
                     </template>
-                    编辑</el-button
+                    查看</el-button
                   >
                   <el-popconfirm
                     title="你确定要删除他吗?"
@@ -160,9 +174,12 @@ function imageDelete(imageId: number) {
             ><template #icon>
               <IconifyIconOffline :icon="editPen"></IconifyIconOffline>
             </template>
-            修改</el-button
+            查看</el-button
           >
-          <el-popconfirm title="你确定要删除他吗?" @confirm.prevent="imageDelete(scope.row.imageId)">
+          <el-popconfirm
+            title="你确定要删除他吗?"
+            @confirm.prevent="imageDelete(scope.row.imageId)"
+          >
             <template #reference>
               <el-button link type="primary" size="small">
                 <template #icon>

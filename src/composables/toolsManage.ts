@@ -2,6 +2,7 @@ import * as cornerstoneTools from '@cornerstonejs/tools'
 import type IToolGroup from '@cornerstonejs/tools/src/types/IToolGroup'
 import { useImageStateStore } from '@/store/imageState'
 import { volumeLoader } from '@cornerstonejs/core'
+import { fa } from 'element-plus/es/locale'
 
 const imageStateStore = useImageStateStore()
 const {
@@ -104,14 +105,12 @@ async function addSegmentationsToState(volumeId: string, segmentationId: string)
 }
 
 async function createTools(
-  viewportId: string,
-  renderingEngineId: string,
-  toolGroupId: string,
-  segmentationId: string='',
-  volumeId: string=''
+
+  segmentationId: string = '',
+  volumeId: string = ''
 ) {
   // Add tools to Cornerstone3D
-  cornerstoneTools.addTool(AnnotationDisplayTool)
+  // cornerstoneTools.addTool(AnnotationDisplayTool)
   // cornerstoneTools.addTool(ReferenceCursors);
   cornerstoneTools.addTool(ReferenceLines)
   // cornerstoneTools.addTool(ScaleOverlayTool);
@@ -152,10 +151,10 @@ async function createTools(
 
   // Define a tool group, which defines how mouse events map to tool commands for
   // Any viewport using the group
-  const toolGroup = cornerstoneTools.ToolGroupManager.createToolGroup(toolGroupId) as IToolGroup
+  const toolGroup = imageStateStore.toolGroup
 
   // Add the tools to the tool group
-  toolGroup.addTool(AnnotationDisplayTool.toolName)
+  // toolGroup.addTool(AnnotationDisplayTool.toolName)
   // toolGroup.addTool(ReferenceCursors.toolName)
   toolGroup.addTool(ReferenceLines.toolName)
   // toolGroup.addTool(ScaleOverlayTool.toolName);
@@ -186,7 +185,7 @@ async function createTools(
   toolGroup.addTool(WindowLevelTool.toolName)
   toolGroup.addTool(PanTool.toolName)
   toolGroup.addTool(ZoomTool.toolName)
-  toolGroup.addTool(StackScrollMouseWheelTool.toolName, { loop: true })
+  toolGroup.addTool(StackScrollMouseWheelTool.toolName, { loop: false })
   toolGroup.addTool(PlanarRotateTool.toolName)
 
   toolGroup.addTool(BrushTool.toolName)
@@ -222,7 +221,7 @@ async function createTools(
     activeStrategy: brushStrategies.ThresholdCircle
   })
 
-  toolGroup.setToolPassive(AnnotationDisplayTool.toolName)
+  // toolGroup.setToolPassive(AnnotationDisplayTool.toolName)
   // toolGroup.setToolPassive(ReferenceCursors.toolName)
   toolGroup.setToolPassive(ReferenceLines.toolName)
   // toolGroup.setToolPassive(ScaleOverlayTool.toolName);
@@ -274,21 +273,20 @@ async function createTools(
   toolGroup.setToolPassive(TrackballRotateTool.toolName)
   toolGroup.setToolPassive(VolumeRotateMouseWheelTool.toolName)
 
-  if (volumeId != ''&& segmentationId != '') {
+  if (volumeId != '' && segmentationId != '') {
     await addSegmentationsToState(volumeId, segmentationId)
     // toolGroup.setToolPassive(DragProbeTool.toolName);
     // // Add the segmentation representation to the toolgroup
-    await segmentation.addSegmentationRepresentations(toolGroupId, [
+    await segmentation.addSegmentationRepresentations(toolGroup.id, [
       {
         segmentationId,
         type: csToolsEnums.SegmentationRepresentations.Labelmap
       }
     ])
   }
-  toolGroup!.addViewport(viewportId, renderingEngineId)
+  // toolGroup!.addViewport(viewportId, renderingEngineId)
 
   imageStateStore.leftMouseActive = ArrowAnnotateTool.toolName
-  imageStateStore.toolGroup = toolGroup
   imageStateStore.bindLeftMouse(LengthTool.toolName)
 }
 

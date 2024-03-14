@@ -2,6 +2,7 @@
 import arrowDown from '@iconify-icons/ep/arrow-down'
 import { useImageStateStore } from '@/store/imageState'
 import {imageKeyValueStore} from '@/composables/image/imageKeyValueStore'
+import { singleImageSegmentationOfThyroidNodulesApi } from '@/api/image'
 defineOptions({
   name: ''
 })
@@ -10,6 +11,11 @@ const imageStateStore = useImageStateStore()
 function singleImageSegmentationOfThyroidNodules() {
   console.log(imageStateStore.viewports[0].getCurrentImageId())
   console.log(imageKeyValueStore.get(imageStateStore.viewports[0].getCurrentImageId()))
+  const params = { singleImageId: imageKeyValueStore.get(imageStateStore.viewports[0].getCurrentImageId()).singleImageId }
+  singleImageSegmentationOfThyroidNodulesApi(params)
+    .then((data) => {
+      console.log(data)
+    })
 }
 </script>
 

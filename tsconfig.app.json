@@ -5,7 +5,6 @@
     "src/**/*",
     "src/**/*.vue",
     "tailwind.config.ts",
-    "tailwind.config.ts",
     "types"
   ],
   "exclude": ["src/**/__tests__/*"],

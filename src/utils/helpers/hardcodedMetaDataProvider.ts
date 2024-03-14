@@ -43,7 +43,6 @@ export default function hardcodedMetaDataProvider(type:string, imageId:string, i
       rowCosines: [1, 0, 0],
       columnCosines: [0, 1, 0],
     };
-
     return imagePlaneModule;
   } else if (type === 'voiLutModule') {
     return {
