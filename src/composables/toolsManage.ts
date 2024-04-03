@@ -46,6 +46,7 @@ const {
   ArrowAnnotateTool,
   CrosshairsTool,
   PlanarFreehandROITool,
+  UltrasoundDirectionalTool,
 
   ToolGroupManager,
   Enums: csToolsEnums,
@@ -146,6 +147,7 @@ async function createTools(
   cornerstoneTools.addTool(StackScrollTool)
   cornerstoneTools.addTool(TrackballRotateTool)
   cornerstoneTools.addTool(VolumeRotateMouseWheelTool)
+  cornerstoneTools.addTool(UltrasoundDirectionalTool)
 
   // cornerstoneTools.addTool(DragProbeTool);
 
@@ -199,7 +201,11 @@ async function createTools(
   toolGroup.addTool(StackScrollTool.toolName)
   toolGroup.addTool(TrackballRotateTool.toolName)
   toolGroup.addTool(VolumeRotateMouseWheelTool.toolName)
-
+  toolGroup.addTool(UltrasoundDirectionalTool.toolName)
+  toolGroup.setToolConfiguration(UltrasoundDirectionalTool.toolName, {
+    displayBothAxesDistances: true,
+  });
+  
   // toolGroup.addTool(DragProbeTool.toolName);
 
   toolGroup.addToolInstance(brushInstanceNames.CircularBrush, BrushTool.toolName, {

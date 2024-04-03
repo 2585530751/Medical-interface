@@ -3,20 +3,27 @@ import { isDark } from '@/composables'
 import dayIcon from '@/assets/svg/day.svg?component'
 import darkIcon from '@/assets/svg/dark.svg?component'
 import askAi from '@/assets/svg/ask-ai.svg'
+import cpatureImage from '@/assets/svg/capture.svg'
 import type { IconifyIconOffline } from '@/components/ReIcon'
 import back from '@iconify-icons/ep/back'
 import setting from '@iconify-icons/ep/setting'
 import message from '@iconify-icons/ep/message'
-defineOptions({
-  name: ''
-})
+import { useImageStateStore } from '@/store/imageState'
+import { ref } from 'vue'
+import downloadImage from '@/layouts/components/imageOperation/downloadImage.vue'
+
+
+
+
+const centerDialogVisible = ref(false)
+
 </script>
 
 <template>
   <div
-    class="flex w-full h-10 border-gray-200 justify-between border-x-0 border-t-0 border border-solid shadow-md dark:border-gray-700 dark:bg-gray-800"
+    class="flex justify-between w-full h-10 border border-t-0 border-gray-200 border-solid shadow-md border-x-0 dark:border-gray-700 dark:bg-gray-800"
   >
-    <div class="flex h-10 justify-center items-center flex-wrap gap-1 pl-2">
+    <div class="flex flex-wrap items-center justify-center h-10 gap-1 pl-2">
       <el-button text>
         <template #icon>
           <IconifyIconOffline :icon="back"></IconifyIconOffline>
@@ -24,7 +31,7 @@ defineOptions({
         返回
       </el-button>
     </div>
-    <div class="flex justify-center items-center">
+    <div class="flex items-center justify-center">
       <el-button-group>
         <el-tooltip content="明暗" placement="bottom" effect="light">
           <el-button text size>
@@ -42,10 +49,18 @@ defineOptions({
             <askAi style="height: 25px; width: 25px"></askAi>
           </el-button>
         </el-tooltip>
+        <el-tooltip content="下载" placement="bottom" effect="light">
+          <el-button text>
+            <cpatureImage
+              style="height: 25px; width: 25px"
+              @click="centerDialogVisible = true"
+            ></cpatureImage>
+          </el-button>
+        </el-tooltip>
       </el-button-group>
     </div>
 
-    <div class="flex h-10 justify-center items-center">
+    <div class="flex items-center justify-center h-10">
       <el-button-group>
         <el-tooltip content="意见反馈" placement="bottom" effect="light">
           <el-button text>
@@ -66,8 +81,11 @@ defineOptions({
           </el-button>
         </el-tooltip>
       </el-button-group>
-
     </div>
+    <downloadImage
+      :download-window-open="centerDialogVisible"
+      @download-window-close="centerDialogVisible = false"
+    ></downloadImage>
   </div>
 </template>
 

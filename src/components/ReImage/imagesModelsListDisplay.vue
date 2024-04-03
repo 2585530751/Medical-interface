@@ -11,29 +11,27 @@ import { changeImagesListWindowsToSession } from '@/composables/image/utils'
 import { Enums } from '@cornerstonejs/core'
 import { generateImageUrl } from '@/composables/image/utils'
 import type IStackViewport from '@cornerstonejs/core/src/types/IStackViewport'
-import { set } from 'nprogress'
 
 const props = defineProps<{
-  imagesList: ImageInfo
+  imagesModelsList: ImageInfo
   index: number
 }>()
 const imageIds: string[] = []
 const { ViewportType } = Enums
 const imageStateStore = useImageStateStore()
-let elementId = ref('cornerstone-element-imagesList-' + props.imagesList.imageId)
-const viewportId = 'stackViewPort-imagesList-' + props.imagesList.imageId
+let elementId = ref('cornerstone-element-imagesModelsList-' + props.imagesModelsList.imageId)
+const viewportId = 'stackViewPort-imagesModelsList-' + props.imagesModelsList.imageId
 const renderingEngine = imageStateStore.renderingEngine
-const imagesListUrl = generateImageUrl(props.imagesList.singleImageList[0].singleImagePath)
-console.log(imagesListUrl)
-const imagesListUrlCheck = ref(true)
-
-function selectImagesListToWindows() {
-  imageStateStore.selectImagesList = props.imagesList.imageId
+const imagesModelsListUrl = generateImageUrl(props.imagesModelsList.singleImageList[0].singleImageModelData.modelResultPath)
+const imagesModelsListUrlCheck = ref(true)
+console.log(imagesModelsListUrl)
+function selectimagesModelsListToWindows() {
+  imageStateStore.selectImagesModelsList = props.index
   const ImageInfoWindows: ImageInfoWindows = {
-    imageInfo: props.imagesList,
-    singleImage: props.imagesList.singleImageList[0]
+    imageInfo: props.imagesModelsList,
+    singleImage: props.imagesModelsList.singleImageList[0]
   }
-  //imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows] = ImageInfoWindows
+  //imageStateStore.imagesModelsListWindows[imageStateStore.selectimagesModelsListWindows] = ImageInfoWindows
 
   imageStateStore.imagesListWindows = [
     ...imageStateStore.imagesListWindows.slice(0, imageStateStore.selectImagesListWindows),
@@ -41,26 +39,27 @@ function selectImagesListToWindows() {
     ...imageStateStore.imagesListWindows.slice(imageStateStore.selectImagesListWindows + 1)
   ]
   changeImagesListWindowsToSession(ImageInfoWindows, imageStateStore.selectImagesListWindows)
+  console.log(imageStateStore.imagesListWindows)
 }
-
 onMounted(() => {
-  if (imagesListUrl && imagesListUrl.endsWith('.dcm')) {
-    setTimeout(() => {
-      const element: HTMLDivElement = document.getElementById(elementId.value) as HTMLDivElement
-      const viewportInput = {
-        viewportId: viewportId,
-        type: ViewportType.STACK,
-        element: element as HTMLDivElement
-      }
-      renderingEngine.enableElement(viewportInput)
-      const viewport = renderingEngine.getViewport(viewportId) as IStackViewport
-      imageIds[0] = imagesListUrl
-      viewport.setStack(imageIds).then(() => {
-        viewport.render()
-      })
-    }, 500)
-  } else {
-    imagesListUrlCheck.value = false
+
+  if (imagesModelsListUrl && imagesModelsListUrl.endsWith('.dcm')) {
+    const element: HTMLDivElement = document.getElementById(elementId.value) as HTMLDivElement
+    const viewportInput = {
+      viewportId: viewportId,
+      type: ViewportType.STACK,
+      element: element as HTMLDivElement
+    }
+    renderingEngine.enableElement(viewportInput)
+    const viewport = renderingEngine.getViewport(viewportId) as IStackViewport
+    imageIds[0] = imagesModelsListUrl
+    viewport.setStack(imageIds).then(() => {
+      viewport.render()
+    })
+   
+  }else{
+    console.log("viewport")
+    imagesModelsListUrlCheck.value = false
   }
 })
 </script>
@@ -72,12 +71,12 @@ onMounted(() => {
     </div>
     <div
       class="flex flex-col justify-center w-4/6 gap-1"
-      :class="{ highlighted: imageStateStore.selectImagesList === imagesList.imageId }"
-      @click="selectImagesListToWindows()"
+      :class="{ highlighted: imageStateStore.selectImagesModelsList === index }"
+      @click="selectimagesModelsListToWindows()"
     >
       <div class="flex items-center justify-between">
         <span class="text-xs text-gray-500">
-          {{ props.imagesList.imageEquipment }}
+          {{ props.imagesModelsList.imageEquipment }}
         </span>
         <span class="text-xs text-gray-500"
           ><IconifyIconOffline
@@ -85,24 +84,24 @@ onMounted(() => {
             :icon="timer"
             :style="{ fontSize: '10px' }"
           ></IconifyIconOffline
-          >{{ props.imagesList.imageCheckTime }}</span
+          >{{ props.imagesModelsList.imageCheckTime }}</span
         >
       </div>
       <div class="border-2 border-solid rounded-lg border-slate-300">
         <el-image
           fit="cover"
-          :src="imageUrl + props.imagesList.singleImageList[0].singleImagePath"
+          :src="imageUrl + props.imagesModelsList.singleImageList[0].singleImageModelData.modelResultPath"
           :crossorigin="'anonymous'"
-          v-show="!imagesListUrlCheck"
+          v-show="!imagesModelsListUrlCheck"
         />
-        <div v-show="imagesListUrlCheck">
-          <div :id="elementId" class="w-32 h-32"></div>
+        <div >
+          <div :id="elementId" class="w-32 h-32" v-show="imagesModelsListUrlCheck"></div>
         </div>
         <!-- <div :id="elementId" class="absolute w-screen h-screen"></div> -->
       </div>
       <div class="flex items-center justify-between">
         <span class="text-xs text-gray-500">
-          {{ props.imagesList.patientName }}
+          {{ props.imagesModelsList.patientName }}
         </span>
         <span class="text-xs text-gray-500"
           ><IconifyIconOffline
@@ -110,7 +109,7 @@ onMounted(() => {
             :icon="files"
             :style="{ fontSize: '10px' }"
           ></IconifyIconOffline
-          >{{ props.imagesList.imageCount }}</span
+          >{{ props.imagesModelsList.imageCount }}</span
         >
       </div>
     </div>

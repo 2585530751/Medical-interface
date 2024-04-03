@@ -24,14 +24,14 @@ export default defineConfig({
     }
   },
   preview: {
-    headers: {
-      'Cross-Origin-Embedder-Policy': 'require-corp',
-      'Cross-Origin-Opener-Policy': 'same-origin'
-    },
+    // headers: {
+    //   'Cross-Origin-Embedder-Policy': 'require-corp',
+    //   'Cross-Origin-Opener-Policy': 'same-origin'
+    // },
   },
   server: {
     headers: {
-      'Cross-Origin-Embedder-Policy': 'require-corp',
+      // 'Cross-Origin-Embedder-Policy': 'require-corp',
       'Cross-Origin-Opener-Policy': 'same-origin'
     },
     proxy: {

@@ -20,6 +20,21 @@ interface SingleImage {
   singleImagePath: string // 路径通常是字符串，确保它匹配你的文件结构
   status: number
   type: string // 如果type有固定的几个值，可以使用枚举(enum)来定义
+  modelType: string
+  singleImageModelData:SingleImageModelData
+}
+
+interface SingleImageModelData {
+  modelResId: number
+  imageId: number
+  singleImageId: number
+  creatorId: number
+  modelId: number
+  creatorName: string
+  createTime: string // ISO 8601日期字符串，或者可以使用Date类型
+  modelResultPath: string
+  modelResultName: string
+  resData: String // 如果resData是一个JSON字符串，可以使用JSON.parse()来解析
 }
 
 interface ImageInfo {

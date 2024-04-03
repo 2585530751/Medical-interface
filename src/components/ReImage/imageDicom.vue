@@ -15,7 +15,6 @@ let elementId = ref('cornerstone-element-imageDicom-' + props.singleImage.single
 const viewportId = 'stackViewPort-imageDicom-' + props.singleImage.singleImageId
 const renderingEngine = imageStateStore.renderingEngine
 const imagesListUrl = generateImageUrl(props.singleImage.singleImagePath)
-console.log('imagesListUrl', imagesListUrl)
 
 onMounted(() => {
   if (props.singleImage.singleImagePath.endsWith('.dcm')) {

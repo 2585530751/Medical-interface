@@ -4,6 +4,7 @@ import { storageSession } from '@pureadmin/utils'
 
 export const imagesListsSession = 'imageLists'
 export const imagesListWindowsSession = 'imagesListWindows'
+export const imagesListsModelsSession = 'imagesListsModels'
 
 export function generateImageUrl(imagePath: String) {
   if (imagePath.endsWith('.png') || imagePath.endsWith('.jpg') || imagePath.endsWith('.jpeg')) {
@@ -66,3 +67,4 @@ export function changeImagesListWindowsToSession(
     session.setItem(imagesListWindowsSession, list)
   }
 }
+

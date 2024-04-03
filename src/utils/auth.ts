@@ -84,15 +84,16 @@ export async function checkAuthStatus() {
     if (authorizedToken) {
       // 调用后端刷新令牌
       try {
-        // const refreshedData = await refreshTokens(authorizedToken)
-        const refreshedData = {
-          expires: 1700729029536,
-          refreshToken:
-            'eyJ0eXAiOiJKV1QiLCJ0b2tlblR5cGUiOiJyZWZyZXNoVG9rZW4iLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySW5mbyI6ImFkbWluIiwiZXhwIjoxNzAwNzI5MzI5fQ.-vOw2SSKW0ktRU25xw0xh8vBxU79ekFTodH9GJyRHz8',
-          roles: ['doctor'],
-          userName: '1234'
-        }
+         const refreshedData = await useUserStoreHook().handRefreshToken(authorizedToken)
+        // const refreshedData = {
+        //   expires: 1700729029536,
+        //   refreshToken:
+        //     'eyJ0eXAiOiJKV1QiLCJ0b2tlblR5cGUiOiJyZWZyZXNoVG9rZW4iLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySW5mbyI6ImFkbWluIiwiZXhwIjoxNzAwNzI5MzI5fQ.-vOw2SSKW0ktRU25xw0xh8vBxU79ekFTodH9GJyRHz8',
+        //   roles: ['doctor'],
+        //   userName: '1234'
+        // }
         // 在 sessionStorage 中更新 'user-info'
+        alert(authorizedToken)
         sessionStorage.setItem('user-info', JSON.stringify(refreshedData))
         isLoggedIn.value = true
       } catch (error) {

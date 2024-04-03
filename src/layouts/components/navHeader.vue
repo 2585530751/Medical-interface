@@ -79,7 +79,7 @@ onBeforeMount(() => {
             src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"
           /> </el-avatar
       ></template>
-      <el-menu-item index="3-1">个人中心</el-menu-item>
+      <el-menu-item index="/user">个人中心</el-menu-item>
       <el-menu-item index="3-2">锁定屏幕</el-menu-item>
       <el-menu-item index="3-3" @click="useUserStoreHook().logOut">退出登录</el-menu-item>
     </el-sub-menu>

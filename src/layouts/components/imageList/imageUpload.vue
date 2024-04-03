@@ -60,14 +60,14 @@ const emits = defineEmits<{
   uploadWindowClose: [] // 具名元组语法
 }>()
 
-let centerDialogVisible = props.uploadWindowOpen
+let centerDialogVisible = ref(props.uploadWindowOpen)
 
 watch(
   () => {
     return props.uploadWindowOpen
   },
   (value, prevValue) => {
-    centerDialogVisible = value
+    centerDialogVisible.value = value
   }
 )
 

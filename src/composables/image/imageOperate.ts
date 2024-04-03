@@ -3,6 +3,16 @@ import { utilities as csUtils } from '@cornerstonejs/core'
 import { utilities as cstUtils } from '@cornerstonejs/tools'
 import vtkColormaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps'
 import { type ViewportColorbar } from '@cornerstonejs/tools/src/utilities/voi/colorbar/ViewportColorbar'
+import { annotation } from '@cornerstonejs/tools'
+import type { Annotation } from '@cornerstonejs/tools/src/types'
+import html2canvas from 'html2canvas'
+
+const { selection, visibility, locking, state } = annotation
+
+function reRenderViewport(renderingEngineId: string, viewportId: string) {
+  const renderingEngine = getRenderingEngine(renderingEngineId)
+  renderingEngine!.renderViewports([viewportId])
+}
 
 function resetOriginal(renderingEngineId: string, viewportId: string) {
   // Get the rendering engine
@@ -58,6 +68,108 @@ function invert(renderingEngineId: string, viewportId: string) {
   const { invert } = viewport.getProperties()
   viewport.setProperties({ invert: !invert })
   viewport.render()
+}
+
+function hideSelectedAnnotation(renderingEngineId: string, viewportId: string) {
+  const annotationUIDs = selection.getAnnotationsSelected()
+
+  if (annotationUIDs && annotationUIDs.length) {
+    for (let i = 0; i < annotationUIDs.length; i++) {
+      const annotationUID = annotationUIDs[i]
+      visibility.setAnnotationVisibility(annotationUID, false)
+    }
+    reRenderViewport(renderingEngineId, viewportId)
+  }
+}
+
+function lockSelectedAnnotation(renderingEngineId: string, viewportId: string) {
+  const annotationUIDs = selection.getAnnotationsSelected()
+
+  if (annotationUIDs && annotationUIDs.length) {
+    for (let i = 0; i < annotationUIDs.length; i++) {
+      const annotationUID = annotationUIDs[i]
+      const defaultFrameOfReferenceSpecificAnnotationManager =
+        annotation.state.getAnnotationManager()
+      const annotation1 =
+        defaultFrameOfReferenceSpecificAnnotationManager.getAnnotation(annotationUID)
+
+      locking.setAnnotationLocked(annotation1!, true)
+      annotation1!.highlighted = false
+    }
+
+    selection.deselectAnnotation()
+    reRenderViewport(renderingEngineId, viewportId)
+  }
+}
+
+function unlockAllAnnotations() {
+  locking.unlockAllAnnotations()
+}
+
+function selectAnnotationsByToolName(
+  toolName: string,
+  renderingEngineId: string,
+  viewportId: string
+) {
+  const annotations: Annotation[] = annotation.state.getAllAnnotations()
+  for (let i = 0; i < annotations.length; i++) {
+    if (annotations[i].metadata.toolName == toolName && !annotations[i].isLocked) {
+      annotations[i].highlighted = true
+      selection.setAnnotationSelected(annotations[i].annotationUID!, true, true)
+    }
+  }
+  reRenderViewport(renderingEngineId, viewportId)
+}
+
+function revokePreviousAnnotation(renderingEngineId: string, viewportId: string) {
+  const annotationUIDs = selection.getAnnotationsSelected()
+  selection.deselectAnnotation(annotationUIDs[annotationUIDs.length - 1])
+  state.getAnnotation(annotationUIDs[annotationUIDs.length - 1]).highlighted = false
+  reRenderViewport(renderingEngineId, viewportId)
+}
+
+function removeAnnotation(renderingEngineId: string, viewportId: string) {
+  const annotationUIDs = selection.getAnnotationsSelected()
+  if (annotationUIDs && annotationUIDs.length) {
+    for (let i = 0; i < annotationUIDs.length; i++) {
+      const annotationUID = annotationUIDs[i]
+      annotation.state.removeAnnotation(annotationUID)
+    }
+    reRenderViewport(renderingEngineId, viewportId)
+  }
+}
+
+function showAllAnnotations(renderingEngineId: string, viewportId: string) {
+  visibility.showAllAnnotations()
+  reRenderViewport(renderingEngineId, viewportId)
+}
+
+function selectAllAnnotations(renderingEngineId: string, viewportId: string) {
+  const annotations: Annotation[] = annotation.state.getAllAnnotations()
+  for (let i = 0; i < annotations.length; i++) {
+    if (!annotations[i].isLocked) {
+      selection.setAnnotationSelected(annotations[i].annotationUID!, true, true)
+      annotations[i].highlighted = true
+    }
+  }
+  reRenderViewport(renderingEngineId, viewportId)
+}
+
+function reverseSelectionAnnotations(renderingEngineId: string, viewportId: string) {
+  const annotations: Annotation[] = annotation.state.getAllAnnotations()
+  for (let i = 0; i < annotations.length; i++) {
+    if (
+      !selection.isAnnotationSelected(annotations[i].annotationUID!) &&
+      !annotations[i].isLocked
+    ) {
+      selection.setAnnotationSelected(annotations[i].annotationUID!, true, true)
+      annotations[i].highlighted = true
+    } else {
+      selection.deselectAnnotation(annotations[i].annotationUID!)
+      annotations[i].highlighted = false
+    }
+  }
+  reRenderViewport(renderingEngineId, viewportId)
 }
 
 function setWindowLevel(
@@ -180,6 +292,16 @@ function createViewportColorbar(index: number, elementId: string, colorbarContai
   return ctColorbar
 }
 
+function downloadCanvasAsImage(divForDownloadViewportName: string, filename: string) {
+  const divForDownloadViewport = document.querySelector(divForDownloadViewportName) as HTMLDivElement
+  html2canvas(divForDownloadViewport).then((canvas: HTMLCanvasElement) => {
+    const link = document.createElement('a')
+    link.download = filename + '.jpg'
+    link.href = canvas.toDataURL('jpg', 1.0)
+    link.click()
+  })
+}
+
 export {
   resetOriginal,
   flipH,
@@ -194,5 +316,15 @@ export {
   resetToDefaultViewportProperties,
   removeCurrentImageIdProperties,
   changeNextImage,
-  changePreviousImage
+  changePreviousImage,
+  hideSelectedAnnotation,
+  showAllAnnotations,
+  lockSelectedAnnotation,
+  unlockAllAnnotations,
+  removeAnnotation,
+  selectAllAnnotations,
+  reverseSelectionAnnotations,
+  revokePreviousAnnotation,
+  selectAnnotationsByToolName,
+  downloadCanvasAsImage
 }

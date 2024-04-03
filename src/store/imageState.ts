@@ -5,7 +5,7 @@ import type { IToolGroup } from '@cornerstonejs/tools/src/types'
 import { getImagePageByDoctorId, deleteSingleImageById } from '@/api/image'
 import { message } from '@/utils/message'
 import { storageSession } from '@pureadmin/utils'
-import { imagesListsSession, imagesListWindowsSession } from '@/composables/image/utils'
+import { imagesListsSession, imagesListWindowsSession,imagesListsModelsSession } from '@/composables/image/utils'
 
 import {
   RenderingEngine,
@@ -25,6 +25,7 @@ import { initDemo } from '@/utils/helpers/index.js'
 import createTools from '@/composables/toolsManage'
 import { utilities as csUtils } from '@cornerstonejs/core'
 import {type ViewportColorbar} from '@cornerstonejs/tools/src/utilities/voi/colorbar/ViewportColorbar'
+import model from '@/router/modules/model'
 
 const { Enums: csToolsEnums } = cornerstoneTools
 const { MouseBindings } = csToolsEnums
@@ -49,7 +50,20 @@ export const useImageStateStore = defineStore('imageState', () => {
     singleImageName: '',
     singleImagePath: '',
     status: 0,
-    type: ''
+    type: '',
+    modelType: '',
+    singleImageModelData: {
+      modelResId: 0,
+      imageId: 0,
+      singleImageId: 0,
+      creatorId: 0,
+      modelId: 0,
+      creatorName: '',
+      createTime: '', // ISO 8601 日期字符串
+      modelResultPath: '',
+      modelResultName: '',
+      resData: ''
+    }
   })
   const imagesList = reactive<ImageInfo>({
     creatorId: 0,
@@ -73,6 +87,11 @@ export const useImageStateStore = defineStore('imageState', () => {
   const imagesLists = reactive<ImageInfo[]>(
     storageSession().getItem<ImageInfo[]>(imagesListsSession)
       ? storageSession().getItem<ImageInfo[]>(imagesListsSession)
+      : []
+  )
+  const imagesModelsLists = reactive<ImageInfo[]>(
+    storageSession().getItem<ImageInfo[]>(imagesListsModelsSession)
+      ? storageSession().getItem<ImageInfo[]>(imagesListsModelsSession)
       : []
   )
   const imagesListWindows = reactive<(0 | ImageInfoWindows)[]>(
@@ -275,8 +294,10 @@ export const useImageStateStore = defineStore('imageState', () => {
 
   const selectImagesList = ref()
   const selectImagesListWindows = ref(0)
+  const selectImagesModelsList = ref()
 
   function bindLeftMouse(newLeftMouseActive: string) {
+    message(`左键当前激活的工具是：${newLeftMouseActive}`, { type: 'success' })
     toolGroup!.value.setToolPassive(leftMouseActive.value)
     leftMouseActive.value = newLeftMouseActive
     toolGroup!.value.setToolActive(leftMouseActive.value, {
@@ -286,6 +307,7 @@ export const useImageStateStore = defineStore('imageState', () => {
         }
       ]
     })
+    
   }
 
   function bindImageList(imageObject: Record<string, any>) {
@@ -311,6 +333,11 @@ export const useImageStateStore = defineStore('imageState', () => {
     } else {
       imagesLists.push(imagesList)
     }
+  }
+
+  function pushImagesModelsList(imagesList: ImageInfo) {
+    console.log(imagesList)
+    imagesModelsLists.push(imagesList)
   }
 
   async function getImagesListData() {
@@ -345,12 +372,14 @@ export const useImageStateStore = defineStore('imageState', () => {
     imagesList,
     imagesLists,
     imagesListWindows,
+    imagesModelsLists,
 
     tableData,
     leftMouseActive,
     toolGroup,
     selectImagesList,
     selectImagesListWindows,
+    selectImagesModelsList,
 
     windowRowsColumns,
 
@@ -362,6 +391,7 @@ export const useImageStateStore = defineStore('imageState', () => {
     bindImageList,
     bindImagesList,
     getImagesListData,
-    pushImagesList
+    pushImagesList,
+    pushImagesModelsList
   }
 })

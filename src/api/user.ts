@@ -60,3 +60,46 @@ export const refreshTokenApi = (data?: object) => {
     }
   )
 }
+
+export const register = (data?: object) => {
+  return http.request<UserResult>(
+    'post',
+    baseUrlApi('user/register'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  )
+}
+
+export const forgetPassword = (data?: object) => {
+  return http.request<UserResult>(
+    'post',
+    baseUrlApi('user/updatePasswordByPhoneNumber'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  )
+}
+
+export const isAccountExisted = (params?: object) => {
+  return http.request<UserResult>(
+    'post',
+    baseUrlApi('user/isAccountExisted'),
+    { params },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  )
+}
+
+export const deleteSingleImageById = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('singleImage/deleteSingleImageById'), { params })
+}

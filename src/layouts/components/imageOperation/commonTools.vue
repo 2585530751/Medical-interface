@@ -40,10 +40,13 @@ import refreshRight from '@iconify-icons/ep/refresh-right'
 import CircleScissor from '@/assets/svg/circleScissor.svg?component'
 import rectangleScissor from '@/assets/svg/rectangleScissor.svg?component'
 import paintFill from '@/assets/svg/paintFill.svg?component'
+import circleEmpty from '@/assets/svg/circle.svg?component'
+import selectToolname from '@/assets/svg/select.svg?component'
+import circleTwoLine from '@/assets/svg/circleTwoLine.svg?component'
 
 import type { IconifyIconOffline } from '@/components/ReIcon'
 import imageOperation from '@/components/ReButton/imageOperation.vue'
-import { type ViewportColorbar } from '@cornerstonejs/tools/src/utilities/voi/colorbar/ViewportColorbar'
+import imageOperationText from '@/components/ReButton/imageOperationText.vue'
 import * as cornerstoneTools from '@cornerstonejs/tools'
 import { useImageStateStore } from '@/store/imageState'
 import {
@@ -58,7 +61,17 @@ import {
   resetToDefaultViewportProperties,
   removeCurrentImageIdProperties,
   changeNextImage,
-  changePreviousImage
+  changePreviousImage,
+  hideSelectedAnnotation,
+  showAllAnnotations,
+  lockSelectedAnnotation,
+  unlockAllAnnotations,
+  removeAnnotation,
+  selectAllAnnotations,
+  reverseSelectionAnnotations,
+  revokePreviousAnnotation,
+  selectAnnotationsByToolName,
+  downloadCanvasAsImage
 } from '@/composables/image/imageOperate'
 import { ref, watch } from 'vue'
 import vtkColormaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps'
@@ -104,6 +117,8 @@ const {
   ArrowAnnotateTool,
   CrosshairsTool,
   PlanarFreehandROITool,
+  UltrasoundDirectionalTool,
+
   utilities: csToolsUtilities,
   Enums: csToolsEnums
 } = cornerstoneTools
@@ -112,6 +127,20 @@ const imageStateStore = useImageStateStore()
 const segmentationTools = ref(true)
 const operateTools = ref(true)
 const annotationTools = ref(true)
+
+const annotationToolsList = [
+  { label: '箭头', toolName: ArrowAnnotateTool.toolName },
+  { label: '直线', toolName: LengthTool.toolName },
+  { label: '十字线', toolName: BidirectionalTool.toolName },
+  { label: '角度', toolName: AngleTool.toolName },
+  { label: 'Cobb角', toolName: CobbAngleTool.toolName },
+  { label: '矩形', toolName: RectangleROITool.toolName },
+  { label: '椭圆', toolName: EllipticalROITool.toolName },
+  { label: '圆心', toolName: CircleROITool.toolName },
+  { label: '铅笔', toolName: PlanarFreehandROITool.toolName },
+  { label: '探测', toolName: ProbeTool.toolName },
+  { label: '超声方向', toolName: UltrasoundDirectionalTool.toolName }
+]
 
 const layouts = [
   { label: '1X1', rows: 1, columns: 1 },
@@ -591,78 +620,189 @@ watch(
           ></IconifyIconOffline>
         </el-button>
       </div>
-      <div v-show="annotationTools" class="flex flex-wrap gap-1 pt-1 pb-1">
-        <imageOperation
-          operation="箭头"
-          @click="imageStateStore.bindLeftMouse(ArrowAnnotateTool.toolName)"
-          ><arrowUpDuotone style="height: 30px; width: 30px"></arrowUpDuotone>
-        </imageOperation>
-        <imageOperation
-          operation="直线"
-          @click="imageStateStore.bindLeftMouse(LengthTool.toolName)"
-        >
-          <straightPipe style="height: 30px; width: 30px"></straightPipe>
-        </imageOperation>
-        <imageOperation operation="中点">
-          <menuDotsLineDuotone style="height: 30px; width: 30px"></menuDotsLineDuotone>
-        </imageOperation>
-        <imageOperation
-          operation="十字线"
-          @click="imageStateStore.bindLeftMouse(BidirectionalTool.toolName)"
-        >
-          <addFill style="height: 30px; width: 30px"></addFill>
-        </imageOperation>
-        <imageOperation operation="角度" @click="imageStateStore.bindLeftMouse(AngleTool.toolName)">
-          <angle style="height: 30px; width: 30px"></angle>
-        </imageOperation>
-        <imageOperation
-          operation="Cobb"
-          @click="imageStateStore.bindLeftMouse(CobbAngleTool.toolName)"
-        >
-          <cobb style="height: 30px; width: 30px; fill: currentColor"></cobb>
-        </imageOperation>
-        <imageOperation operation="CT值">
-          <iImagingAlternativeCt style="height: 30px; width: 30px"></iImagingAlternativeCt>
-        </imageOperation>
-        <imageOperation operation="心胸比">
-          <cardiopulmonary style="height: 30px; width: 30px; fill: currentColor"></cardiopulmonary>
-        </imageOperation>
-        <imageOperation
-          operation="椭圆"
-          @click="imageStateStore.bindLeftMouse(EllipticalROITool.toolName)"
-        >
-          <ellipses style="height: 30px; width: 30px; fill: currentColor"></ellipses>
-        </imageOperation>
-        <imageOperation
-          operation="圆心"
-          @click="imageStateStore.bindLeftMouse(CircleROITool.toolName)"
-        >
-          <circleCenter style="height: 30px; width: 30px; fill: currentColor"></circleCenter>
-        </imageOperation>
-        <imageOperation
-          operation="矩形"
-          @click="imageStateStore.bindLeftMouse(RectangleROITool.toolName)"
-        >
-          <rectangles style="height: 30px; width: 30px; fill: currentColor"></rectangles>
-        </imageOperation>
-        <imageOperation operation="钢笔">
-          <pen style="height: 30px; width: 30px"></pen>
-        </imageOperation>
-        <imageOperation
-          operation="铅笔"
-          @click="imageStateStore.bindLeftMouse(PlanarFreehandROITool.toolName)"
-        >
-          <pencil style="height: 30px; width: 30px; fill: currentColor"></pencil>
-        </imageOperation>
-        <imageOperation operation="球体">
-          <sphere style="height: 30px; width: 30px"></sphere>
-        </imageOperation>
-        <imageOperation
-          operation="长方体"
-          @click="imageStateStore.bindLeftMouse(ProbeTool.toolName)"
-        >
-          <cuboid style="height: 30px; width: 30px; fill: currentColor"></cuboid>
-        </imageOperation>
+      <div
+        v-show="annotationTools"
+        class="flex flex-col gap-1 divide-x-0 divide-y-2 divide-slate-400/30 divide-dashed"
+      >
+        <div class="flex flex-wrap gap-1 pt-1 pb-1">
+          <imageOperation
+            operation="箭头"
+            @click="imageStateStore.bindLeftMouse(ArrowAnnotateTool.toolName)"
+            ><arrowUpDuotone style="height: 30px; width: 30px"></arrowUpDuotone>
+          </imageOperation>
+          <imageOperation
+            operation="直线"
+            @click="imageStateStore.bindLeftMouse(LengthTool.toolName)"
+          >
+            <straightPipe style="height: 30px; width: 30px"></straightPipe>
+          </imageOperation>
+
+          <imageOperation
+            operation="十字线"
+            @click="imageStateStore.bindLeftMouse(BidirectionalTool.toolName)"
+          >
+            <addFill style="height: 30px; width: 30px"></addFill>
+          </imageOperation>
+          <imageOperation
+            operation="角度"
+            @click="imageStateStore.bindLeftMouse(AngleTool.toolName)"
+          >
+            <angle style="height: 30px; width: 30px"></angle>
+          </imageOperation>
+          <imageOperation
+            operation="Cobb"
+            @click="imageStateStore.bindLeftMouse(CobbAngleTool.toolName)"
+          >
+            <cobb style="height: 30px; width: 30px; fill: currentColor"></cobb>
+          </imageOperation>
+
+          <imageOperation
+            operation="椭圆"
+            @click="imageStateStore.bindLeftMouse(EllipticalROITool.toolName)"
+          >
+            <ellipses style="height: 30px; width: 30px; fill: currentColor"></ellipses>
+          </imageOperation>
+          <imageOperation
+            operation="圆心"
+            @click="imageStateStore.bindLeftMouse(CircleROITool.toolName)"
+          >
+            <circleEmpty style="height: 30px; width: 30px; fill: currentColor"></circleEmpty>
+          </imageOperation>
+          <imageOperation
+            operation="矩形"
+            @click="imageStateStore.bindLeftMouse(RectangleROITool.toolName)"
+          >
+            <rectangles style="height: 30px; width: 30px; fill: currentColor"></rectangles>
+          </imageOperation>
+
+          <imageOperation
+            operation="铅笔"
+            @click="imageStateStore.bindLeftMouse(PlanarFreehandROITool.toolName)"
+          >
+            <pencil style="height: 30px; width: 30px; fill: currentColor"></pencil>
+          </imageOperation>
+          <imageOperation
+            operation="探测"
+            @click="imageStateStore.bindLeftMouse(ProbeTool.toolName)"
+          >
+            <circleCenter style="height: 30px; width: 30px; fill: currentColor"></circleCenter>
+          </imageOperation>
+          <imageOperation
+            operation="超声定向"
+            @click="imageStateStore.bindLeftMouse(UltrasoundDirectionalTool.toolName)"
+          >
+            <circleTwoLine style="height: 30px; width: 30px; fill: currentColor"></circleTwoLine
+          ></imageOperation>
+          <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
+            <div
+              class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
+              @click="
+                selectAnnotationsByToolName(
+                  imageStateStore.leftMouseActive,
+                  imageStateStore.renderingEngine.id,
+                  imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                )
+              "
+            >
+              <selectToolname style="height: 30px; width: 30px"></selectToolname>
+              <span class="text-sm text-gray-500 dark:text-white">选取</span>
+            </div>
+            <div
+              style="border-left-width: 1px"
+              class="flex items-center h-full text-lg font-extrabold border-0 border-solid rounded-sm cursor-pointer hover:bg-gray-300 border-slate-300"
+            >
+              <el-dropdown trigger="click">
+                <IconifyIconOffline
+                  class="hover:text-blue-500"
+                  :icon="arrowDown"
+                  :style="{ fontSize: '15px' }"
+                ></IconifyIconOffline>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item
+                      v-for="annotationTools in annotationToolsList"
+                      @click="
+                        selectAnnotationsByToolName(
+                          annotationTools.toolName,
+                          imageStateStore.renderingEngine.id,
+                          imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                        )
+                      "
+                      :key="annotationTools.label"
+                      >{{ annotationTools.label }}</el-dropdown-item
+                    >
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
+          </div>
+        </div>
+        <div class="flex flex-wrap gap-1 pt-1 pb-1">
+          <imageOperationText
+            operation="隐藏"
+            @click="
+              hideSelectedAnnotation(
+                imageStateStore.renderingEngine.id,
+                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+              )
+            "
+          ></imageOperationText>
+          <imageOperationText
+            operation="显示"
+            @click="
+              showAllAnnotations(
+                imageStateStore.renderingEngine.id,
+                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+              )
+            "
+          ></imageOperationText>
+          <imageOperationText
+            operation="锁定"
+            @click="
+              lockSelectedAnnotation(
+                imageStateStore.renderingEngine.id,
+                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+              )
+            "
+          ></imageOperationText>
+          <imageOperationText operation="解锁" @click="unlockAllAnnotations()"></imageOperationText>
+          <imageOperationText
+            operation="删除"
+            @click="
+              removeAnnotation(
+                imageStateStore.renderingEngine.id,
+                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+              )
+            "
+          ></imageOperationText>
+          <imageOperationText
+            operation="全选"
+            @click="
+              selectAllAnnotations(
+                imageStateStore.renderingEngine.id,
+                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+              )
+            "
+          ></imageOperationText>
+          <imageOperationText
+            operation="反选"
+            @click="
+              reverseSelectionAnnotations(
+                imageStateStore.renderingEngine.id,
+                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+              )
+            "
+          ></imageOperationText>
+          <imageOperationText
+            operation="撤销"
+            @click="
+              revokePreviousAnnotation(
+                imageStateStore.renderingEngine.id,
+                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+              )
+            "
+          ></imageOperationText>
+        </div>
       </div>
     </div>
 
@@ -684,7 +824,15 @@ watch(
         <imageOperation operation="3D探针">
           <probes style="height: 30px; width: 30px; fill: currentColor"></probes>
         </imageOperation>
-        <imageOperation operation="截屏" @click="imageStateStore.bindLeftMouse('CircularEraser')">
+        <imageOperation
+          operation="截屏"
+          @click="
+            downloadCanvasAsImage(
+              `div[data-viewport-uid='stackViewPort${imageStateStore.selectImagesListWindows}']`,
+              `image${imageStateStore.selectImagesListWindows}`
+            )
+          "
+        >
           <captureImage style="height: 30px; width: 30px; fill: currentColor"></captureImage>
         </imageOperation>
         <imageOperation operation="删除">
@@ -763,6 +911,24 @@ watch(
         </div>
         <imageOperation operation="三维">
           <cube3d style="height: 30px; width: 30px"></cube3d>
+        </imageOperation>
+        <imageOperation operation="CT值">
+          <iImagingAlternativeCt style="height: 30px; width: 30px"></iImagingAlternativeCt>
+        </imageOperation>
+        <imageOperation operation="心胸比">
+          <cardiopulmonary style="height: 30px; width: 30px; fill: currentColor"></cardiopulmonary>
+        </imageOperation>
+        <imageOperation operation="中点">
+          <menuDotsLineDuotone style="height: 30px; width: 30px"></menuDotsLineDuotone>
+        </imageOperation>
+        <imageOperation operation="钢笔">
+          <pen style="height: 30px; width: 30px"></pen>
+        </imageOperation>
+        <imageOperation operation="球体">
+          <sphere style="height: 30px; width: 30px"></sphere>
+        </imageOperation>
+        <imageOperation operation="长方体">
+          <cuboid style="height: 30px; width: 30px; fill: currentColor"></cuboid>
         </imageOperation>
       </div>
     </div>

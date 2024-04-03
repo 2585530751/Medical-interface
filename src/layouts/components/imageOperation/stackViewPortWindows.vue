@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ImageInfoWindows } from '@/types/image'
+import type { ImageInfoWindows, SingleImage } from '@/types/image'
 import { initDemo } from '@/utils/helpers/index.js'
 import registerWebImageLoader from '@/utils/helpers/registerWebImageLoader'
 import hardcodedMetaDataProvider from '@/utils/helpers//hardcodedMetaDataProvider'
@@ -51,51 +51,6 @@ onUnmounted(() => {
   }
 })
 
-// watch(
-//   () => imageStateStore.imagesListWindows,
-//   (newValue, oldValue) => {
-//     if (oldValue && oldValue[props.index] != 0) {
-//       if (JSON.stringify(newValue[props.index]) != JSON.stringify(oldValue[props.index])) {
-//         renderingEngine.disableElement(viewportId)
-//         console.log(imageStateStore.imagesListWindows[props.index])
-//         console.log(props.imagesInfoWindows)
-//         imageIds.length = 0
-//         renderStackViewport()
-//       }
-//     } else {
-//       renderStackViewport()
-//     }
-//   },
-//   {
-//     deep: true
-//   }
-// )
-
-// async function addSegmentation() {
-//   const { imageIds: segmentationImageIds } = await imageLoader.createAndCacheDerivedImages(imageIds)
-//   segmentation.addSegmentations([
-//     {
-//       segmentationId: 'segmentationIds' + props.index,
-//       representation: {
-//         type: csToolsEnums.SegmentationRepresentations.Labelmap,
-//         data: {
-//           imageIdReferenceMap: cstUtils.segmentation.createImageIdReferenceMap(
-//             imageIds,
-//             segmentationImageIds
-//           )
-//         }
-//       }
-//     }
-//   ])
-//   // Add the segmentation representation to the toolgroup
-//   await segmentation.addSegmentationRepresentations(imageStateStore.toolGroup.id, [
-//     {
-//       segmentationId: 'segmentationIds' + props.index,
-//       type: csToolsEnums.SegmentationRepresentations.Labelmap
-//     }
-//   ])
-// }
-
 watch(
   () => props.imagesInfoWindows,
   (newValue, oldValue) => {
@@ -118,8 +73,13 @@ function constructImagesId() {
   var singleImageIndex = 0
   if (props.imagesInfoWindows != 0) {
     const temporarySingleImage = props.imagesInfoWindows.singleImage
-    props.imagesInfoWindows.imageInfo.singleImageList.forEach((item: any) => {
-      const temporarySingleImagePath = generateImageUrl(item.singleImagePath) as string
+    props.imagesInfoWindows.imageInfo.singleImageList.forEach((item: SingleImage) => {
+      var temporarySingleImagePath;
+      if(item.modelType === 'model'){
+        temporarySingleImagePath= generateImageUrl(item.singleImageModelData.modelResultPath) as string
+      }else{
+        temporarySingleImagePath = generateImageUrl(item.singleImagePath) as string
+      }
       imageKeyValueStore.set(temporarySingleImagePath, item)
       imageIds.push(temporarySingleImagePath)
       if (temporarySingleImage && temporarySingleImage.singleImageId === item.singleImageId) {
@@ -177,7 +137,7 @@ async function renderStackViewport() {
 
 <template>
   <div
-    class="flex border-stone-200"
+    class="flex justify-between border-stone-200"
     :class="{ highlighted: imageStateStore.selectImagesListWindows === props.index }"
   >
     <div
