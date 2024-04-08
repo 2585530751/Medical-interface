@@ -5,7 +5,12 @@ import type { IToolGroup } from '@cornerstonejs/tools/src/types'
 import { getImagePageByDoctorId, deleteSingleImageById } from '@/api/image'
 import { message } from '@/utils/message'
 import { storageSession } from '@pureadmin/utils'
-import { imagesListsSession, imagesListWindowsSession,imagesListsModelsSession } from '@/composables/image/utils'
+import {
+  imagesListsSession,
+  imagesListWindowsSession,
+  imagesModelsListsSession,
+  pushimagesModelsListsSession
+} from '@/composables/image/utils'
 
 import {
   RenderingEngine,
@@ -16,16 +21,17 @@ import {
   volumeLoader,
   BaseVolumeViewport,
   VideoViewport,
-  StackViewport
+  StackViewport,
+  VolumeViewport
 } from '@cornerstonejs/core'
-import type { IStackViewport } from '@cornerstonejs/core/src/types'
+import type { Types } from '@cornerstonejs/core'
+import type { IStackViewport, IVolumeViewport } from '@cornerstonejs/core/src/types'
 import { formatDate } from '@/composables/image/utils'
 import type { ImageInfo, ImageInfoWindows, SingleImage } from '@/types/image'
 import { initDemo } from '@/utils/helpers/index.js'
 import createTools from '@/composables/toolsManage'
 import { utilities as csUtils } from '@cornerstonejs/core'
-import {type ViewportColorbar} from '@cornerstonejs/tools/src/utilities/voi/colorbar/ViewportColorbar'
-import model from '@/router/modules/model'
+import { type ViewportColorbar } from '@cornerstonejs/tools/src/utilities/voi/colorbar/ViewportColorbar'
 
 const { Enums: csToolsEnums } = cornerstoneTools
 const { MouseBindings } = csToolsEnums
@@ -90,8 +96,8 @@ export const useImageStateStore = defineStore('imageState', () => {
       : []
   )
   const imagesModelsLists = reactive<ImageInfo[]>(
-    storageSession().getItem<ImageInfo[]>(imagesListsModelsSession)
-      ? storageSession().getItem<ImageInfo[]>(imagesListsModelsSession)
+    storageSession().getItem<ImageInfo[]>(imagesModelsListsSession)
+      ? storageSession().getItem<ImageInfo[]>(imagesModelsListsSession)
       : []
   )
   const imagesListWindows = reactive<(0 | ImageInfoWindows)[]>(
@@ -99,6 +105,8 @@ export const useImageStateStore = defineStore('imageState', () => {
       ? storageSession().getItem<(0 | ImageInfoWindows)[]>(imagesListWindowsSession)
       : [0, 0, 0, 0, 0, 0, 0, 0, 0]
   )
+
+  const segmentationRepresentationUIDList = reactive(new Map())
 
   const tableData = reactive([
     {
@@ -282,8 +290,10 @@ export const useImageStateStore = defineStore('imageState', () => {
   const renderingEngine: Ref<RenderingEngine> = ref(
     new RenderingEngine('stackRenderingEngine')
   ) as Ref<RenderingEngine>
-  const viewports: Ref<BaseVolumeViewport[] | IStackViewport[] | VideoViewport[]> = ref([]) as Ref<
-    BaseVolumeViewport[] | IStackViewport[] | VideoViewport[]
+  const viewports: Ref<
+    BaseVolumeViewport[] | Types.IStackViewport[] | VideoViewport[] | Types.IVolumeViewport[]
+  > = ref([]) as Ref<
+    BaseVolumeViewport[] | Types.IStackViewport[] | VideoViewport[] | Types.IVolumeViewport[]
   >
   const viewportColorbar: Ref<ViewportColorbar[]> = ref([])
 
@@ -291,6 +301,7 @@ export const useImageStateStore = defineStore('imageState', () => {
   const toolGroup: Ref<IToolGroup> = ref(
     cornerstoneTools.ToolGroupManager.createToolGroup('GroupToolsId') as unknown as IToolGroup
   ) as Ref<IToolGroup>
+  const segmentationId = ref('segementationId')
 
   const selectImagesList = ref()
   const selectImagesListWindows = ref(0)
@@ -307,7 +318,6 @@ export const useImageStateStore = defineStore('imageState', () => {
         }
       ]
     })
-    
   }
 
   function bindImageList(imageObject: Record<string, any>) {
@@ -336,8 +346,18 @@ export const useImageStateStore = defineStore('imageState', () => {
   }
 
   function pushImagesModelsList(imagesList: ImageInfo) {
-    console.log(imagesList)
-    imagesModelsLists.push(imagesList)
+    let existingElement = imagesModelsLists.find(
+      (element) =>
+        element.singleImageList.length === imagesList.singleImageList.length &&
+        element.singleImageList[0].singleImagePath === imagesList.singleImageList[0].singleImagePath
+    )
+    if (existingElement) {
+      const index = imagesModelsLists.indexOf(existingElement)
+      imagesModelsLists.splice(index, 1)
+      imagesModelsLists.push(imagesList)
+    } else {
+      imagesModelsLists.push(imagesList)
+    }
   }
 
   async function getImagesListData() {
@@ -372,6 +392,8 @@ export const useImageStateStore = defineStore('imageState', () => {
     imagesList,
     imagesLists,
     imagesListWindows,
+    segmentationRepresentationUIDList,
+    segmentationId,
     imagesModelsLists,
 
     tableData,

@@ -17,6 +17,12 @@ const props = defineProps<{
   imagesList: ImageInfo
   index: number
 }>()
+
+const emit = defineEmits<{
+  addSelectImagesLists: [imagesList: ImageInfo,checked:boolean]
+}>()
+
+const checked = ref(false)
 const imageIds: string[] = []
 const { ViewportType } = Enums
 const imageStateStore = useImageStateStore()
@@ -24,7 +30,6 @@ let elementId = ref('cornerstone-element-imagesList-' + props.imagesList.imageId
 const viewportId = 'stackViewPort-imagesList-' + props.imagesList.imageId
 const renderingEngine = imageStateStore.renderingEngine
 const imagesListUrl = generateImageUrl(props.imagesList.singleImageList[0].singleImagePath)
-console.log(imagesListUrl)
 const imagesListUrlCheck = ref(true)
 
 function selectImagesListToWindows() {
@@ -41,6 +46,10 @@ function selectImagesListToWindows() {
     ...imageStateStore.imagesListWindows.slice(imageStateStore.selectImagesListWindows + 1)
   ]
   changeImagesListWindowsToSession(ImageInfoWindows, imageStateStore.selectImagesListWindows)
+}
+
+function checkInputCheckbox() {
+  emit('addSelectImagesLists', props.imagesList, checked.value)
 }
 
 onMounted(() => {
@@ -68,7 +77,7 @@ onMounted(() => {
 <template>
   <div class="flex justify-center w-5/6 flex-nowrap">
     <div class="w-1/6">
-      <input type="checkbox" />
+      <el-checkbox v-model="checked" size="large" @change="checkInputCheckbox"/>
     </div>
     <div
       class="flex flex-col justify-center w-4/6 gap-1"
@@ -98,7 +107,6 @@ onMounted(() => {
         <div v-show="imagesListUrlCheck">
           <div :id="elementId" class="w-32 h-32"></div>
         </div>
-        <!-- <div :id="elementId" class="absolute w-screen h-screen"></div> -->
       </div>
       <div class="flex items-center justify-between">
         <span class="text-xs text-gray-500">

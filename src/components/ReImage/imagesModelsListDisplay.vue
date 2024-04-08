@@ -16,6 +16,12 @@ const props = defineProps<{
   imagesModelsList: ImageInfo
   index: number
 }>()
+
+const emit = defineEmits<{
+  addSelectImagesModelsLists: [imagesList: ImageInfo,checked:boolean]
+}>()
+
+const checked = ref(false)
 const imageIds: string[] = []
 const { ViewportType } = Enums
 const imageStateStore = useImageStateStore()
@@ -39,7 +45,6 @@ function selectimagesModelsListToWindows() {
     ...imageStateStore.imagesListWindows.slice(imageStateStore.selectImagesListWindows + 1)
   ]
   changeImagesListWindowsToSession(ImageInfoWindows, imageStateStore.selectImagesListWindows)
-  console.log(imageStateStore.imagesListWindows)
 }
 onMounted(() => {
 
@@ -67,7 +72,7 @@ onMounted(() => {
 <template>
   <div class="flex justify-center w-5/6 flex-nowrap">
     <div class="w-1/6">
-      <input type="checkbox" />
+      <el-checkbox v-model="checked" size="large" @change=" $emit('addSelectImagesModelsLists', props.imagesModelsList, checked)"/>
     </div>
     <div
       class="flex flex-col justify-center w-4/6 gap-1"

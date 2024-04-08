@@ -39,3 +39,7 @@ export const singleImageSegmentationOfThyroidNodulesApi = (params?: object) => {
 export const singleImageClassifyOfThyroidNodulesApi = (params?: object) => {
   return http.request<any>('get', baseUrlApi('modelApi/singleClassify'), { params })
 }
+
+export const singleImageSegmentationOfPulmonaryNodulesApi = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('modelApi/singleLungDetect'), { params })
+}

@@ -2,7 +2,6 @@ import * as cornerstoneTools from '@cornerstonejs/tools'
 import type IToolGroup from '@cornerstonejs/tools/src/types/IToolGroup'
 import { useImageStateStore } from '@/store/imageState'
 import { volumeLoader } from '@cornerstonejs/core'
-import { fa } from 'element-plus/es/locale'
 
 const imageStateStore = useImageStateStore()
 const {
@@ -47,6 +46,12 @@ const {
   CrosshairsTool,
   PlanarFreehandROITool,
   UltrasoundDirectionalTool,
+  LivewireContourTool,
+  SplineROITool,
+
+  PlanarFreehandContourSegmentationTool,
+  LivewireContourSegmentationTool,
+  SplineContourSegmentationTool,
 
   ToolGroupManager,
   Enums: csToolsEnums,
@@ -60,7 +65,9 @@ const brushInstanceNames = {
   SphereBrush: 'SphereBrush',
   SphereEraser: 'SphereEraser',
   ThresholdCircle: 'ThresholdCircle',
-  ThresholdSphere: 'ThresholdSphere'
+  ThresholdSphere: 'ThresholdSphere',
+  DynamicThreshold: 'DynamicThreshold',
+  ScissorsEraser: 'ScissorsEraser'
 }
 
 const brushStrategies = {
@@ -69,17 +76,10 @@ const brushStrategies = {
   [brushInstanceNames.SphereBrush]: 'FILL_INSIDE_SPHERE',
   [brushInstanceNames.SphereEraser]: 'ERASE_INSIDE_SPHERE',
   [brushInstanceNames.ThresholdCircle]: 'THRESHOLD_INSIDE_CIRCLE',
-  [brushInstanceNames.ThresholdSphere]: 'THRESHOLD_INSIDE_SPHERE'
+  [brushInstanceNames.ThresholdSphere]: 'THRESHOLD_INSIDE_SPHERE',
+  [brushInstanceNames.DynamicThreshold]: 'THRESHOLD_INSIDE_CIRCLE',
+  [brushInstanceNames.ScissorsEraser]: 'ERASE_INSIDE'
 }
-
-const brushValues = [
-  brushInstanceNames.CircularBrush,
-  brushInstanceNames.CircularEraser,
-  brushInstanceNames.SphereBrush,
-  brushInstanceNames.SphereEraser,
-  brushInstanceNames.ThresholdCircle,
-  brushInstanceNames.ThresholdSphere
-]
 
 async function addSegmentationsToState(volumeId: string, segmentationId: string) {
   // Create a segmentation of the same resolution as the source data
@@ -105,11 +105,7 @@ async function addSegmentationsToState(volumeId: string, segmentationId: string)
   ])
 }
 
-async function createTools(
-
-  segmentationId: string = '',
-  volumeId: string = ''
-) {
+async function createTools(segmentationId: string = '', volumeId: string = '') {
   // Add tools to Cornerstone3D
   // cornerstoneTools.addTool(AnnotationDisplayTool)
   // cornerstoneTools.addTool(ReferenceCursors);
@@ -148,7 +144,12 @@ async function createTools(
   cornerstoneTools.addTool(TrackballRotateTool)
   cornerstoneTools.addTool(VolumeRotateMouseWheelTool)
   cornerstoneTools.addTool(UltrasoundDirectionalTool)
+  cornerstoneTools.addTool(LivewireContourTool)
 
+  cornerstoneTools.addTool(PlanarFreehandContourSegmentationTool)
+  cornerstoneTools.addTool(LivewireContourSegmentationTool)
+  cornerstoneTools.addTool(SplineContourSegmentationTool)
+  cornerstoneTools.addTool(SplineROITool);
   // cornerstoneTools.addTool(DragProbeTool);
 
   // Define a tool group, which defines how mouse events map to tool commands for
@@ -181,7 +182,8 @@ async function createTools(
 
   // set interpolation to be ON while editing only
   toolGroup.setToolConfiguration(PlanarFreehandROITool.toolName, {
-    interpolation: { interpolateOnAdd: false, interpolateOnEdit: true }
+    interpolation: { interpolateOnAdd: false, interpolateOnEdit: true },
+    calculateStats: true
   })
 
   toolGroup.addTool(WindowLevelTool.toolName)
@@ -202,10 +204,43 @@ async function createTools(
   toolGroup.addTool(TrackballRotateTool.toolName)
   toolGroup.addTool(VolumeRotateMouseWheelTool.toolName)
   toolGroup.addTool(UltrasoundDirectionalTool.toolName)
+  toolGroup.addTool(LivewireContourTool.toolName)
+  toolGroup.addToolInstance('CardinalSplineROI', SplineROITool.toolName, {
+    spline: {
+      type: SplineROITool.SplineTypes.Cardinal,
+      configuration: {
+        [SplineROITool.SplineTypes.Cardinal]: {
+          scale: 0.5
+        }
+      }
+    }
+  })
+
+  toolGroup.addToolInstance('CatmullRomSplineROI', SplineROITool.toolName, {
+    spline: {
+      type: SplineROITool.SplineTypes.CatmullRom
+    }
+  })
+
+  toolGroup.addToolInstance('LinearSplineROI', SplineROITool.toolName, {
+    spline: {
+      type: SplineROITool.SplineTypes.Linear
+    }
+  })
+
+  toolGroup.addToolInstance('BSplineROI', SplineROITool.toolName, {
+    spline: {
+      type: SplineROITool.SplineTypes.BSpline
+    }
+  })
+
+  toolGroup.addTool(SplineContourSegmentationTool.toolName)
   toolGroup.setToolConfiguration(UltrasoundDirectionalTool.toolName, {
-    displayBothAxesDistances: true,
-  });
-  
+    displayBothAxesDistances: true
+  })
+
+  toolGroup.addTool(PlanarFreehandContourSegmentationTool.toolName)
+  toolGroup.addTool(LivewireContourSegmentationTool.toolName)
   // toolGroup.addTool(DragProbeTool.toolName);
 
   toolGroup.addToolInstance(brushInstanceNames.CircularBrush, BrushTool.toolName, {
@@ -226,7 +261,35 @@ async function createTools(
   toolGroup.addToolInstance(brushInstanceNames.ThresholdCircle, BrushTool.toolName, {
     activeStrategy: brushStrategies.ThresholdCircle
   })
+  toolGroup.addToolInstance(brushInstanceNames.DynamicThreshold, BrushTool.toolName, {
+    activeStrategy: brushStrategies.DynamicThreshold
+  })
+  toolGroup.addToolInstance(brushInstanceNames.ScissorsEraser, SphereScissorsTool.toolName, {
+    activeStrategy: brushStrategies.ScissorsEraser
+  })
+  toolGroup.addToolInstance('CatmullRomSplineSegmentation', SplineContourSegmentationTool.toolName, {
+    spline: {
+      type: SplineContourSegmentationTool.SplineTypes.CatmullRom
+    }
+  })
 
+  toolGroup.addToolInstance('LinearSplineSegmentation', SplineContourSegmentationTool.toolName, {
+    spline: {
+      type: SplineContourSegmentationTool.SplineTypes.Linear
+    }
+  })
+
+  toolGroup.addToolInstance('BSplineSegmentation', SplineContourSegmentationTool.toolName, {
+    spline: {
+      type: SplineContourSegmentationTool.SplineTypes.BSpline
+    }
+  })
+
+  toolGroup.addToolInstance('CardinalSplineSegmentation', SplineContourSegmentationTool.toolName, {
+    spline: {
+      type: SplineContourSegmentationTool.SplineTypes.Cardinal
+    }
+  })
   // toolGroup.setToolPassive(AnnotationDisplayTool.toolName)
   // toolGroup.setToolPassive(ReferenceCursors.toolName)
   toolGroup.setToolPassive(ReferenceLines.toolName)
@@ -278,18 +341,11 @@ async function createTools(
   toolGroup.setToolPassive(StackScrollTool.toolName)
   toolGroup.setToolPassive(TrackballRotateTool.toolName)
   toolGroup.setToolPassive(VolumeRotateMouseWheelTool.toolName)
+  toolGroup.setToolPassive(LivewireContourTool.toolName)
 
-  if (volumeId != '' && segmentationId != '') {
-    await addSegmentationsToState(volumeId, segmentationId)
-    // toolGroup.setToolPassive(DragProbeTool.toolName);
-    // // Add the segmentation representation to the toolgroup
-    await segmentation.addSegmentationRepresentations(toolGroup.id, [
-      {
-        segmentationId,
-        type: csToolsEnums.SegmentationRepresentations.Labelmap
-      }
-    ])
-  }
+  toolGroup.setToolPassive(PlanarFreehandContourSegmentationTool.toolName)
+  toolGroup.setToolPassive(LivewireContourSegmentationTool.toolName)
+
   // toolGroup!.addViewport(viewportId, renderingEngineId)
 
   imageStateStore.leftMouseActive = ArrowAnnotateTool.toolName

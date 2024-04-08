@@ -19,7 +19,7 @@ function changeCurrentComp(comp: any): void {
 </script>
 
 <template>
-  <div v-show="display" class="divide-x-0 divide-y-4 w-60 divide-double divide-slate-400/25">
+  <div v-show="display" class="divide-x-0 divide-y-4 w-60 divide-double divide-slate-400/25 ">
     <div
       class="flex items-center justify-between flex-nowrap bg-stone-50 dark:border-gray-700 dark:bg-gray-800"
     >

@@ -69,7 +69,6 @@ function downloadCanvas() {
   html2canvas(divForDownloadViewport).then((canvas: HTMLCanvasElement) => {
     const link = document.createElement('a')
     link.download = imageInfo.imageName+'.'+imageInfo.imageType
-    console.log(imageInfo.imageType)
     link.href = canvas.toDataURL(imageInfo.imageType, 1.0)
     link.click()
   })

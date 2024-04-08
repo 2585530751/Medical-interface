@@ -2,7 +2,6 @@ import { getRenderingEngine, type Types } from '@cornerstonejs/core'
 import { utilities as csUtils } from '@cornerstonejs/core'
 import { utilities as cstUtils } from '@cornerstonejs/tools'
 import vtkColormaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps'
-import { type ViewportColorbar } from '@cornerstonejs/tools/src/utilities/voi/colorbar/ViewportColorbar'
 import { annotation } from '@cornerstonejs/tools'
 import type { Annotation } from '@cornerstonejs/tools/src/types'
 import html2canvas from 'html2canvas'
@@ -293,7 +292,9 @@ function createViewportColorbar(index: number, elementId: string, colorbarContai
 }
 
 function downloadCanvasAsImage(divForDownloadViewportName: string, filename: string) {
-  const divForDownloadViewport = document.querySelector(divForDownloadViewportName) as HTMLDivElement
+  const divForDownloadViewport = document.querySelector(
+    divForDownloadViewportName
+  ) as HTMLDivElement
   html2canvas(divForDownloadViewport).then((canvas: HTMLCanvasElement) => {
     const link = document.createElement('a')
     link.download = filename + '.jpg'

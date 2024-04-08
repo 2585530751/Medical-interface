@@ -22,6 +22,7 @@ import iImagingAlternativeCt from '@/assets/svg/i-imaging-alternative-ct.svg?com
 import cardiopulmonary from '@/assets/svg/cardiopulmonary.svg?component'
 import ellipses from '@/assets/svg/ellipses.svg?component'
 import circleCenter from '@/assets/svg/circleCenter.svg?component'
+import scissorsEraser from '@/assets/svg/scissorsEraser.svg?component'
 import rectangles from '@/assets/svg/rectangles.svg?component'
 import pen from '@/assets/svg/pen.svg?component'
 import pencil from '@/assets/svg/pencil.svg?component'
@@ -43,11 +44,25 @@ import paintFill from '@/assets/svg/paintFill.svg?component'
 import circleEmpty from '@/assets/svg/circle.svg?component'
 import selectToolname from '@/assets/svg/select.svg?component'
 import circleTwoLine from '@/assets/svg/circleTwoLine.svg?component'
+import circularBrush from '@/assets/svg/circularBrush.svg?component'
+import circularEraser from '@/assets/svg/circularEraser.svg?component'
+import thresholdCircle from '@/assets/svg/threSholdCircle.svg?component'
+import splineSegmentation from '@/assets/svg/splineSegmentation.svg?component'
+import livewireSegmentation from '@/assets/svg/livewireSegmentation.svg?component'
+import planarFreehandSegmentation from '@/assets/svg/planarFreehandSegmentation.svg?component'
+import livewireContour from '@/assets/svg/livewireContour.svg?component'
+import splineROI from '@/assets/svg/splineROI.svg?component'
 
+import { storageSession } from '@pureadmin/utils'
+import { imagesListWindowsSession } from '@/composables/image/utils'
+import type { ImageInfoWindows } from '@/types/image'
+import type { Types } from '@cornerstonejs/core'
+import { getRenderingEngine } from '@cornerstonejs/core'
 import type { IconifyIconOffline } from '@/components/ReIcon'
 import imageOperation from '@/components/ReButton/imageOperation.vue'
 import imageOperationText from '@/components/ReButton/imageOperationText.vue'
 import * as cornerstoneTools from '@cornerstonejs/tools'
+import type { Types as cstTypes } from '@cornerstonejs/tools'
 import { useImageStateStore } from '@/store/imageState'
 import {
   resetOriginal,
@@ -73,7 +88,8 @@ import {
   selectAnnotationsByToolName,
   downloadCanvasAsImage
 } from '@/composables/image/imageOperate'
-import { ref, watch } from 'vue'
+import type { ContourConfig } from '@cornerstonejs/tools/src/types/ContourTypes'
+import { reactive, ref, watch } from 'vue'
 import vtkColormaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps'
 
 const {
@@ -118,7 +134,14 @@ const {
   CrosshairsTool,
   PlanarFreehandROITool,
   UltrasoundDirectionalTool,
+  LivewireContourTool,
+  SplineROITool,
 
+  PlanarFreehandContourSegmentationTool,
+  LivewireContourSegmentationTool,
+  SplineContourSegmentationTool,
+
+  segmentation,
   utilities: csToolsUtilities,
   Enums: csToolsEnums
 } = cornerstoneTools
@@ -127,6 +150,40 @@ const imageStateStore = useImageStateStore()
 const segmentationTools = ref(true)
 const operateTools = ref(true)
 const annotationTools = ref(true)
+const otherTools=ref(true)
+
+const Splines = {
+  CardinalSplineSegmentation: {
+    splineType: SplineContourSegmentationTool.SplineTypes.Cardinal
+  },
+  CatmullRomSplineSegmentation: {
+    splineType: SplineContourSegmentationTool.SplineTypes.CatmullRom
+  },
+  LinearSplineSegmentation: {
+    splineType: SplineContourSegmentationTool.SplineTypes.Linear
+  },
+  BSplineSegmentation: {
+    splineType: SplineContourSegmentationTool.SplineTypes.BSpline
+  }
+}
+
+const Splines1 = {
+  CardinalSplineROI: {
+    splineType: SplineROITool.SplineTypes.Cardinal
+  },
+  CatmullRomSplineROI: {
+    splineType: SplineROITool.SplineTypes.CatmullRom
+  },
+  LinearSplineROI: {
+    splineType: SplineROITool.SplineTypes.Linear
+  },
+  BSplineROI: {
+    splineType: SplineROITool.SplineTypes.BSpline
+  }
+}
+
+const splineToolsNames = [...Object.keys(Splines)]
+const splineAnnotationToolsNames = [...Object.keys(Splines1)]
 
 const annotationToolsList = [
   { label: '箭头', toolName: ArrowAnnotateTool.toolName },
@@ -136,7 +193,7 @@ const annotationToolsList = [
   { label: 'Cobb角', toolName: CobbAngleTool.toolName },
   { label: '矩形', toolName: RectangleROITool.toolName },
   { label: '椭圆', toolName: EllipticalROITool.toolName },
-  { label: '圆心', toolName: CircleROITool.toolName },
+  { label: '圆形', toolName: CircleROITool.toolName },
   { label: '铅笔', toolName: PlanarFreehandROITool.toolName },
   { label: '探测', toolName: ProbeTool.toolName },
   { label: '超声方向', toolName: UltrasoundDirectionalTool.toolName }
@@ -166,6 +223,11 @@ const windowLevelPresetValues = [
   { label: 'Brain 80/40', window: 80, level: 40 },
   { label: 'Abdomen 350/60', window: 360, level: 60 },
   { label: 'Chest 360/40', window: 350, level: 40 }
+]
+
+const thresholdCirclePresetValues = [
+  { label: 'CT Fat: (-150, -70)', threshold: [-150, -70] },
+  { label: 'CT Bone: (200, 1000)', threshold: [200, 1000] }
 ]
 
 const colormaps = vtkColormaps.rgbPresetNames.map((presetName) =>
@@ -213,6 +275,140 @@ watch(
     deep: true
   }
 )
+
+const segmentationToolsConfiguration = reactive({
+  circularBrush: {
+    radius: 10
+  },
+  circularEraser: {
+    radius: 10
+  },
+  thresholdCircle: {
+    radius: 10,
+    threshold: [40, 100]
+  },
+  contourSegmentationTool: {
+    outlineWidthActive: 2,
+    outlineOpacity: 0.5,
+    fillAlpha: 0.5,
+    outlineDashActive: 0
+  }
+})
+
+function changeBrushSizeForToolGroup(radius: number) {
+  csToolsUtilities.segmentation.setBrushSizeForToolGroup(imageStateStore.toolGroup.id, radius)
+}
+
+function changeBrushThresholdForToolGroup() {
+  csToolsUtilities.segmentation.setBrushThresholdForToolGroup(
+    imageStateStore.toolGroup.id,
+    segmentationToolsConfiguration.thresholdCircle.threshold as Types.Point2
+  )
+}
+
+function changeThresholdCirclePresetValue(threshold: number[]) {
+  segmentationToolsConfiguration.thresholdCircle.threshold[0] = threshold[0]
+  segmentationToolsConfiguration.thresholdCircle.threshold[1] = threshold[1]
+  changeBrushThresholdForToolGroup()
+}
+
+function updateSegmentationConfig(config: ContourConfig) {
+  const segmentationRepresentation =
+    segmentation.activeSegmentation.getActiveSegmentationRepresentation(
+      imageStateStore.toolGroup.id
+    )
+  const segmentationConfig = getSegmentationConfig(
+    imageStateStore.toolGroup.id,
+    segmentationRepresentation.segmentationRepresentationUID
+  )
+
+  Object.assign(segmentationConfig.CONTOUR as ContourConfig, config)
+
+  segmentation.config.setSegmentationRepresentationSpecificConfig(
+    imageStateStore.toolGroup.id,
+    segmentationRepresentation.segmentationRepresentationUID,
+    segmentationConfig
+  )
+}
+function getSegmentationConfig(
+  toolGroupdId: string,
+  segmentationRepresentationUID: string
+): cstTypes.RepresentationConfig {
+  const segmentationConfig =
+    segmentation.config.getSegmentationRepresentationSpecificConfig(
+      toolGroupdId,
+      segmentationRepresentationUID
+    ) ?? {}
+
+  // Add CONTOUR object because getSegmentationRepresentationSpecificConfig
+  // can return an empty object
+  if (!segmentationConfig.CONTOUR) {
+    segmentationConfig.CONTOUR = {}
+  }
+
+  return segmentationConfig
+}
+
+const annotationToolsConfiguration = reactive({
+  cardinalSplineROI: {
+    resolution: 10,
+    scale: 0.5
+  },
+  catmullRomSplineROI: {
+    resolution: 10
+  },
+  bSplineROI: {
+    resolution: 10
+  }
+})
+
+function changeSplineResolutionForToolGroup(splineToolName: string, resolution: number) {
+  const toolGroup = imageStateStore.toolGroup
+  const { splineType } = Splines1[splineToolName as keyof typeof Splines1]
+  const splineConfig = toolGroup.getToolConfiguration(splineToolName, 'spline')
+  splineConfig.configuration[splineType].resolution = resolution
+  toolGroup.setToolConfiguration(splineToolName, { spline: splineConfig })
+}
+
+function changeSplineScaleForToolGroup(splineToolName: string, scale: number) {
+  const toolGroup = imageStateStore.toolGroup
+  const { splineType } = Splines1[splineToolName as keyof typeof Splines1]
+  const splineConfig = toolGroup.getToolConfiguration(splineToolName, 'spline')
+  splineConfig.configuration[splineType].scale = scale
+  toolGroup.setToolConfiguration(splineToolName, { spline: splineConfig })
+}
+
+function deleteImagesListWindowsToSession(
+  index: number,
+  renderingEngineId: string,
+  viewportId: string
+) {
+  const session = storageSession()
+  const renderingEngine = getRenderingEngine(renderingEngineId)
+  // const viewport = <Types.IStackViewport>renderingEngine!.getViewport(viewportId)
+  if (session.getItem(imagesListWindowsSession)) {
+    const list: (ImageInfoWindows | 0)[] = session.getItem(imagesListWindowsSession)
+    list[index] = 0
+    session.setItem(imagesListWindowsSession, list)
+    imageStateStore.viewports.splice(index, 1)
+    imageStateStore.viewportColorbar[index].destroy()
+    imageStateStore.viewportColorbar.splice(index, 1)
+    imageStateStore.imagesListWindows[index] = 0
+    renderingEngine!.disableElement(viewportId)
+  }
+}
+
+function removeAllImagesListWindowsToSession(renderingEngineId: string) {
+  imageStateStore.imagesListWindows.forEach((item, index) => {
+    if (item != 0) {
+      deleteImagesListWindowsToSession(
+        index,
+        renderingEngineId,
+        imageStateStore.viewports[index].id
+      )
+    }
+  })
+}
 </script>
 
 <template>
@@ -663,7 +859,7 @@ watch(
             <ellipses style="height: 30px; width: 30px; fill: currentColor"></ellipses>
           </imageOperation>
           <imageOperation
-            operation="圆心"
+            operation="圆形"
             @click="imageStateStore.bindLeftMouse(CircleROITool.toolName)"
           >
             <circleEmpty style="height: 30px; width: 30px; fill: currentColor"></circleEmpty>
@@ -693,6 +889,43 @@ watch(
           >
             <circleTwoLine style="height: 30px; width: 30px; fill: currentColor"></circleTwoLine
           ></imageOperation>
+          <imageOperation
+            operation="实时轮廓"
+            @click="imageStateStore.bindLeftMouse(LivewireContourTool.toolName)"
+          >
+            <livewireContour style="height: 30px; width: 30px; fill: currentColor"></livewireContour
+          ></imageOperation>
+          <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
+            <div
+              class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
+              @click="imageStateStore.bindLeftMouse(splineAnnotationToolsNames[0])"
+            >
+              <splineROI style="height: 30px; width: 30px; fill: currentColor"></splineROI>
+              <span class="text-sm text-gray-500 dark:text-white">曲线</span>
+            </div>
+            <div
+              style="border-left-width: 1px"
+              class="flex items-center h-full text-lg font-extrabold border-0 border-solid rounded-sm cursor-pointer hover:bg-gray-300 border-slate-300"
+            >
+              <el-dropdown trigger="click">
+                <IconifyIconOffline
+                  class="hover:text-blue-500"
+                  :icon="arrowDown"
+                  :style="{ fontSize: '15px' }"
+                ></IconifyIconOffline>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item
+                      v-for="splineAnnotationToolsName in splineAnnotationToolsNames"
+                      @click="imageStateStore.bindLeftMouse(splineAnnotationToolsName)"
+                      :key="splineAnnotationToolsName"
+                      >{{ splineAnnotationToolsName }}</el-dropdown-item
+                    >
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
+          </div>
           <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
             <div
               class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
@@ -803,6 +1036,147 @@ watch(
             "
           ></imageOperationText>
         </div>
+        <div
+          class="px-2 pt-1 pb-1"
+          v-show="imageStateStore.leftMouseActive == splineAnnotationToolsNames[0]"
+        >
+          <div class="flex flex-col">
+            <div class="flex justify-between">
+              <el-text>Cardinal Resolution</el-text
+              ><el-input-number
+                :min="1"
+                :max="10"
+                @change="
+                  changeSplineResolutionForToolGroup(
+                    splineAnnotationToolsNames[0],
+                    annotationToolsConfiguration.cardinalSplineROI.resolution
+                  )
+                "
+                :controls="false"
+                v-model="annotationToolsConfiguration.cardinalSplineROI.resolution"
+                style="width: 45px; height: 20px"
+              />
+            </div>
+            <div>
+              <el-slider
+                :min="1"
+                :max="10"
+                @change="
+                  changeSplineResolutionForToolGroup(
+                    splineAnnotationToolsNames[0],
+                    annotationToolsConfiguration.cardinalSplineROI.resolution
+                  )
+                "
+                v-model="annotationToolsConfiguration.cardinalSplineROI.resolution"
+              />
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <div class="flex justify-between">
+              <el-text>Cardinal Scale</el-text
+              ><el-input-number
+                :min="0"
+                :max="1"
+                :step="0.01"
+                @change="
+                  changeSplineScaleForToolGroup(
+                    splineAnnotationToolsNames[0],
+                    annotationToolsConfiguration.cardinalSplineROI.scale
+                  )
+                "
+                :controls="false"
+                v-model="annotationToolsConfiguration.cardinalSplineROI.scale"
+                style="width: 60px; height: 20px"
+              />
+            </div>
+            <div>
+              <el-slider
+                :min="0"
+                :max="1"
+                :step="0.01"
+                @change="
+                  changeSplineScaleForToolGroup(
+                    splineAnnotationToolsNames[0],
+                    annotationToolsConfiguration.cardinalSplineROI.scale
+                  )
+                "
+                v-model="annotationToolsConfiguration.cardinalSplineROI.scale"
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          class="px-2 pt-1 pb-1"
+          v-show="imageStateStore.leftMouseActive == splineAnnotationToolsNames[1]"
+        >
+          <div class="flex flex-col">
+            <div class="flex justify-between">
+              <el-text>CatmullRom Resolution</el-text
+              ><el-input-number
+                :min="1"
+                :max="10"
+                @change="
+                  changeSplineResolutionForToolGroup(
+                    splineAnnotationToolsNames[1],
+                    annotationToolsConfiguration.catmullRomSplineROI.resolution
+                  )
+                "
+                :controls="false"
+                v-model="annotationToolsConfiguration.catmullRomSplineROI.resolution"
+                style="width: 45px; height: 20px"
+              />
+            </div>
+            <div>
+              <el-slider
+                :min="1"
+                :max="10"
+                @change="
+                  changeSplineResolutionForToolGroup(
+                    splineAnnotationToolsNames[1],
+                    annotationToolsConfiguration.catmullRomSplineROI.resolution
+                  )
+                "
+                v-model="annotationToolsConfiguration.catmullRomSplineROI.resolution"
+              />
+            </div>
+          </div>
+        </div>
+        <div
+          class="px-2 pt-1 pb-1"
+          v-show="imageStateStore.leftMouseActive == splineAnnotationToolsNames[3]"
+        >
+          <div class="flex flex-col">
+            <div class="flex justify-between">
+              <el-text>bSplineROI resolution</el-text
+              ><el-input-number
+                :min="1"
+                :max="10"
+                @change="
+                  changeSplineResolutionForToolGroup(
+                    splineAnnotationToolsNames[3],
+                    annotationToolsConfiguration.bSplineROI.resolution
+                  )
+                "
+                :controls="false"
+                v-model="annotationToolsConfiguration.bSplineROI.resolution"
+                style="width: 45px; height: 20px"
+              />
+            </div>
+            <div>
+              <el-slider
+                :min="1"
+                :max="10"
+                @change="
+                  changeSplineResolutionForToolGroup(
+                    splineAnnotationToolsNames[3],
+                    annotationToolsConfiguration.bSplineROI.resolution
+                  )
+                "
+                v-model="annotationToolsConfiguration.bSplineROI.resolution"
+              />
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -811,7 +1185,6 @@ watch(
         class="flex items-center justify-between h-5 py-1 pl-2 bg-gray-100 rounded-md dark:bg-gray-700"
       >
         <a class="inline text-base tracking-widest text-gray-600 dark:text-white">分割工具</a>
-
         <el-button text size="small" @click="segmentationTools = !segmentationTools">
           <IconifyIconOffline
             class="hover:text-blue-500"
@@ -820,10 +1193,402 @@ watch(
           ></IconifyIconOffline>
         </el-button>
       </div>
-      <div v-show="segmentationTools" class="flex flex-wrap gap-1 pt-1 pb-1">
-        <imageOperation operation="3D探针">
-          <probes style="height: 30px; width: 30px; fill: currentColor"></probes>
-        </imageOperation>
+      <div
+        v-show="segmentationTools"
+        class="flex flex-col gap-1 divide-x-0 divide-y-2 divide-slate-400/30 divide-dashed"
+      >
+        <div class="flex flex-wrap gap-1 pt-1 pb-1">
+          <imageOperation
+            operation="矩形分割"
+            @click="imageStateStore.bindLeftMouse(RectangleScissorsTool.toolName)"
+          >
+            <rectangleScissor
+              style="height: 30px; width: 30px; fill: currentColor"
+            ></rectangleScissor>
+          </imageOperation>
+          <imageOperation
+            operation="圆形分割"
+            @click="imageStateStore.bindLeftMouse(CircleScissorsTool.toolName)"
+          >
+            <circleScissor style="height: 30px; width: 30px; fill: currentColor"></circleScissor>
+          </imageOperation>
+          <imageOperation
+            operation="圆形擦除"
+            @click="imageStateStore.bindLeftMouse('ScissorsEraser')"
+          >
+            <scissorsEraser style="height: 30px; width: 30px; fill: currentColor"></scissorsEraser>
+          </imageOperation>
+          <imageOperation
+            operation="画笔填充"
+            @click="imageStateStore.bindLeftMouse(PaintFillTool.toolName)"
+          >
+            <paintFill style="height: 30px; width: 30px; fill: currentColor"></paintFill>
+          </imageOperation>
+
+          <imageOperation
+            operation="毛刷"
+            @click="imageStateStore.bindLeftMouse('CircularBrush')"
+            @mouseup="
+              changeBrushSizeForToolGroup(segmentationToolsConfiguration.circularBrush.radius)
+            "
+          >
+            <circularBrush style="height: 30px; width: 30px; fill: currentColor"></circularBrush>
+          </imageOperation>
+
+          <imageOperation
+            operation="橡皮"
+            @click="imageStateStore.bindLeftMouse('CircularEraser')"
+            @mouseup="
+              changeBrushSizeForToolGroup(segmentationToolsConfiguration.circularEraser.radius)
+            "
+          >
+            <circularEraser style="height: 30px; width: 30px; fill: currentColor"></circularEraser>
+          </imageOperation>
+
+          <imageOperation
+            operation="阈值"
+            @click="imageStateStore.bindLeftMouse('ThresholdCircle')"
+            @mouseup="
+              changeBrushSizeForToolGroup(segmentationToolsConfiguration.thresholdCircle.radius)
+            "
+          >
+            <thresholdCircle
+              style="height: 30px; width: 30px; fill: currentColor"
+            ></thresholdCircle>
+          </imageOperation>
+
+          <imageOperation
+            operation="实时轮廓"
+            @click="imageStateStore.bindLeftMouse(LivewireContourSegmentationTool.toolName)"
+          >
+            <livewireSegmentation
+              style="height: 30px; width: 30px; fill: currentColor"
+            ></livewireSegmentation>
+          </imageOperation>
+
+          <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
+            <div
+              class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
+              @click="imageStateStore.bindLeftMouse(splineToolsNames[0])"
+            >
+              <splineSegmentation
+                style="height: 30px; width: 30px; fill: currentColor"
+              ></splineSegmentation>
+              <span class="text-sm text-gray-500 dark:text-white">曲线</span>
+            </div>
+            <div
+              style="border-left-width: 1px"
+              class="flex items-center h-full text-lg font-extrabold border-0 border-solid rounded-sm cursor-pointer hover:bg-gray-300 border-slate-300"
+            >
+              <el-dropdown trigger="click">
+                <IconifyIconOffline
+                  class="hover:text-blue-500"
+                  :icon="arrowDown"
+                  :style="{ fontSize: '15px' }"
+                ></IconifyIconOffline>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item
+                      v-for="splineToolsName in splineToolsNames"
+                      @click="imageStateStore.bindLeftMouse(splineToolsName)"
+                      :key="splineToolsName"
+                      >{{ splineToolsName }}</el-dropdown-item
+                    >
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
+          </div>
+          <imageOperation
+            operation="手绘轮廓"
+            @click="imageStateStore.bindLeftMouse(PlanarFreehandContourSegmentationTool.toolName)"
+          >
+            <planarFreehandSegmentation
+              style="height: 30px; width: 30px; fill: currentColor"
+            ></planarFreehandSegmentation>
+          </imageOperation>
+        </div>
+        <div class="px-2 pt-1 pb-1" v-show="imageStateStore.leftMouseActive == 'CircularBrush'">
+          <div class="flex justify-between">
+            <el-text>毛刷半径(mm)</el-text
+            ><el-input-number
+              :min="1"
+              :max="100"
+              @change="
+                changeBrushSizeForToolGroup(segmentationToolsConfiguration.circularBrush.radius)
+              "
+              :controls="false"
+              v-model="segmentationToolsConfiguration.circularBrush.radius"
+              style="width: 45px; height: 20px"
+            />
+          </div>
+          <div>
+            <el-slider
+              @change="
+                changeBrushSizeForToolGroup(segmentationToolsConfiguration.circularBrush.radius)
+              "
+              v-model="segmentationToolsConfiguration.circularBrush.radius"
+            />
+          </div>
+        </div>
+        <div class="px-2 pt-1 pb-1" v-show="imageStateStore.leftMouseActive == 'CircularEraser'">
+          <div class="flex justify-between">
+            <el-text>橡皮半径(mm)</el-text
+            ><el-input-number
+              :min="1"
+              :max="100"
+              @change="
+                changeBrushSizeForToolGroup(segmentationToolsConfiguration.circularEraser.radius)
+              "
+              :controls="false"
+              v-model="segmentationToolsConfiguration.circularEraser.radius"
+              style="width: 45px; height: 20px"
+            />
+          </div>
+          <div>
+            <el-slider
+              @change="
+                changeBrushSizeForToolGroup(segmentationToolsConfiguration.circularEraser.radius)
+              "
+              v-model="segmentationToolsConfiguration.circularEraser.radius"
+            />
+          </div>
+        </div>
+        <div class="px-2 pt-1 pb-1" v-show="imageStateStore.leftMouseActive == 'ThresholdCircle'">
+          <div class="flex justify-between">
+            <el-text>阈值半径(mm)</el-text
+            ><el-input-number
+              :min="1"
+              :max="100"
+              @change="
+                changeBrushSizeForToolGroup(segmentationToolsConfiguration.thresholdCircle.radius)
+              "
+              :controls="false"
+              v-model="segmentationToolsConfiguration.thresholdCircle.radius"
+              style="width: 45px; height: 20px"
+            />
+          </div>
+          <div>
+            <el-slider
+              @change="
+                changeBrushSizeForToolGroup(segmentationToolsConfiguration.thresholdCircle.radius)
+              "
+              v-model="segmentationToolsConfiguration.thresholdCircle.radius"
+            />
+          </div>
+          <div class="flex justify-between">
+            <el-text>阈值</el-text>
+            <el-dropdown trigger="click">
+              <el-button text size="small">
+                <IconifyIconOffline
+                  class="hover:text-blue-500"
+                  :icon="arrowDown"
+                  :style="{ fontSize: '20px' }"
+                ></IconifyIconOffline>
+              </el-button>
+
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item
+                    v-for="(thresholdCirclePresetValue, index) in thresholdCirclePresetValues"
+                    :key="index"
+                    @click="changeThresholdCirclePresetValue(thresholdCirclePresetValue.threshold)"
+                  >
+                    {{ thresholdCirclePresetValue.label }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <div class="flex gap-1">
+              <el-input-number
+                :min="-1000"
+                :max="1000"
+                @change="changeBrushThresholdForToolGroup()"
+                :controls="false"
+                v-model="segmentationToolsConfiguration.thresholdCircle.threshold[0]"
+                style="width: 65px; height: 20px"
+              />
+              <el-input-number
+                :min="-1000"
+                :max="1000"
+                @change="changeBrushThresholdForToolGroup()"
+                :controls="false"
+                v-model="segmentationToolsConfiguration.thresholdCircle.threshold[1]"
+                style="width: 60px; height: 20px"
+              />
+            </div>
+          </div>
+          <div>
+            <el-slider
+              range
+              @change="changeBrushThresholdForToolGroup()"
+              v-model="segmentationToolsConfiguration.thresholdCircle.threshold"
+              :min="-1000"
+              :max="1000"
+            />
+          </div>
+        </div>
+        <div
+          class="px-2 pt-1 pb-1"
+          v-show="
+            imageStateStore.leftMouseActive == LivewireContourSegmentationTool.toolName ||
+            imageStateStore.leftMouseActive == PlanarFreehandContourSegmentationTool.toolName ||
+            splineToolsNames.includes(imageStateStore.leftMouseActive)
+          "
+        >
+          <div class="flex flex-col">
+            <div class="flex justify-between">
+              <el-text>轮廓厚度</el-text
+              ><el-input-number
+                :min="1"
+                :max="20"
+                @change="
+                  updateSegmentationConfig({
+                    outlineWidthActive: Number(
+                      segmentationToolsConfiguration.contourSegmentationTool.outlineWidthActive
+                    )
+                  })
+                "
+                :controls="false"
+                v-model="segmentationToolsConfiguration.contourSegmentationTool.outlineWidthActive"
+                style="width: 45px; height: 20px"
+              />
+            </div>
+            <div>
+              <el-slider
+                :min="1"
+                :max="20"
+                @change="
+                  updateSegmentationConfig({
+                    outlineWidthActive: Number(
+                      segmentationToolsConfiguration.contourSegmentationTool.outlineWidthActive
+                    )
+                  })
+                "
+                v-model="segmentationToolsConfiguration.contourSegmentationTool.outlineWidthActive"
+              />
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <div class="flex justify-between">
+              <el-text>轮廓透明度</el-text
+              ><el-input-number
+                :min="0"
+                :max="1"
+                @change="
+                  updateSegmentationConfig({
+                    outlineOpacity: Number(
+                      segmentationToolsConfiguration.contourSegmentationTool.outlineOpacity
+                    )
+                  })
+                "
+                :controls="false"
+                v-model="segmentationToolsConfiguration.contourSegmentationTool.outlineOpacity"
+                style="width: 50px; height: 20px"
+              />
+            </div>
+            <div>
+              <el-slider
+                :min="0"
+                :max="1"
+                :step="0.01"
+                @change="
+                  updateSegmentationConfig({
+                    outlineOpacity: Number(
+                      segmentationToolsConfiguration.contourSegmentationTool.outlineOpacity
+                    )
+                  })
+                "
+                v-model="segmentationToolsConfiguration.contourSegmentationTool.outlineOpacity"
+              />
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <div class="flex justify-between">
+              <el-text>轮廓虚线</el-text
+              ><el-input-number
+                :min="0"
+                :max="20"
+                @change="
+                  updateSegmentationConfig({
+                    outlineDashActive: String(
+                      segmentationToolsConfiguration.contourSegmentationTool.outlineDashActive
+                    )
+                  })
+                "
+                :controls="false"
+                v-model="segmentationToolsConfiguration.contourSegmentationTool.outlineDashActive"
+                style="width: 50px; height: 20px"
+              />
+            </div>
+            <div>
+              <el-slider
+                :min="0"
+                :max="20"
+                :step="1"
+                @change="
+                  updateSegmentationConfig({
+                    outlineDashActive: String(
+                      segmentationToolsConfiguration.contourSegmentationTool.outlineDashActive
+                    )
+                  })
+                "
+                v-model="segmentationToolsConfiguration.contourSegmentationTool.outlineDashActive"
+              />
+            </div>
+          </div>
+          <div class="flex flex-col">
+            <div class="flex justify-between">
+              <el-text>覆盖Alpha</el-text
+              ><el-input-number
+                :min="0"
+                :max="1"
+                @change="
+                  updateSegmentationConfig({
+                    fillAlpha: Number(
+                      segmentationToolsConfiguration.contourSegmentationTool.fillAlpha
+                    )
+                  })
+                "
+                :controls="false"
+                v-model="segmentationToolsConfiguration.contourSegmentationTool.fillAlpha"
+                style="width: 50px; height: 20px"
+              />
+            </div>
+            <div>
+              <el-slider
+                :min="0"
+                :max="1"
+                :step="0.01"
+                @change="
+                  updateSegmentationConfig({
+                    fillAlpha: Number(
+                      segmentationToolsConfiguration.contourSegmentationTool.fillAlpha
+                    )
+                  })
+                "
+                v-model="segmentationToolsConfiguration.contourSegmentationTool.fillAlpha"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="p-2 bg-stone-50 dark:bg-gray-800">
+      <div
+        class="flex items-center justify-between h-5 py-1 pl-2 bg-gray-100 rounded-md dark:bg-gray-700"
+      >
+        <a class="inline text-base tracking-widest text-gray-600 dark:text-white">其他</a>
+
+        <el-button text size="small" @click="otherTools = !otherTools">
+          <IconifyIconOffline
+            class="hover:text-blue-500"
+            :icon="otherTools ? arrowUp : arrowDown"
+            :style="{ fontSize: '20px' }"
+          ></IconifyIconOffline>
+        </el-button>
+      </div>
+      <div v-show="otherTools" class="flex flex-wrap gap-1 pt-1 pb-1">
         <imageOperation
           operation="截屏"
           @click="
@@ -835,106 +1600,28 @@ watch(
         >
           <captureImage style="height: 30px; width: 30px; fill: currentColor"></captureImage>
         </imageOperation>
-        <imageOperation operation="删除">
-          <remove style="height: 30px; width: 30px; fill: currentColor"></remove>
+        <imageOperation operation="删除视窗">
+          <remove
+            style="height: 30px; width: 30px; fill: currentColor"
+            @click="
+              deleteImagesListWindowsToSession(
+                imageStateStore.selectImagesListWindows,
+                imageStateStore.renderingEngine.id,
+                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+              )
+            "
+          ></remove>
         </imageOperation>
         <imageOperation
-          operation="清除"
-          @click="imageStateStore.bindLeftMouse(PaintFillTool.toolName)"
+          operation="清空视窗"
+          @click="removeAllImagesListWindowsToSession(imageStateStore.renderingEngine.id)"
         >
           <removals style="height: 30px; width: 30px; fill: currentColor"></removals>
         </imageOperation>
-        <imageOperation operation="复制" @click="imageStateStore.bindLeftMouse('CircularBrush')">
-          <copy style="height: 30px; width: 30px; fill: currentColor"></copy>
-        </imageOperation>
-        <imageOperation
-          operation="画笔填充"
-          @click="imageStateStore.bindLeftMouse(PaintFillTool.toolName)"
-        >
-          <paintFill style="height: 30px; width: 30px; fill: currentColor"></paintFill>
-        </imageOperation>
-        <imageOperation operation="矩形剪刀">
-          <rectangleScissor
-            style="height: 30px; width: 30px; fill: currentColor"
-          ></rectangleScissor>
-        </imageOperation>
-        <imageOperation operation="圆形剪刀">
-          <circleScissor style="height: 30px; width: 30px; fill: currentColor"></circleScissor>
-        </imageOperation>
-      </div>
-    </div>
-    <div class="p-2 bg-stone-50 dark:bg-gray-800">
-      <div
-        class="flex items-center justify-between h-5 py-1 pl-2 bg-gray-100 rounded-md dark:bg-gray-700"
-      >
-        <a class="inline text-base tracking-widest text-gray-600 dark:text-white">其他</a>
-
-        <el-button text size="small" @click="segmentationTools = !segmentationTools">
-          <IconifyIconOffline
-            class="hover:text-blue-500"
-            :icon="segmentationTools ? arrowUp : arrowDown"
-            :style="{ fontSize: '20px' }"
-          ></IconifyIconOffline>
-        </el-button>
-      </div>
-      <div v-show="segmentationTools" class="flex flex-wrap gap-1 pt-1 pb-1">
-        <imageOperation operation="会诊">
-          <diagnosisOutline style="height: 30px; width: 30px"></diagnosisOutline>
-        </imageOperation>
-        <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
-          <div
-            class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
-          >
-            <layer style="height: 30px; width: 30px"></layer>
-            <span class="text-sm text-gray-500 dark:text-white">融合</span>
-          </div>
-          <div
-            style="border-left-width: 1px"
-            class="flex items-center h-full text-lg font-extrabold border-0 border-solid rounded-sm cursor-pointer hover:bg-gray-300 border-slate-300"
-          >
-            <el-dropdown trigger="click">
-              <IconifyIconOffline
-                class="hover:text-blue-500"
-                :icon="arrowDown"
-                :style="{ fontSize: '15px' }"
-              ></IconifyIconOffline>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item>Action 1</el-dropdown-item>
-                  <el-dropdown-item>Action 2</el-dropdown-item>
-                  <el-dropdown-item>Action 3</el-dropdown-item>
-                  <el-dropdown-item>Action 4</el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
-          </div>
-        </div>
-        <imageOperation operation="三维">
-          <cube3d style="height: 30px; width: 30px"></cube3d>
-        </imageOperation>
-        <imageOperation operation="CT值">
-          <iImagingAlternativeCt style="height: 30px; width: 30px"></iImagingAlternativeCt>
-        </imageOperation>
-        <imageOperation operation="心胸比">
-          <cardiopulmonary style="height: 30px; width: 30px; fill: currentColor"></cardiopulmonary>
-        </imageOperation>
-        <imageOperation operation="中点">
-          <menuDotsLineDuotone style="height: 30px; width: 30px"></menuDotsLineDuotone>
-        </imageOperation>
-        <imageOperation operation="钢笔">
-          <pen style="height: 30px; width: 30px"></pen>
-        </imageOperation>
-        <imageOperation operation="球体">
-          <sphere style="height: 30px; width: 30px"></sphere>
-        </imageOperation>
-        <imageOperation operation="长方体">
-          <cuboid style="height: 30px; width: 30px; fill: currentColor"></cuboid>
-        </imageOperation>
+        
       </div>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped></style>
-
-<!-- @/store/imageState -->

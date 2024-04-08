@@ -23,13 +23,15 @@ import stackViewPortWindows from '@/layouts/components/imageOperation/stackViewP
 import image from '@/router/modules/image'
 
 const imageStateStore = useImageStateStore()
-createTools()
+
 
 
 onMounted(() => {
   const element: HTMLDivElement = document.getElementById('imageOperationView') as HTMLDivElement
   element.oncontextmenu = (e) => e.preventDefault()
 })
+
+createTools()
 
 const gridStyle = computed(() => ({
   display: 'grid',
