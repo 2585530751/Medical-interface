@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { onMounted, reactive, ref, } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import {
   provinceAndCityDataPlus,
@@ -9,7 +9,11 @@ import {
   regionData,
   CodeToText
 } from '@/utils/chinaArea'
-
+import {
+  getUserInformationApi,
+  postUserInformationApi
+} from "@/api/user"
+import { message } from '@/utils/message';
 interface userRuleForm {
   name: string
   account: string
@@ -22,6 +26,7 @@ interface userRuleForm {
   userHeight: number | null
   userWeight: number | null
   place: string[]
+  idCard: string
 }
 
 const formSize = ref('default')
@@ -35,36 +40,66 @@ const userRuleForm = reactive<userRuleForm>({
   userName: '',
   birthOfDate: '',
   gender: '',
-  userHeight: null,
-  userWeight: null,
-  place: ['', '', '']
+  userHeight: 0,
+  userWeight: 0,
+  place: ['', '', ''],
+  idCard: ''
 })
 
-const rules = reactive<FormRules>({
-  account: [
-    {
-      required: true,
-      message: 'Please select Activity zone',
-      trigger: 'change'
+function getUserInformation() {                                      //将个人信息界面中用户信息显示到表格中
+
+  getUserInformationApi().then((data) => {
+    if (data.success == true) {
+       
+      userRuleForm.address = data.data.address
+      userRuleForm.birthOfDate = data.data.birthOfDate
+      userRuleForm.email = data.data.email
+      userRuleForm.gender = data.data.gender
+      userRuleForm.idCard = data.data.idCard
+      userRuleForm.name = data.data.name
+      userRuleForm.phoneNumber = data.data.phoneNumber
+      const placeStr = data.data.place
+      userRuleForm.place[0] = placeStr.substring(0, 2) + '0000'
+      if (placeStr.substring(0, 2) == '82' || placeStr.substring(0, 2) == '81') {
+        userRuleForm.place[1] = placeStr
+        userRuleForm.place.splice(2)
+      } else {
+        userRuleForm.place[1] = placeStr.substring(0, 4) + '00'
+        userRuleForm.place[2] = placeStr
+      }
+      
+      userRuleForm.userHeight = data.data.userHeight
+      userRuleForm.userName = data.data.userName
+      userRuleForm.userWeight = data.data.userWeight
+      userRuleForm.account = data.data.account
     }
-  ],
-  phoneNumber: [
-    {
-      type: 'date',
-      required: true,
-      message: 'Please pick a time',
-      trigger: 'change'
-    }
-  ],
-  userName: [
-    {
-      required: true,
-      message: 'Please select activity userName',
-      trigger: 'change'
-    }
-  ]
+
+  })
+}
+
+onMounted(() => {
+  getUserInformation()
 })
 
+const updateUserInformation = async (formEl: FormInstance | undefined) => {    //将个人信息界面中用户信息保存进数据库
+  const updatePlace = userRuleForm.place.length == 3 ? userRuleForm.place[2] : userRuleForm.place[1]
+  postUserInformationApi({
+    account: userRuleForm.account,
+    name: userRuleForm.name,
+    email: userRuleForm.email,
+    phoneNumber: userRuleForm.phoneNumber,
+    place: updatePlace,
+    address: userRuleForm.address,
+    birthOfDate: new Date(userRuleForm.birthOfDate),
+    gender: userRuleForm.gender,
+    userName: userRuleForm.userName,
+    idCard: userRuleForm.idCard,
+    userHeight: userRuleForm.userHeight,
+    userWeight: userRuleForm.userWeight
+  }).then((data) => {
+
+  })
+}
 const submitForm = async (formEl: FormInstance | undefined) => {
   if (!formEl) return
   await formEl.validate((valid, fields) => {
@@ -76,36 +111,19 @@ const submitForm = async (formEl: FormInstance | undefined) => {
   })
 }
 
-const resetForm = (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  formEl.resetFields()
-}
-
-const options = Array.from({ length: 10000 }).map((_, idx) => ({
-  value: `${idx + 1}`,
-  label: `${idx + 1}`
-}))
 </script>
 
 <template>
   <div class="flex flex-col">
     <div class="flex justify-between ml-3">
       <el-text size="large">基本信息</el-text>
-      <el-button type="default">保存</el-button>
+      <el-button type="default" @click="updateUserInformation">保存</el-button>
     </div>
     <div class="m-2">
-      <el-form
-        ref="userRuleFormRef"
-        :model="userRuleForm"
-        :rules="rules"
-        label-width="auto"
-        class="w-full"
-        :size="formSize"
-        :inline="true"
-        status-icon
-      >
+      <el-form ref="userRuleFormRef" :model="userRuleForm" label-width="auto" class="w-full" :size="formSize"
+        :inline="true" status-icon>
         <el-form-item label="账号" prop="account">
-          <el-input v-model="userRuleForm.account" class="w-96" disabled />
+          <el-input v-model="userRuleForm.account" class="w-96" disabled/>
         </el-form-item>
         <el-form-item label="名称" prop="userName">
           <el-input v-model="userRuleForm.name" class="w-96" />
@@ -118,31 +136,26 @@ const options = Array.from({ length: 10000 }).map((_, idx) => ({
           <el-input v-model="userRuleForm.phoneNumber" class="w-96" />
         </el-form-item>
         <el-form-item label="籍贯" prop="place">
-          <el-cascader v-model="userRuleForm.place" :options="regionData" class="w-96"/>
+          <el-cascader v-model="userRuleForm.place" :options="regionData" class="w-96" />
         </el-form-item>
         <el-form-item label="住址" prop="address">
           <el-input v-model="userRuleForm.address" class="w-96" />
         </el-form-item>
-        <el-form-item label="生日" prop="birthOfDate" >
-          <el-date-picker
-            v-model="userRuleForm.birthOfDate"
-            type="date"
-            label="选择日期"
-            placeholder="选择日期"
-          />
+        <el-form-item label="生日" prop="birthOfDate">
+          <el-date-picker v-model="userRuleForm.birthOfDate" type="date" label="选择日期" placeholder="选择日期" />
         </el-form-item>
         <el-form-item label="性别">
           <el-radio-group v-model="userRuleForm.gender">
-            <el-radio label="1" border>男性</el-radio>
-            <el-radio label="2" border>女性</el-radio>
+            <el-radio label="男性" border>男性</el-radio>
+            <el-radio label="女性" border>女性</el-radio>
           </el-radio-group>
         </el-form-item>
         <br />
-        <el-form-item label="真实姓名" prop="name">
-          <el-input v-model="userRuleForm.name" class="w-96" />
+        <el-form-item label="真实姓名" prop="userName">
+          <el-input v-model="userRuleForm.userName" class="w-96" />
         </el-form-item>
-        <el-form-item label="身份证号" prop="address">
-          <el-input v-model="userRuleForm.address" class="w-96" />
+        <el-form-item label="身份证号" prop="idCard">
+          <el-input v-model="userRuleForm.idCard" class="w-96" />
         </el-form-item>
         <el-form-item label="身高" prop="userHeight">
           <el-input v-model="userRuleForm.userHeight" class="w-96" />

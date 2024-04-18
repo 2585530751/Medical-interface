@@ -349,7 +349,8 @@ export const useImageStateStore = defineStore('imageState', () => {
     let existingElement = imagesModelsLists.find(
       (element) =>
         element.singleImageList.length === imagesList.singleImageList.length &&
-        element.singleImageList[0].singleImagePath === imagesList.singleImageList[0].singleImagePath
+        element.singleImageList[0].singleImageModelData.modelId ===
+        imagesList.singleImageList[0].singleImageModelData.modelId
     )
     if (existingElement) {
       const index = imagesModelsLists.indexOf(existingElement)

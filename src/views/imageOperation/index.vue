@@ -9,7 +9,6 @@ import navHeader from '@/layouts/components/imageOperation/header.vue'
 import navLeftSidebar from '@/layouts/components/imageOperation/leftSidebar.vue'
 import navRightSidebar from '@/layouts/components/imageOperation/rightSidebar.vue'
 import imageDisplay from '@/layouts/components/imageOperation/imageDisplay.vue'
-import stackImagesView from '@/layouts/components/imageOperation/stackImagesView.vue'
 import pngjpgImageDisplay from '@/layouts/components/imageOperation/pngjpgImageDisplay.vue'
 
 </script>

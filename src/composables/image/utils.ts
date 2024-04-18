@@ -59,11 +59,10 @@ export function pushimagesModelsListsSession(imagesList: ImageInfo) {
     let existingElement = list.find((element) => {
       return (
         element.singleImageList.length === imagesList.singleImageList.length &&
-        element.singleImageList[0].singleImagePath ===
-        imagesList.singleImageList[0].singleImagePath
+        element.singleImageList[0].singleImageModelData.modelId ===
+        imagesList.singleImageList[0].singleImageModelData.modelId
       )
     })
-    console.log(existingElement)
     if (existingElement) {
       // 如果存在相同imageId的元素，则删除它并添加新元素
       const index = list.indexOf(existingElement)

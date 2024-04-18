@@ -19,7 +19,7 @@ import router from '@/router'
 // 相关配置请参考：www.axios-js.com/zh-cn/docs/#axios-request-config-1
 const defaultConfig: AxiosRequestConfig = {
   // 请求超时时间
-  timeout: 10000,
+  timeout: 1000000,
   headers: {
     Accept: 'application/json, text/plain, */*',
     'Content-Type': 'application/json',
@@ -160,7 +160,7 @@ class PureHttp {
       }
     )
   }
-
+//实现的另一种方案
   private static refreshtoken1($config: PureHttpRequestConfig) {
     return new Promise((resolve, reject) => {
       useUserStoreHook()

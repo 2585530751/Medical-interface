@@ -30,7 +30,7 @@ onBeforeMount(() => {
     :unique-opened="true"
     :router="true"
     @select="handleSelect"
-    ><el-menu-item index="/">
+    ><el-menu-item index="/">                                                
       <template #title>
         <div class="flex items-center py-2 dark:hidden">
           <img src="@/assets/images/KDLWord1.png" class="h-8" />
@@ -58,7 +58,7 @@ onBeforeMount(() => {
     <el-sub-menu index="2">
       <template #title>设置</template>
       <el-menu-item index="2-1">关于</el-menu-item>
-      <el-menu-item index="2-2">帮助</el-menu-item>
+      <el-menu-item index="/help">帮助</el-menu-item>
       <el-menu-item index="2-3">问题反馈</el-menu-item>
     </el-sub-menu>
 
@@ -88,7 +88,7 @@ onBeforeMount(() => {
         <el-button type="primary">登录</el-button>
       </div>
     </div>
-    
+
   </el-menu>
   <login
     :login-window-open="centerDialogVisible"

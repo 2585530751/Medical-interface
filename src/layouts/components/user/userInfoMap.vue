@@ -43,7 +43,7 @@
     <div class="flex justify-center gap-2">
       <el-input v-model="detailedAddress" class="w-96">
         <template #prepend>详细地址</template></el-input
-      ><el-button type="default">保存</el-button>
+      ><el-button type="default" @click="updateUserAddress">保存</el-button>
     </div>
   </div>
 </template>
@@ -51,6 +51,8 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { WarningFilled } from '@element-plus/icons-vue'
+import {updateUserAddressApi} from '@/api/user'
+import { message } from '@/utils/message'
 const mapRef = ref(null)
 const BMapRef = ref(null)
 const geocoder = ref(null)
@@ -60,6 +62,19 @@ const ready = ({ BMap, map }) => {
   mapRef.value = map
   BMapRef.value = BMap
   geocoder.value = new BMap.Geocoder(map)
+}
+
+
+
+function updateUserAddress(){
+  updateUserAddressApi(detailedAddress.value).then((data)=>{
+     if(data.success==true){
+      message(data.msg, { type: 'success' })
+     }
+     else{
+      message(data.msg, { type: 'error' })
+     }
+  })
 }
 
 const location = ref('')

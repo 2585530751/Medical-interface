@@ -32,6 +32,10 @@ export const deleteSingleImageById = (params?: object) => {
   return http.request<any>('get', baseUrlApi('singleImage/deleteSingleImageById'), { params })
 }
 
+export const imageSegmentationOfThyroidNodulesApi = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('modelApi/segment'), { params })
+}
+
 export const singleImageSegmentationOfThyroidNodulesApi = (params?: object) => {
   return http.request<any>('get', baseUrlApi('modelApi/singleSegment'), { params })
 }
@@ -40,6 +44,14 @@ export const singleImageClassifyOfThyroidNodulesApi = (params?: object) => {
   return http.request<any>('get', baseUrlApi('modelApi/singleClassify'), { params })
 }
 
-export const singleImageSegmentationOfPulmonaryNodulesApi = (params?: object) => {
+export const imageClassifyOfThyroidNodulesApi = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('modelApi/classify'), { params })
+}
+
+export const singleImageDetectionOfPulmonaryNodulesApi = (params?: object) => {
   return http.request<any>('get', baseUrlApi('modelApi/singleLungDetect'), { params })
+}
+
+export const imageDetectionOfPulmonaryNodulesApi = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('modelApi/lungDetect'), { params })
 }

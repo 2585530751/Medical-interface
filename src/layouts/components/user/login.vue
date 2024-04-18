@@ -105,9 +105,8 @@ const onRegister = async (formEl: FormInstance | undefined) => {
         .then((res) => {
           if (res.success) {
             //获取后端路由
-            message('注册成功！', { type: 'success' })
+            message('注册成功！请重新登录！', { type: 'success' })
             emits('loginWindowClose')
-            isLoggedIn.value = true
           } else {
             message(res.msg, { type: 'error' })
           }

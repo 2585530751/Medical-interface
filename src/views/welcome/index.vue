@@ -133,7 +133,7 @@ onMounted(() => {
 
     <!-- Container for demo purpose -->
     <section class="dark:bg-gray-800 dark:text-gray-100">
-      <div class="max-w-xl p-6 py-12 mx-auto space-y-12 lg:px-8 lg:max-w-7xl">
+      <div class="max-w-xl p-6 py-12 mx-auto space-y-12 lg:px-8 lg:max-w-7xl" >
         <div>
           <p class="text-3xl font-bold text-center tracki sm:text-4xl dark:text-gray-50">
             我们的特色
@@ -149,23 +149,13 @@ onMounted(() => {
           >
             <div class="flex-shrink-0">
               <div
-                class="flex items-center justify-center w-12 h-12 mx-auto text-white bg-indigo-500 rounded-md"
+                class="flex items-center justify-center w-12 h-12 mx-auto text-white bg-indigo-500 rounded-md  dark:bg-gray-600" 
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="256"
-                  height="256"
-                  viewBox="0 0 256 256"
-                >
-                  <path
-                    fill="currentColor"
-                    d="M228 216a12 12 0 0 1-12 12H72a12 12 0 0 1 0-24h144a12 12 0 0 1 12 12Zm24-80v24a12 12 0 0 1-12 12H61.07a43.72 43.72 0 0 1-42.14-31.36L4.86 93.75A20 20 0 0 1 24 68h8a12 12 0 0 1 8.48 3.51L61 92h15.27L69 70.32A20 20 0 0 1 88 44h8a12 12 0 0 1 8.48 3.51L149 92h59a44.05 44.05 0 0 1 44 44Zm-24 0a20 20 0 0 0-20-20h-64a12 12 0 0 1-8.48-3.51l-40.69-40.7l9.47 28.42A12 12 0 0 1 92.91 116H56a12 12 0 0 1-8.49-3.51L30.4 95.36l11.51 38.39A19.89 19.89 0 0 0 61.07 148H228Z"
-                  />
-                </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3L2 12h3v8h14v-8h3zm-2 5h4v10h-2v-8h-2z"/></svg>
               </div>
             </div>
             <h3 class="py-1 text-2xl font-semibold text-gray-700 sm:text-xl dark:text-white">
-              一站式
+              一站式  
             </h3>
             <p class="py-1 text-gray-500 indent-8 text-md dark:text-gray-300">
               囊括多种数据治理、统计分析、机器学习建模及图表绘制方法，一站式解决您的临床研究分析问题。
@@ -176,20 +166,9 @@ onMounted(() => {
           >
             <div class="flex-shrink-0">
               <div
-                class="flex items-center justify-center w-12 h-12 mx-auto text-white bg-indigo-500 rounded-md"
+                class="flex items-center justify-center w-12 h-12 mx-auto text-white bg-indigo-500 rounded-md dark:bg-gray-600"
               >
-                <svg
-                  width="20"
-                  height="20"
-                  fill="currentColor"
-                  class="w-6 h-6"
-                  viewBox="0 0 1792 1792"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M491 1536l91-91-235-235-91 91v107h128v128h107zm523-928q0-22-22-22-10 0-17 7l-542 542q-7 7-7 17 0 22 22 22 10 0 17-7l542-542q7-7 7-17zm-54-192l416 416-832 832h-416v-416zm683 96q0 53-37 90l-166 166-416-416 166-165q36-38 90-38 53 0 91 38l235 234q37 39 37 91z"
-                  ></path>
-                </svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="2em" height="2em" viewBox="0 0 24 24"><path fill="currentColor" d="M3.466 3.62c-.004.052-.014.104-.018.158c-.406 4.626 2.747 8.548 8.03 9.994c2.024.553 5.374 2.018 5.06 5.599a5.06 5.06 0 0 1-1.803 3.46c-1.022.857-2.308 1.21-3.64 1.166C5.147 23.794 0 18.367 0 12.05a11.95 11.95 0 0 1 3.467-8.428zM9.82 1.032C10.727.27 11.876-.046 13.055.005C18.996.27 24 5.67 24 11.936a11.94 11.94 0 0 1-2.667 7.536c.332-4.908-2.94-8.897-8.59-10.441c-2.337-.64-4.749-2.274-4.514-4.948A4.47 4.47 0 0 1 9.82 1.03z"/></svg>
               </div>
             </div>
             <h3 class="py-1 text-2xl font-semibold text-gray-700 sm:text-xl dark:text-white">
@@ -204,12 +183,12 @@ onMounted(() => {
           >
             <div class="flex-shrink-0">
               <div
-                class="flex items-center justify-center w-12 h-12 mx-auto text-white bg-indigo-500 rounded-md"
+                class="flex items-center justify-center w-12 h-12 mx-auto text-white bg-indigo-500 rounded-md dark:bg-gray-600"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  width="256"
-                  height="256"
+                  width="40"
+                  height="40"
                   viewBox="0 0 256 256"
                 >
                   <path
@@ -369,6 +348,7 @@ onMounted(() => {
 </template>
 
 <style lang="scss" scoped>
+
 .ep-button {
   margin: 4px;
 }

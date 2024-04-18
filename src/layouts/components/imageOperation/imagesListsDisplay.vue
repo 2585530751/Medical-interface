@@ -146,8 +146,8 @@ function deleteSelectedImagesModelsLists() {
     let existingElement = list.find((element) => {
       return (
         element.singleImageList.length === imagesModelsList.singleImageList.length &&
-        element.singleImageList[0].singleImagePath ===
-          imagesModelsList.singleImageList[0].singleImagePath
+          element.singleImageList[0].singleImageModelData.modelId ===
+          imagesModelsList.singleImageList[0].singleImageModelData.modelId
       )
     })
     console.log(existingElement)

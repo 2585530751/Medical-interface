@@ -39,23 +39,6 @@ export default [
     }
   },
   {
-    path: "/empty1",
-    name: "Empty1",
-    component: () => import("@/views/empty/index1.vue"),
-    meta: {
-      title: "menus.hsempty",
-      showLink: false,
-    }
-  },
-  {
-    path: "/testGet",
-    name: "testGet",
-    component: () => import("@/views/testGet.vue"),
-    meta: {
-      showLink: false,
-    }
-  },
-  {
     path: "/imageOperation",
     name: "ImageOperation",
     component: () => import("@/views/imageOperation/index.vue"),

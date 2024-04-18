@@ -12,6 +12,7 @@ export type UserResult = {
     roles: Array<string>
     /** `token` */
     accessToken: string
+
     /** 用于调用刷新`accessToken`的接口时所需的`token` */
     refreshToken: string
     /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
@@ -102,4 +103,34 @@ export const isAccountExisted = (params?: object) => {
 
 export const deleteSingleImageById = (params?: object) => {
   return http.request<any>('get', baseUrlApi('singleImage/deleteSingleImageById'), { params })
+}
+
+export const getUserInformationApi = (params?: object) => {
+  return http.request<any>("get", baseUrlApi("user/getUserInfo"))
+}
+
+export const updateUserAddressApi = (data?: object) => {
+  return http.request<any>("post", baseUrlApi("user/updateUserAddress"), { data }, {
+    headers: {
+      'Content-Type': 'text/plain'
+    }
+  })
+}
+
+// export const postUserInformationApi =(params?: object) =>{
+//   return http.request<any>("post",baseUrlApi("user/updateUserInfo"),{params})
+// }
+
+
+export const postUserInformationApi = (params?: object) => {
+  return http.request<any>(
+    'post',
+    baseUrlApi('user/updateUserInfo'),
+    { params },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  )
 }
