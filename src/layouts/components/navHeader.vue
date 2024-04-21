@@ -8,9 +8,13 @@ import login from './user/login.vue'
 import rolePermission from '@/components/rolePermission.vue'
 import { isLoggedIn, checkAuthStatus } from '@/utils/auth'
 import { useUserStoreHook } from '@/store/modules/user'
+import { getHeadIconApi } from '@/api/user'
+import { basicImageUrl, serverUrl, emptyImageUrl } from '@/api/utils'
 
-const errorHandler = () => true
+
 const activeIndex = ref('')
+const imageUrl = ref('')
+
 const handleSelect = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }
@@ -18,7 +22,18 @@ const handleSelect = (key: string, keyPath: string[]) => {
 const centerDialogVisible = ref(false)
 onBeforeMount(() => {
   checkAuthStatus()
+  getHeadIcon()
 })
+
+function getHeadIcon() {
+  getHeadIconApi().then((data) => {
+    imageUrl.value = basicImageUrl + data.msg
+  })
+}
+
+const errorHandler = () => {
+  imageUrl.value = serverUrl + emptyImageUrl
+}
 </script>
 
 <template>
@@ -30,7 +45,7 @@ onBeforeMount(() => {
     :unique-opened="true"
     :router="true"
     @select="handleSelect"
-    ><el-menu-item index="/">                                                
+    ><el-menu-item index="/">
       <template #title>
         <div class="flex items-center py-2 dark:hidden">
           <img src="@/assets/images/KDLWord1.png" class="h-8" />
@@ -74,10 +89,8 @@ onBeforeMount(() => {
 
     <el-sub-menu index="3" v-if="isLoggedIn === true">
       <template #title
-        ><el-avatar style="margin: auto" :size="30" src="https://empty" @error="errorHandler">
-          <img
-            src="https://cube.elemecdn.com/e/fd/0fc7d20532fdaf769a25683617711png.png"
-          /> </el-avatar
+        ><el-avatar style="margin: auto" :size="30" :src="imageUrl" @error="errorHandler">
+          <img :src="imageUrl" /> </el-avatar
       ></template>
       <el-menu-item index="/user">个人中心</el-menu-item>
       <el-menu-item index="3-2">锁定屏幕</el-menu-item>
@@ -88,7 +101,6 @@ onBeforeMount(() => {
         <el-button type="primary">登录</el-button>
       </div>
     </div>
-
   </el-menu>
   <login
     :login-window-open="centerDialogVisible"

@@ -25,7 +25,6 @@ export const constantRoutes: Array<RouteRecordRaw> = formatTwoStageRoutes(
   formatFlatteningRoutes(buildHierarchyTree(routes.flat(Infinity)))
 );
 
-console.log('constantRoutes',constantRoutes)
 export const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes:constantRoutes.concat(...(remainingRouter as any)),

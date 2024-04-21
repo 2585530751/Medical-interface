@@ -5,8 +5,8 @@ import { ref, onMounted } from 'vue'
 
 const tableSize = ref('default')
 
-const pageSize = ref(100)
-const currentPage = ref(4)
+const pageSize = ref(10)
+const currentPage = ref(1)
 const handleSizeChange = (val: number) => {
   console.log(`${val} items per page`)
 }
@@ -23,7 +23,7 @@ const handleCurrentChange = (val: number) => {
       <el-pagination class="justify-center "
         v-model:current-page="currentPage"
         v-model:page-size="pageSize"
-        :page-sizes="[100, 200, 300, 400]"
+        :page-sizes="[10, 20, 30, 40]"
         :small="false"
         :disabled="false"
         :background="true"

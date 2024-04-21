@@ -1,4 +1,4 @@
-import { imageUrl } from '@/api/utils'
+import { basicImageUrl } from '@/api/utils'
 import type { ImageInfo, ImageInfoWindows } from '@/types/image'
 import { storageSession } from '@pureadmin/utils'
 
@@ -8,9 +8,9 @@ export const imagesModelsListsSession = 'imagesModelsLists'
 
 export function generateImageUrl(imagePath: String) {
   if (imagePath.endsWith('.png') || imagePath.endsWith('.jpg') || imagePath.endsWith('.jpeg')) {
-    return 'web:' + imageUrl + imagePath
+    return 'web:' + basicImageUrl + imagePath
   } else if (imagePath.endsWith('.dcm')) {
-    return 'wadouri:' + imageUrl + imagePath
+    return 'wadouri:' + basicImageUrl + imagePath
   }
 }
 

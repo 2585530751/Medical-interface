@@ -50,7 +50,6 @@ function getUserInformation() {                                      //将个人
 
   getUserInformationApi().then((data) => {
     if (data.success == true) {
-       
       userRuleForm.address = data.data.address
       userRuleForm.birthOfDate = data.data.birthOfDate
       userRuleForm.email = data.data.email
@@ -67,7 +66,6 @@ function getUserInformation() {                                      //将个人
         userRuleForm.place[1] = placeStr.substring(0, 4) + '00'
         userRuleForm.place[2] = placeStr
       }
-      
       userRuleForm.userHeight = data.data.userHeight
       userRuleForm.userName = data.data.userName
       userRuleForm.userWeight = data.data.userWeight
@@ -97,17 +95,11 @@ const updateUserInformation = async (formEl: FormInstance | undefined) => {    /
     userHeight: userRuleForm.userHeight,
     userWeight: userRuleForm.userWeight
   }).then((data) => {
-
-  })
-}
-const submitForm = async (formEl: FormInstance | undefined) => {
-  if (!formEl) return
-  await formEl.validate((valid, fields) => {
-    if (valid) {
-      console.log('submit!')
-    } else {
-      console.log('error submit!', fields)
-    }
+      if(data.success==true){
+        message(data.msg, { type: 'success' })
+      }else{
+        message(data.msg, { type: 'error' })
+      }
   })
 }
 
@@ -126,7 +118,7 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           <el-input v-model="userRuleForm.account" class="w-96" disabled/>
         </el-form-item>
         <el-form-item label="名称" prop="userName">
-          <el-input v-model="userRuleForm.name" class="w-96" />
+          <el-input v-model="userRuleForm.userName" class="w-96" />
         </el-form-item>
         <br />
         <el-form-item label="邮箱" prop="email">
@@ -151,8 +143,8 @@ const submitForm = async (formEl: FormInstance | undefined) => {
           </el-radio-group>
         </el-form-item>
         <br />
-        <el-form-item label="真实姓名" prop="userName">
-          <el-input v-model="userRuleForm.userName" class="w-96" />
+        <el-form-item label="真名" prop="name">
+          <el-input v-model="userRuleForm.name" class="w-96" />
         </el-form-item>
         <el-form-item label="身份证号" prop="idCard">
           <el-input v-model="userRuleForm.idCard" class="w-96" />

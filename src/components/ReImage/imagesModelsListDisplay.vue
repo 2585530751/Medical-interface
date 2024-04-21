@@ -2,7 +2,7 @@
 import files from '@iconify-icons/ep/files'
 import timer from '@iconify-icons/ep/timer'
 import folder from '@iconify-icons/ep/folder'
-import { imageUrl } from '@/api/utils'
+import { basicImageUrl } from '@/api/utils'
 
 import { ref, onMounted } from 'vue'
 import { useImageStateStore } from '@/store/imageState'
@@ -95,7 +95,7 @@ onMounted(() => {
       <div class="border-2 border-solid rounded-lg border-slate-300">
         <el-image
           fit="cover"
-          :src="imageUrl + props.imagesModelsList.singleImageList[0].singleImageModelData.modelResultPath"
+          :src="basicImageUrl + props.imagesModelsList.singleImageList[0].singleImageModelData.modelResultPath"
           :crossorigin="'anonymous'"
           v-show="!imagesModelsListUrlCheck"
         />

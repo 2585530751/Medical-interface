@@ -28,6 +28,10 @@ export const getImagePageByDoctorId = (data?: object) => {
   )
 }
 
+export const deleteImageById = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('image/deleteImageById'), { params })
+}
+
 export const deleteSingleImageById = (params?: object) => {
   return http.request<any>('get', baseUrlApi('singleImage/deleteSingleImageById'), { params })
 }
@@ -54,4 +58,14 @@ export const singleImageDetectionOfPulmonaryNodulesApi = (params?: object) => {
 
 export const imageDetectionOfPulmonaryNodulesApi = (params?: object) => {
   return http.request<any>('get', baseUrlApi('modelApi/lungDetect'), { params })
+}
+
+export const singleImageIntestinalPolypsSegmentationApi = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('modelApi/intestinalPolypsSingleSegmentation'), {
+    params
+  })
+}
+
+export const imageIntestinalPolypsSegmentationApi = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('modelApi/intestinalPolypsSegmentation'), { params })
 }

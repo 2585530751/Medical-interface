@@ -8,7 +8,9 @@ import {
   singleImageDetectionOfPulmonaryNodulesApi,
   imageSegmentationOfThyroidNodulesApi,
   imageDetectionOfPulmonaryNodulesApi,
-  imageClassifyOfThyroidNodulesApi
+  imageClassifyOfThyroidNodulesApi,
+  singleImageIntestinalPolypsSegmentationApi,
+  imageIntestinalPolypsSegmentationApi
 } from '@/api/image'
 import { message } from '@/utils/message'
 import type { ImageInfo } from '@/types/image'
@@ -85,7 +87,7 @@ async function imageSegmentationOfThyroidNodules() {
 
             while (j < imageInfo.singleImageList.length) {
               if (imageInfo.singleImageList[j].singleImageId == data.data[i].singleImageId) {
-                console.log(j)
+                
                 break
               }
               j++
@@ -228,11 +230,93 @@ async function imageDetectionOfPulmonaryNodules() {
             let j = 0
             while (j < imageInfo.singleImageList.length) {
               if (imageInfo.singleImageList[j].singleImageId == data.data[i].singleImageId) {
-                console.log(j)
+                
                 break
               }
               j++
             }
+            imageInfo.singleImageList[j].singleImageModelData = singleImageModelData
+            imageInfo.singleImageList[j].modelType = 'model'
+          }
+          pushimagesModelsListsSession(imageInfo)
+          imageStateStore.pushImagesModelsList(imageInfo)
+          message(data.msg, { type: 'success' })
+        } else {
+          message(data.msg, { type: 'error' })
+        }
+      })
+      .catch((error) => {
+        message(error, { type: 'error' })
+      })
+  }
+}
+
+async function singleImageIntestinalPolypsSegmentation() {
+  const imageInfoWindows =
+    imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows]
+  if (imageInfoWindows != 0) {
+    const params = {
+      singleImageId: imageKeyValueStore.get(
+        imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
+      ).singleImageId
+    }
+    console.log(params)
+    await singleImageIntestinalPolypsSegmentationApi(params)
+      .then((data) => {
+        if ((data.code = 200)) {
+          const singleImageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
+          const imageInfo = { ...imageInfoWindows.imageInfo }
+          const singleImage = Object.assign(
+            {},
+            imageInfo.singleImageList.find((obj) => obj.singleImageId === params.singleImageId)
+          )
+          singleImage!.singleImageModelData = singleImageModelData
+          singleImage!.modelType = 'model'
+          imageInfo.singleImageList = [singleImage!]
+          pushimagesModelsListsSession(imageInfo)
+          imageStateStore.pushImagesModelsList(imageInfo)
+
+          message(data.msg, { type: 'success' })
+        } else {
+          message(data.msg, { type: 'error' })
+        }
+      })
+      .catch((error) => {
+        message(error, { type: 'error' })
+      })
+  }
+}
+
+async function imageIntestinalPolypsSegmentation() {
+  const imageInfoWindows =
+    imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows]
+  if (imageInfoWindows != 0) {
+    const params = {
+      imageId: imageKeyValueStore.get(
+        imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
+      ).imageId
+    }
+    console.log(params)
+    await imageIntestinalPolypsSegmentationApi(params)
+      .then((data) => {
+        if ((data.code = 200)) {
+          const imageInfo = { ...imageInfoWindows.imageInfo }
+          for (var i = 0; i < data.data.length; i++) {
+            const singleImageModelData = Object.assign(
+              {},
+              data.data[i],
+              JSON.parse(data.data[i].resData)
+            )
+            let j = 0
+
+            while (j < imageInfo.singleImageList.length) {
+              if (imageInfo.singleImageList[j].singleImageId == data.data[i].singleImageId) {
+                
+                break
+              }
+              j++
+            }
+
             imageInfo.singleImageList[j].singleImageModelData = singleImageModelData
             imageInfo.singleImageList[j].modelType = 'model'
           }
@@ -340,10 +424,10 @@ async function imageDetectionOfPulmonaryNodules() {
 
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="singleImageClassifyOfThyroidNodules"
+              <el-dropdown-item @click="singleImageIntestinalPolypsSegmentation"
                 >图像分类</el-dropdown-item
               >
-              <el-dropdown-item @click="imageClassifyOfThyroidNodules">序列分类</el-dropdown-item>
+              <el-dropdown-item @click="imageIntestinalPolypsSegmentation">序列分类</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>

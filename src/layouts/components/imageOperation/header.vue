@@ -14,7 +14,7 @@ import { useImageStateStore } from '@/store/imageState'
 import { onMounted, reactive, ref } from 'vue'
 import downloadImage from '@/layouts/components/imageOperation/downloadImage.vue'
 import { message } from '@/utils/message'
-
+import { router } from '@/router'
 import {
   imageLoader,
   Enums,
@@ -283,7 +283,7 @@ function removeStackSegmentation(segmentationId: string) {
     class="flex justify-between w-full h-10 border border-t-0 border-gray-200 border-solid shadow-md border-x-0 dark:border-gray-700 dark:bg-gray-800"
   >
     <div class="flex flex-wrap items-center justify-center h-10 gap-1 pl-2">
-      <el-button text>
+      <el-button text @click="router.push('/image')">
         <template #icon>
           <IconifyIconOffline :icon="back"></IconifyIconOffline>
         </template>

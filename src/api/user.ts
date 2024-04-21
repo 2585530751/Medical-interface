@@ -134,3 +134,20 @@ export const postUserInformationApi = (params?: object) => {
     }
   )
 }
+
+export const setHeadIconApi = (data?: object) => {
+  return http.request<any>(
+    'post',
+    baseUrlApi('user/setHeadIcon'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+  )
+}
+
+export const getHeadIconApi = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('user/getHeadIcon'))
+}

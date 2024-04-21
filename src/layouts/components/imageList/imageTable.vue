@@ -4,23 +4,27 @@ import { onMounted, reactive, ref } from 'vue'
 import editPen from '@iconify-icons/ep/edit-pen'
 import deleteUser from '@iconify-icons/ep/delete'
 import IonEllipsisHorizontal from '@/assets/svg/IonEllipsisHorizontal.svg?component'
-import { getImagePageByDoctorId, deleteSingleImageById } from '@/api/image'
+import { getImagePageByDoctorId, deleteSingleImageById, deleteImageById } from '@/api/image'
 import router from '@/router'
-import { imageUrl } from '@/api/utils'
+import { basicImageUrl } from '@/api/utils'
 import { useImageStateStore } from '@/store/imageState'
 import { changeImagesListWindowsToSession, pushImageListToSession } from '@/composables/image/utils'
 import type { ImageInfo, ImageInfoWindows, SingleImage } from '@/types/image'
 import imageDicom from '@/components/ReImage/imageDicom.vue'
+import { message } from '@/utils/message'
 
 defineProps<{
   tableSize: string
 }>()
 
 const imageStateStore = useImageStateStore()
-imageStateStore.getImagesListData()
+
 const tableRef = ref<TableInstance>()
 
-onMounted(async () => {})
+onMounted(async () => {
+  // imageStateStore.tableData.length=0
+  imageStateStore.getImagesListData()
+})
 function imageOperation(imageList: SingleImage, imagesList: ImageInfo) {
   imageStateStore.bindImageList(imageList)
   imageStateStore.bindImagesList(imagesList)
@@ -83,20 +87,29 @@ async function singleImageDelete(imageRow: object, singleImageId: number) {
 }
 
 function imageDelete(imageId: number) {
-  let index = 0
-  // 遍历数组
-  while (index < imageStateStore.tableData.length) {
-    const currentObject = imageStateStore.tableData[index]
-    // 如果 imageId 等于 imageId，则使用 splice 方法删除该对象
-    if (currentObject.imageId === imageId) {
-      imageStateStore.tableData.splice(index, 1)
-      break
+  const params = { imageId: imageId }
+  deleteImageById(params).then((res) => {
+    if (res.success) {
+      let index = 0
+      // 遍历数组
+      while (index < imageStateStore.tableData.length) {
+        const currentObject = imageStateStore.tableData[index]
+        // 如果 imageId 等于 imageId，则使用 splice 方法删除该对象
+        if (currentObject.imageId === imageId) {
+          imageStateStore.tableData.splice(index, 1)
+          break
+        } else {
+          // 如果不需要删除，则移动到下一个元素
+          index++
+        }
+      }
+      message('删除成功', { type: 'success' })
     } else {
-      // 如果不需要删除，则移动到下一个元素
-      index++
+      message(res.msg, { type: 'error' })
     }
-  }
+  })
 }
+
 </script>
 
 <template>
@@ -118,7 +131,7 @@ function imageDelete(imageId: number) {
               <el-table-column label="图片" width="150px">
                 <template #default="scope">
                   <el-image
-                    :src="imageUrl + scope.row.singleImagePath"
+                    :src="basicImageUrl + scope.row.singleImagePath"
                     :crossorigin="'anonymous'"
                     v-show="scope.row.singleImagePath.endsWith('.png')||scope.row.singleImagePath.endsWith('.jpg')||scope.row.singleImagePath.endsWith('.jpeg')"
                   />
