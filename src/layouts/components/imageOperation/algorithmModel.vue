@@ -32,7 +32,7 @@ const imageStateStore = useImageStateStore()
 async function singleImageSegmentationOfThyroidNodules() {
   const imageInfoWindows =
     imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows]
-  if (imageInfoWindows != 0) {
+  if (imageInfoWindows != 0 ) {
     const params = {
       singleImageId: imageKeyValueStore.get(
         imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
@@ -42,10 +42,10 @@ async function singleImageSegmentationOfThyroidNodules() {
       .then((data) => {
         if ((data.code = 200)) {
           const singleImageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
-          const imageInfo = { ...imageInfoWindows.imageInfo }
+          const imageInfo = JSON.parse(JSON.stringify(imageInfoWindows.imageInfo))
           const singleImage = Object.assign(
             {},
-            imageInfo.singleImageList.find((obj) => obj.singleImageId === params.singleImageId)
+            imageInfo.singleImageList.find((obj:any) => obj.singleImageId === params.singleImageId)
           )
           singleImage!.singleImageModelData = singleImageModelData
           singleImage!.modelType = 'model'
@@ -73,10 +73,12 @@ async function imageSegmentationOfThyroidNodules() {
         imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
       ).imageId
     }
+    
     await imageSegmentationOfThyroidNodulesApi(params)
       .then((data) => {
+        
         if ((data.code = 200)) {
-          const imageInfo = { ...imageInfoWindows.imageInfo }
+          const imageInfo = JSON.parse(JSON.stringify(imageInfoWindows.imageInfo))
           for (var i = 0; i < data.data.length; i++) {
             const singleImageModelData = Object.assign(
               {},
@@ -92,7 +94,6 @@ async function imageSegmentationOfThyroidNodules() {
               }
               j++
             }
-
             imageInfo.singleImageList[j].singleImageModelData = singleImageModelData
             imageInfo.singleImageList[j].modelType = 'model'
           }
@@ -126,7 +127,6 @@ async function singleImageClassifyOfThyroidNodules() {
           message(data.msg+messageText, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
-          console.log(data.msg)
         }
       })
       .catch((error) => {
@@ -167,7 +167,6 @@ async function imageClassifyOfThyroidNodules() {
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
-          console.log(data.msg)
         }
       })
       .catch((error) => {
@@ -189,10 +188,10 @@ async function singleImageDetectionOfPulmonaryNodules() {
       .then((data) => {
         if ((data.code = 200)) {
           const singleImageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
-          const imageInfo = { ...imageInfoWindows.imageInfo }
+          const imageInfo = JSON.parse(JSON.stringify(imageInfoWindows.imageInfo))
           const singleImage = Object.assign(
             {},
-            imageInfo.singleImageList.find((obj) => obj.singleImageId === params.singleImageId)
+            imageInfo.singleImageList.find((obj:any) => obj.singleImageId === params.singleImageId)
           )
           singleImage!.singleImageModelData = singleImageModelData
           singleImage!.modelType = 'model'
@@ -220,7 +219,7 @@ async function imageDetectionOfPulmonaryNodules() {
     await imageDetectionOfPulmonaryNodulesApi(params)
       .then((data) => {
         if ((data.code = 200)) {
-          const imageInfo = { ...imageInfoWindows.imageInfo }
+          const imageInfo = JSON.parse(JSON.stringify(imageInfoWindows.imageInfo))
           for (var i = 0; i < data.data.length; i++) {
             const singleImageModelData = Object.assign(
               {},
@@ -230,7 +229,6 @@ async function imageDetectionOfPulmonaryNodules() {
             let j = 0
             while (j < imageInfo.singleImageList.length) {
               if (imageInfo.singleImageList[j].singleImageId == data.data[i].singleImageId) {
-                
                 break
               }
               j++
@@ -260,15 +258,14 @@ async function singleImageIntestinalPolypsSegmentation() {
         imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
       ).singleImageId
     }
-    console.log(params)
     await singleImageIntestinalPolypsSegmentationApi(params)
       .then((data) => {
         if ((data.code = 200)) {
           const singleImageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
-          const imageInfo = { ...imageInfoWindows.imageInfo }
+          const imageInfo = JSON.parse(JSON.stringify(imageInfoWindows.imageInfo))
           const singleImage = Object.assign(
             {},
-            imageInfo.singleImageList.find((obj) => obj.singleImageId === params.singleImageId)
+            imageInfo.singleImageList.find((obj:any) => obj.singleImageId === params.singleImageId)
           )
           singleImage!.singleImageModelData = singleImageModelData
           singleImage!.modelType = 'model'
@@ -296,11 +293,11 @@ async function imageIntestinalPolypsSegmentation() {
         imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
       ).imageId
     }
-    console.log(params)
+   
     await imageIntestinalPolypsSegmentationApi(params)
       .then((data) => {
         if ((data.code = 200)) {
-          const imageInfo = { ...imageInfoWindows.imageInfo }
+          const imageInfo = JSON.parse(JSON.stringify(imageInfoWindows.imageInfo))
           for (var i = 0; i < data.data.length; i++) {
             const singleImageModelData = Object.assign(
               {},
@@ -308,7 +305,7 @@ async function imageIntestinalPolypsSegmentation() {
               JSON.parse(data.data[i].resData)
             )
             let j = 0
-
+            
             while (j < imageInfo.singleImageList.length) {
               if (imageInfo.singleImageList[j].singleImageId == data.data[i].singleImageId) {
                 
@@ -316,7 +313,6 @@ async function imageIntestinalPolypsSegmentation() {
               }
               j++
             }
-
             imageInfo.singleImageList[j].singleImageModelData = singleImageModelData
             imageInfo.singleImageList[j].modelType = 'model'
           }

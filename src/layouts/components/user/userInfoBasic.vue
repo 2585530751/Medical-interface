@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, reactive, ref, } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import {
   provinceAndCityDataPlus,
@@ -9,11 +9,8 @@ import {
   regionData,
   CodeToText
 } from '@/utils/chinaArea'
-import {
-  getUserInformationApi,
-  postUserInformationApi
-} from "@/api/user"
-import { message } from '@/utils/message';
+import { getUserInformationApi, postUserInformationApi } from '@/api/user'
+import { message } from '@/utils/message'
 interface userRuleForm {
   name: string
   account: string
@@ -46,7 +43,8 @@ const userRuleForm = reactive<userRuleForm>({
   idCard: ''
 })
 
-function getUserInformation() {                                      //将个人信息界面中用户信息显示到表格中
+function getUserInformation() {
+  //将个人信息界面中用户信息显示到表格中
 
   getUserInformationApi().then((data) => {
     if (data.success == true) {
@@ -58,20 +56,22 @@ function getUserInformation() {                                      //将个人
       userRuleForm.name = data.data.name
       userRuleForm.phoneNumber = data.data.phoneNumber
       const placeStr = data.data.place
-      userRuleForm.place[0] = placeStr.substring(0, 2) + '0000'
-      if (placeStr.substring(0, 2) == '82' || placeStr.substring(0, 2) == '81') {
-        userRuleForm.place[1] = placeStr
-        userRuleForm.place.splice(2)
-      } else {
-        userRuleForm.place[1] = placeStr.substring(0, 4) + '00'
-        userRuleForm.place[2] = placeStr
+      if (placeStr != undefined) {
+        userRuleForm.place[0] = placeStr.substring(0, 2) + '0000'
+        if (placeStr.substring(0, 2) == '82' || placeStr.substring(0, 2) == '81') {
+          userRuleForm.place[1] = placeStr
+          userRuleForm.place.splice(2)
+        } else {
+          userRuleForm.place[1] = placeStr.substring(0, 4) + '00'
+          userRuleForm.place[2] = placeStr
+        }
       }
+
       userRuleForm.userHeight = data.data.userHeight
       userRuleForm.userName = data.data.userName
       userRuleForm.userWeight = data.data.userWeight
       userRuleForm.account = data.data.account
     }
-
   })
 }
 
@@ -79,7 +79,8 @@ onMounted(() => {
   getUserInformation()
 })
 
-const updateUserInformation = async (formEl: FormInstance | undefined) => {    //将个人信息界面中用户信息保存进数据库
+const updateUserInformation = async (formEl: FormInstance | undefined) => {
+  //将个人信息界面中用户信息保存进数据库
   const updatePlace = userRuleForm.place.length == 3 ? userRuleForm.place[2] : userRuleForm.place[1]
   postUserInformationApi({
     account: userRuleForm.account,
@@ -88,21 +89,20 @@ const updateUserInformation = async (formEl: FormInstance | undefined) => {    /
     phoneNumber: userRuleForm.phoneNumber,
     place: updatePlace,
     address: userRuleForm.address,
-    birthOfDate: new Date(userRuleForm.birthOfDate),
+    birthOfDate: userRuleForm.birthOfDate==undefined?'':new Date(userRuleForm.birthOfDate),
     gender: userRuleForm.gender,
     userName: userRuleForm.userName,
     idCard: userRuleForm.idCard,
     userHeight: userRuleForm.userHeight,
     userWeight: userRuleForm.userWeight
   }).then((data) => {
-      if(data.success==true){
-        message(data.msg, { type: 'success' })
-      }else{
-        message(data.msg, { type: 'error' })
-      }
+    if (data.success == true) {
+      message(data.msg, { type: 'success' })
+    } else {
+      message(data.msg, { type: 'error' })
+    }
   })
 }
-
 </script>
 
 <template>
@@ -112,10 +112,17 @@ const updateUserInformation = async (formEl: FormInstance | undefined) => {    /
       <el-button type="default" @click="updateUserInformation">保存</el-button>
     </div>
     <div class="m-2">
-      <el-form ref="userRuleFormRef" :model="userRuleForm" label-width="auto" class="w-full" :size="formSize"
-        :inline="true" status-icon>
+      <el-form
+        ref="userRuleFormRef"
+        :model="userRuleForm"
+        label-width="auto"
+        class="w-full"
+        :size="formSize"
+        :inline="true"
+        status-icon
+      >
         <el-form-item label="账号" prop="account">
-          <el-input v-model="userRuleForm.account" class="w-96" disabled/>
+          <el-input v-model="userRuleForm.account" class="w-96" disabled />
         </el-form-item>
         <el-form-item label="名称" prop="userName">
           <el-input v-model="userRuleForm.userName" class="w-96" />
@@ -134,7 +141,12 @@ const updateUserInformation = async (formEl: FormInstance | undefined) => {    /
           <el-input v-model="userRuleForm.address" class="w-96" />
         </el-form-item>
         <el-form-item label="生日" prop="birthOfDate">
-          <el-date-picker v-model="userRuleForm.birthOfDate" type="date" label="选择日期" placeholder="选择日期" />
+          <el-date-picker
+            v-model="userRuleForm.birthOfDate"
+            type="date"
+            label="选择日期"
+            placeholder="选择日期"
+          />
         </el-form-item>
         <el-form-item label="性别">
           <el-radio-group v-model="userRuleForm.gender">

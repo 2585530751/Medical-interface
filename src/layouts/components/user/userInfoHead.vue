@@ -74,13 +74,15 @@ function getUserInformation() {
       userInfo.email = data.data.email
       userInfo.phoneNumber = data.data.phoneNumber
       const placeStr = data.data.place
-      userInfo.place[0] = placeStr.substring(0, 2) + '0000'
-      if (placeStr.substring(0, 2) == '82' || placeStr.substring(0, 2) == '81') {
-        userInfo.place[1] = placeStr
-        userInfo.place.splice(2)
-      } else {
-        userInfo.place[1] = placeStr.substring(0, 4) + '00'
-        userInfo.place[2] = placeStr
+      if (placeStr != undefined) {
+        userInfo.place[0] = placeStr.substring(0, 2) + '0000'
+        if (placeStr.substring(0, 2) == '82' || placeStr.substring(0, 2) == '81') {
+          userInfo.place[1] = placeStr
+          userInfo.place.splice(2)
+        } else {
+          userInfo.place[1] = placeStr.substring(0, 4) + '00'
+          userInfo.place[2] = placeStr
+        }
       }
       userInfo.userName = data.data.userName
       userInfo.account = data.data.account
@@ -98,7 +100,7 @@ function getHeadIcon() {
 <template>
   <el-card>
     <div class="flex items-center justify-center gap-10">
-      <el-descriptions title="用户名" :column="3" size="large"  border>
+      <el-descriptions title="用户名" :column="3" size="large" border>
         <el-descriptions-item min-width="100px">
           <template #label>
             <div class="cell-item">
@@ -131,9 +133,11 @@ function getHeadIcon() {
             </div>
           </template>
           {{
-            codeToText[userInfo.place[0]] +
-            codeToText[userInfo.place[1]] +
-            codeToText[userInfo.place[2]]
+            userInfo.place[0] == ''
+              ? ''
+              : codeToText[userInfo.place[0]] +
+                codeToText[userInfo.place[1]] +
+                codeToText[userInfo.place[2]]
           }}
         </el-descriptions-item>
         <el-descriptions-item min-width="100px">

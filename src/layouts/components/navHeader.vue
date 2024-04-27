@@ -72,9 +72,9 @@ const errorHandler = () => {
     >
     <el-sub-menu index="2">
       <template #title>设置</template>
-      <el-menu-item index="2-1">关于</el-menu-item>
-      <el-menu-item index="/help">帮助</el-menu-item>
-      <el-menu-item index="2-3">问题反馈</el-menu-item>
+      <el-menu-item index="/setting/aboutUs">关于我们</el-menu-item>
+      <el-menu-item index="/setting">帮助文档</el-menu-item>
+      <el-menu-item index="/setting/problemFeedback">问题反馈</el-menu-item>
     </el-sub-menu>
 
     <div style="display: flex" class="mx-5">
@@ -93,7 +93,6 @@ const errorHandler = () => {
           <img :src="imageUrl" /> </el-avatar
       ></template>
       <el-menu-item index="/user">个人中心</el-menu-item>
-      <el-menu-item index="3-2">锁定屏幕</el-menu-item>
       <el-menu-item index="3-3" @click="useUserStoreHook().logOut">退出登录</el-menu-item>
     </el-sub-menu>
     <div v-else class="flex items-center mx-5">

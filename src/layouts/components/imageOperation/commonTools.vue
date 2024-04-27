@@ -390,9 +390,9 @@ function deleteImagesListWindowsToSession(
     const list: (ImageInfoWindows | 0)[] = session.getItem(imagesListWindowsSession)
     list[index] = 0
     session.setItem(imagesListWindowsSession, list)
-    imageStateStore.viewports.splice(index, 1)
+    imageStateStore.viewports[index]=0 as any
     imageStateStore.viewportColorbar[index].destroy()
-    imageStateStore.viewportColorbar.splice(index, 1)
+    imageStateStore.viewportColorbar[index]=0 as any
     imageStateStore.imagesListWindows[index] = 0
     renderingEngine!.disableElement(viewportId)
   }

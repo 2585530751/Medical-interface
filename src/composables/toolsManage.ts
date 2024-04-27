@@ -10,7 +10,7 @@ const {
   AnnotationDisplayTool,
   ReferenceCursors,
   ReferenceLines,
-  // ScaleOverlayTool,
+  ScaleOverlayTool,
 
   DragProbeTool,
 
@@ -106,10 +106,18 @@ async function addSegmentationsToState(volumeId: string, segmentationId: string)
 }
 
 async function createTools(segmentationId: string = '', volumeId: string = '') {
+  try {
+    // 尝试执行的代码块
+    // 如果这里的代码抛出了异常，控制流将转到 catch 块
+    cornerstoneTools.addTool(ReferenceLines)
+  } catch (error) {
+    // 当 try 块中的代码抛出异常时，将执行此块
+    return;
+  }
   // Add tools to Cornerstone3D
   // cornerstoneTools.addTool(AnnotationDisplayTool)
   // cornerstoneTools.addTool(ReferenceCursors);
-  cornerstoneTools.addTool(ReferenceLines)
+  
   // cornerstoneTools.addTool(ScaleOverlayTool);
 
   cornerstoneTools.addTool(LengthTool)
@@ -149,7 +157,7 @@ async function createTools(segmentationId: string = '', volumeId: string = '') {
   cornerstoneTools.addTool(PlanarFreehandContourSegmentationTool)
   cornerstoneTools.addTool(LivewireContourSegmentationTool)
   cornerstoneTools.addTool(SplineContourSegmentationTool)
-  cornerstoneTools.addTool(SplineROITool);
+  cornerstoneTools.addTool(SplineROITool)
   // cornerstoneTools.addTool(DragProbeTool);
 
   // Define a tool group, which defines how mouse events map to tool commands for
@@ -267,11 +275,15 @@ async function createTools(segmentationId: string = '', volumeId: string = '') {
   toolGroup.addToolInstance(brushInstanceNames.ScissorsEraser, SphereScissorsTool.toolName, {
     activeStrategy: brushStrategies.ScissorsEraser
   })
-  toolGroup.addToolInstance('CatmullRomSplineSegmentation', SplineContourSegmentationTool.toolName, {
-    spline: {
-      type: SplineContourSegmentationTool.SplineTypes.CatmullRom
+  toolGroup.addToolInstance(
+    'CatmullRomSplineSegmentation',
+    SplineContourSegmentationTool.toolName,
+    {
+      spline: {
+        type: SplineContourSegmentationTool.SplineTypes.CatmullRom
+      }
     }
-  })
+  )
 
   toolGroup.addToolInstance('LinearSplineSegmentation', SplineContourSegmentationTool.toolName, {
     spline: {
@@ -293,7 +305,17 @@ async function createTools(segmentationId: string = '', volumeId: string = '') {
   // toolGroup.setToolPassive(AnnotationDisplayTool.toolName)
   // toolGroup.setToolPassive(ReferenceCursors.toolName)
   toolGroup.setToolPassive(ReferenceLines.toolName)
+ 
+
+  // toolGroup.setToolConfiguration(
+  //   ScaleOverlayTool.toolName,
+  //   {
+  //     scaleLocation: 'bottom',
+  //   },
+  //   true //overwrite
+  // );
   // toolGroup.setToolPassive(ScaleOverlayTool.toolName);
+
   // Set the initial state of the tools, here we set one tool active on left click.
   // This means left click will draw that tool.
   toolGroup.setToolPassive(LengthTool.toolName)

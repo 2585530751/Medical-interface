@@ -345,19 +345,19 @@ export const useImageStateStore = defineStore('imageState', () => {
     }
   }
 
-  function pushImagesModelsList(imagesList: ImageInfo) {
+  function pushImagesModelsList(imagesListParameter: ImageInfo) {
     let existingElement = imagesModelsLists.find(
       (element) =>
-        element.singleImageList.length === imagesList.singleImageList.length &&
+        element.singleImageList.length === imagesListParameter.singleImageList.length &&
         element.singleImageList[0].singleImageModelData.modelId ===
-        imagesList.singleImageList[0].singleImageModelData.modelId
+          imagesListParameter.singleImageList[0].singleImageModelData.modelId
     )
     if (existingElement) {
       const index = imagesModelsLists.indexOf(existingElement)
       imagesModelsLists.splice(index, 1)
-      imagesModelsLists.push(imagesList)
+      imagesModelsLists.push(imagesListParameter)
     } else {
-      imagesModelsLists.push(imagesList)
+      imagesModelsLists.push(imagesListParameter)
     }
   }
 
@@ -378,7 +378,6 @@ export const useImageStateStore = defineStore('imageState', () => {
               }
               tableData.push(item.image)
             })
-            console.log(records)
           }
         } else {
           message(res.msg, { type: 'error' })

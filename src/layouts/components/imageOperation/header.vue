@@ -71,7 +71,6 @@ async function switchSegmentationRepresentation() {
       segmentationContourId
     )
     imageStateStore.segmentationRepresentationUIDList.delete(segmentationContourId)
-
     segmentationRepresentationType.value = 'Labelmap'
   } else {
     for (const segmentationRepresentationLabelmap of segmentationRepresentationLabelmaps) {
@@ -79,13 +78,8 @@ async function switchSegmentationRepresentation() {
         imageStateStore.toolGroup.id,
         segmentationRepresentationLabelmap
       )
-      console.log(segmentationRepresentationLabelmap)
       imageStateStore.segmentationRepresentationUIDList.delete(segmentationRepresentationLabelmap)
-      console.log(
-        imageStateStore.segmentationRepresentationUIDList.has(segmentationRepresentationLabelmap)
-      )
     }
-    console.log(imageStateStore.segmentationRepresentationUIDList)
     segmentationRepresentationLabelmaps.length = 0
     await addContourSegmentation(segmentationContourId)
     segmentationRepresentationType.value = 'Contour'
@@ -100,7 +94,7 @@ async function checkAddStackSegmentation() {
     imageStateStore.selectImagesListWindows
   ] as ImageInfoWindows
 
-  const segmentationId = imageStateStore.segmentationId + imageInfoWindows.imageInfo.imageId
+  const segmentationId:string = imageStateStore.segmentationId + imageInfoWindows.imageInfo.imageId
   const segmentationContourId = imageStateStore.segmentationId + 'Contour'
 
   if (
@@ -116,7 +110,7 @@ async function checkAddStackSegmentation() {
     message('该视窗已经是Labelmap分割层。', { type: 'error' })
     return
   } else {
-    segmentationRepresentationLabelmaps.push(segmentationId)
+    segmentationRepresentationLabelmaps.push(segmentationId as never)
     await addStackSegmentation(stackViewport, segmentationId)
     message('成功将分割层切换为Labelmap分割层。！', { type: 'success' })
   }

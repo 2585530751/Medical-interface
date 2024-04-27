@@ -12,8 +12,6 @@ import type { Types } from '@cornerstonejs/core'
 import { initDemo, setCtTransferFunctionForVolumeActor } from '@/utils/helpers/index.js'
 import { onMounted } from 'vue'
 import type { RGB } from '@cornerstonejs/core/src/types/'
-import OrientationAxis from '@cornerstonejs/core/src/enums/OrientationAxis'
-import createTools from '@/composables/toolsManage'
 import hardcodedMetaDataProvider from '@/utils/helpers/hardcodedMetaDataProvider'
 import registerWebImageLoader from '@/utils/helpers/registerWebImageLoader'
 defineOptions({

@@ -27,8 +27,8 @@ function changeCurrentComp(comp: any): void {
       <div>
         <el-button-group>
           <el-button text @click="changeCurrentComp(commonTools)"> 工具 </el-button>
-          <el-button text @click="changeCurrentComp(algorithmModel)"> 算法 </el-button>
-          <el-button text @click="changeCurrentComp(algorithmModel)"> 病灶 </el-button>
+          <el-button text @click="changeCurrentComp(algorithmModel)"> AI辅助 </el-button>
+
         </el-button-group>
       </div>
     </div>

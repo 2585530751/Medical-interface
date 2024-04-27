@@ -9,7 +9,7 @@ import { generateImageUrl } from '@/composables/image/utils'
 import { imageKeyValueStore } from '@/composables/image/imageKeyValueStore'
 import { createViewportColorbar } from '@/composables/image/imageOperate'
 // import {type ViewportColorbar} from '@cornerstonejs/tools/src/utilities/voi/colorbar/ViewportColorbar'
-import { Enums as csToolsEnums, segmentation, utilities as cstUtils } from '@cornerstonejs/tools'
+import { Enums as csToolsEnums, segmentation, utilities as cstUtils,cancelActiveManipulations,annotation } from '@cornerstonejs/tools'
 import { api } from 'dicomweb-client'
 import {
   RenderingEngine,
@@ -71,7 +71,7 @@ watch(
   () => props.imagesInfoWindows,
   (newValue, oldValue) => {
     if (oldValue !== 0) {
-      if (JSON.stringify(newValue) != JSON.stringify(oldValue)&&newValue!=0) {
+      if (JSON.stringify(newValue) != JSON.stringify(oldValue) && newValue != 0) {
         imageStateStore.viewportColorbar[props.index].destroy()
         renderingEngine.disableElement(viewportId)
         imageIds.length = 0
@@ -171,6 +171,7 @@ async function handleMouseEnter() {
     }
   }
 }
+
 function handleMouseLeave() {
   imageStateStore.toolGroup.setToolActive(imageStateStore.leftMouseActive, {
     bindings: [
@@ -181,6 +182,11 @@ function handleMouseLeave() {
   })
 }
 
+function cancelAndRemoveAnnotation(temElement: HTMLDivElement) {
+  const annotationUID = cancelActiveManipulations(temElement)
+  annotation.state.removeAnnotation(annotationUID as string)
+}
+
 async function renderStackViewport() {
   if (props.imagesInfoWindows != 0) {
     const element: HTMLDivElement = document.getElementById(elementId.value) as HTMLDivElement
@@ -189,7 +195,6 @@ async function renderStackViewport() {
       viewportId
     ) as Types.IStackViewport
     if (!viewport) {
-      
       const viewportInput = {
         viewportId: viewportId,
         type: ViewportType.STACK,
@@ -218,6 +223,10 @@ async function renderStackViewport() {
         }, 100) // 延迟1000毫秒后调用
       })
       ro.observe(element)
+
+      element.addEventListener(csToolsEnums.Events.KEY_DOWN, (evt) => {
+        cancelAndRemoveAnnotation(element)
+      })
     }
     await viewport.setStack(imageIds, singleImageIndex)
     viewport.render()
