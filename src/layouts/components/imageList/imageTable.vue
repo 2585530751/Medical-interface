@@ -125,6 +125,7 @@ function imageDelete(imageId: number) {
         <template #default="props">
           <el-button type="primary">基础阅片</el-button>
           <el-button type="primary">显微镜</el-button>
+          
           <div m="4">
             <h3>随访记录</h3>
             <el-table :data="props.row.singleImageList">

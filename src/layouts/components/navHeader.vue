@@ -61,14 +61,19 @@ const errorHandler = () => {
     </el-menu-item>
 
     <div class="flex-grow" />
-    <role-permission :value="['doctor']">
-      <el-menu-item index="/image">医学影像</el-menu-item>
+    <role-permission :value="['doctor','radiologist']">
+      <el-menu-item index="/image">序列管理</el-menu-item>
     </role-permission>
     <role-permission :value="['doctor']"
       ><el-menu-item index="/model">算法模型</el-menu-item></role-permission
     >
-    <role-permission :value="['doctor']">
+    <role-permission :value="['doctor', 'radiologist']">
       <el-menu-item index="/patient">患者详情</el-menu-item></role-permission
+    >
+
+
+    <role-permission :value="['radiologist']">
+      <el-menu-item index="/patientManagment">患者管理</el-menu-item></role-permission
     >
     <el-sub-menu index="2">
       <template #title>设置</template>
