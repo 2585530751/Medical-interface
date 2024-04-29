@@ -1,5 +1,4 @@
-import type image from "@/router/modules/image"
-import type { Interface } from "readline"
+
 
 interface SingleImage {
   imageId: number

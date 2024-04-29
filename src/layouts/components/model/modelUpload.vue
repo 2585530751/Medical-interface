@@ -1,7 +1,4 @@
 <script setup lang="ts">
-defineOptions({
-  name: ''
-})
 import { reactive, ref, watch } from 'vue'
 import { UploadFilled } from '@element-plus/icons-vue'
 import { type UploadRequestOptions, type UploadProps, type UploadRawFile } from 'element-plus'
@@ -12,7 +9,11 @@ import { uploadImages } from '@/api/image'
 import { Delete, Download, Plus, ZoomIn } from '@element-plus/icons-vue'
 import { uploadModelInfoApi } from '@/api/model'
 import { genFileId } from 'element-plus'
-import model from '@/router/modules/model'
+import { ModelInfo } from '@/types/model' 
+
+defineOptions({
+  name: ''
+})
 
 const props = defineProps<{
   uploadWindowOpen?: boolean
@@ -21,6 +22,7 @@ const props = defineProps<{
 
 const emits = defineEmits<{
   uploadWindowClose: [] // 具名元组语法
+  uploadModelInfoAction: [modelInfo:ModelInfo] // 具名元组语法
 }>()
 
 const imageViewCheck = ref(false)
@@ -47,16 +49,16 @@ const handleExceed: UploadProps['onExceed'] = (files) => {
 }
 
 const submitUpload = () => {
+  if(modelInfo.modelImage === '') {
+    message('请上传模型图片', { type: 'error' })
+    return
+  }
   uploadRef.value!.submit()
 }
 
 const headers: Record<string, any> = {
   'Content-Type': 'multipart/form-data'
 }
-
-// const submitUpload = () => {
-//   uploadRef.value!.submit()
-// }
 
 let centerDialogVisible = ref(props.uploadWindowOpen)
 
@@ -73,14 +75,13 @@ function uploadModelInfo(options: UploadRequestOptions) {
   const formData = new FormData()
   formData.append('modelImage', options.file)
   formData.append('modelInfo', JSON.stringify(modelInfo))
-  console.log('formData', formData.get('modelInfo'))
   uploadModelInfoApi(formData)
     .then((res) => {
       if (res.success) {
         message(res.msg, { type: 'success' })
-        // 清理 Blob URL，防止内存泄漏
         URL.revokeObjectURL(modelInfo.modelImage)
         emits('uploadWindowClose')
+        emits('uploadModelInfoAction', res.data)
       } else {
         message(res.msg, { type: 'error' })
       }
@@ -110,7 +111,6 @@ function uploadModelInfo(options: UploadRequestOptions) {
           <el-form-item label="模型类型" prop="modelPattern">
             <el-select
               v-model="modelInfo.modelPattern"
-              multiple
               placeholder="请输入模型类型"
               class="w-full"
             >

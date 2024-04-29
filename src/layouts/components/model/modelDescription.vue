@@ -3,38 +3,71 @@ defineOptions({
   name: ''
 })
 import type { IconifyIconOffline } from '@/components/ReIcon'
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, watch } from 'vue'
 import { getModelInfoByModelIdApi } from '@/api/model'
+import { useRoute } from 'vue-router'
+import { basicImageUrl } from '@/api/utils'
 
 import link from '@iconify-icons/ep/link'
 import camera from '@iconify-icons/ep/camera'
+import { message } from '@/utils/message'
+
 interface information {
   modelName: string
-  modelAbstract: string
-  modelDescription: string
+  modelAbstract: string[]
+  modelDescription: string[]
   modelImage: string
+  modelPaperLink: string
+  modelCodeLink: string
 }
+
+const route = useRoute()
 
 const modelInformation = reactive<information>({
   modelName: '',
-  modelAbstract: "",
-  modelDescription: '',
+  modelAbstract: [],
+  modelDescription: [],
   modelImage: '',
+  modelPaperLink: '',
+  modelCodeLink: ''
 })
 
-function getModelInfoByModelId() {
-  const param = { modelId: 1 }
-  getModelInfoByModelIdApi(param).then((res:any) => {
-    modelInformation.modelName = res.data.modelName
-    modelInformation.modelAbstract = res.data.modelAbstract
-    modelInformation.modelDescription = res.data.modelDescription
-    modelInformation.modelImage = res.data.modelImage
+function getModelInfoByModelId(modelId: number) {
+  const param = { modelId: modelId }
+  getModelInfoByModelIdApi(param).then((res: any) => {
+    if (res.success) {
+      console.log(res.data)
+      const abstractList = res.data.modelAbstract.split(/\r?\n|\r/)
+      const descriptionList = res.data.modelDescription.split(/\r?\n|\r/)
+      const filterAbstractList = abstractList.filter((item: string) => item.trim() !== '')
+      const filterDescriptionList = descriptionList.filter((item: string) => item.trim() !== '')
+      modelInformation.modelAbstract = filterAbstractList
+      modelInformation.modelDescription = filterDescriptionList
+      modelInformation.modelName = res.data.modelName
+      modelInformation.modelImage = res.data.modelImage
+      modelInformation.modelPaperLink = res.data.modelPaperLink
+      modelInformation.modelCodeLink = res.data.modelCodeLink
+    } else {
+      message(res.msg, { type: 'error' })
+    }
   })
 }
 
+function navigateToLink(link: string) {
+  window.location.href = link
+}
+
 onMounted(() => {
-  getModelInfoByModelId()
+  const modelId = route.query.modelId as any
+  getModelInfoByModelId(modelId)
 })
+
+watch(
+  () => route.query.modelId,
+  (value) => {
+    getModelInfoByModelId(value as any)
+  }
+)
 </script>
 
 <template>
@@ -86,17 +119,25 @@ onMounted(() => {
               {{ modelInformation.modelName }}
             </h1>
             <p class="text-base font-semibold leading-7 text-center text-indigo-600">摘要</p>
-            <pre class="text-xl text-left text-gray-700 dark:text-white">
-                {{ modelInformation.modelAbstract }}  
-              </pre
+            <p
+              v-for="(paragraph, index) in modelInformation.modelAbstract"
+              :key="index"
+              class="text-xl text-left text-gray-700 dark:text-white indent-8"
             >
+              {{ paragraph }}
+            </p>
             <div class="flex justify-end pt-10">
-              <el-button type="primary"
-                ><template #icon>
-                  <IconifyIconOffline :icon="link"> </IconifyIconOffline> </template
+              <el-button
+                v-if="modelInformation.modelPaperLink != ''"
+                type="primary"
+                @click="navigateToLink(modelInformation.modelPaperLink)"
+                ><template #icon> <IconifyIconOffline :icon="link"> </IconifyIconOffline> </template
                 >文章链接</el-button
               >
-              <el-button type="primary"
+              <el-button
+                v-if="modelInformation.modelCodeLink != ''"
+                type="primary"
+                @click="navigateToLink(modelInformation.modelCodeLink)"
                 ><template #icon>
                   <IconifyIconOffline :icon="camera"> </IconifyIconOffline> </template
                 >算法模型</el-button
@@ -110,7 +151,7 @@ onMounted(() => {
       >
         <img
           class="w-[48rem] max-w-none rounded-xl bg-gray-900 shadow-xl ring-1 ring-gray-400/10 sm:w-[57rem]"
-          :src="modelInformation.modelImage"
+          :src="basicImageUrl + modelInformation.modelImage"
           alt=""
         />
       </div>
@@ -119,11 +160,13 @@ onMounted(() => {
       >
         <div class="lg:pr-4">
           <div class="text-base leading-7 text-gray-700 dark:text-white">
-            <pre class="text-xl text-left indent-8 dark:text-white">
-             
-              {{ modelInformation.modelDescription }}
-
-            </pre>
+            <p
+              class="text-xl text-left indent-8"
+              v-for="(paragraph, index) in modelInformation.modelDescription"
+              :key="index"
+            >
+              {{ paragraph }}
+            </p>
           </div>
         </div>
       </div>

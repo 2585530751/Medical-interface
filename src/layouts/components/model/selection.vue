@@ -3,10 +3,20 @@ import type { IconifyIconOffline } from '@/components/ReIcon'
 import arrowDown from '@iconify-icons/ep/arrow-down'
 import arrowUp from '@iconify-icons/ep/arrow-up'
 import { reactive, ref } from 'vue'
-import modelUpload from './modelUpload.vue'
+import modelUpload from '@/layouts/components/model/modelUpload.vue'
+import { basicImageUrl } from '@/api/utils'
 import 'animate.css'
 
-const selectedOption = ref({
+const props = defineProps<{
+  uploadWindowOpen?: boolean
+}>()
+
+const emits = defineEmits<{
+  uploadSelectionModelInfo: [modelInfo: ModelInfo] // 具名元组语法
+  emitSelectedOption: [selectedOption: Record<string, string>] // 具名元组语法
+}>()
+
+const selectedOption = reactive({
   type: '全部',
   year: '全部',
   sort: '综合'
@@ -40,6 +50,7 @@ const selectedList = reactive({
     name: '年份',
     value: [
       '全部',
+      '2024',
       '2023',
       '2022',
       '2021',
@@ -58,6 +69,10 @@ const selectedList = reactive({
     value: ['综合', '创建时间', '评分']
   }
 })
+
+function uploadModelList(modelInfo: ModelInfo) {
+  emits('uploadSelectionModelInfo', modelInfo)
+}
 </script>
 
 <template>
@@ -90,7 +105,7 @@ const selectedList = reactive({
                 :key="index"
                 class="cursor-pointer"
                 :class="{ selected: selectedOption[key] === value }"
-                @click="selectedOption[key] = value"
+                @click="selectedOption[key] = value,emits('emitSelectedOption', selectedOption)"
                 >{{ value }}</a
               >
             </div>
@@ -100,6 +115,7 @@ const selectedList = reactive({
     </Transition>
   </div>
   <modelUpload
+    @upload-model-info-action="uploadModelList"
     :options="selectedList.type.value"
     :upload-window-open="centerDialogVisible"
     @upload-window-close="centerDialogVisible = false"

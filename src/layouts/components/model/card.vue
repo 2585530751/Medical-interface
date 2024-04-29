@@ -1,17 +1,28 @@
 <script setup lang="ts">
 import { RouterLink } from 'vue-router'
 import { getAllModelsInfoApi } from '@/api/model'
-import { onMounted, ref } from 'vue'
+import { watch, onMounted, ref } from 'vue'
+import { basicImageUrl } from '@/api/utils'
+import { ModelInfo } from '@/types/model'
 
 defineOptions({
   name: 'card'
 })
 
-const modelInfoLists = ref([])
+const props = defineProps<{
+  uploadModelInfo: ModelInfo
+  selectedOption: Record<string, string>
+}>()
+
+const modelInfoLists = ref<ModelInfo[]>([])
+let modedInfoListsStorage: ModelInfo[] = []
 
 function getAllModelsInfo() {
   getAllModelsInfoApi().then((res: any) => {
-    console.log(res)
+    if (res.success) {
+      modelInfoLists.value = res.data
+      modedInfoListsStorage = [...res.data]
+    }
   })
 }
 
@@ -19,34 +30,68 @@ onMounted(() => {
   getAllModelsInfo()
 })
 
+watch(
+  () => props.uploadModelInfo,
+  () => {
+    modelInfoLists.value.push(props.uploadModelInfo)
+  }
+)
 
+watch(
+  () => props.selectedOption,
+  () => {
+    modelInfoLists.value.length = 0
+    let tempModedInfoLists: ModelInfo[] = [...modedInfoListsStorage]
+    if (props.selectedOption.type != '全部') {
+      tempModedInfoLists = modedInfoListsStorage.filter(
+        (item) => item.modelPattern == props.selectedOption.type
+      )
+    }
+    if (props.selectedOption.year != '全部') {
+      tempModedInfoLists = tempModedInfoLists.filter(
+        (item) => item.modelCreateTime.split('-')[0] == props.selectedOption.year
+      )
+    }
+    if (props.selectedOption.sort == '创建时间') {
+      tempModedInfoLists.sort((a, b) => {
+        return new Date(a.modelCreateTime).getTime() - new Date(b.modelCreateTime).getTime()
+      })
+    }
+    modelInfoLists.value = tempModedInfoLists
+  },
+  {
+    deep: true
+  }
+)
 </script>
 
 <template>
   <section class="text-gray-600 body-font">
     <div class="container px-5 py-24 mx-auto">
-      <div class="flex flex-wrap justify-center -m-4">
-        <div v-for="(modelInfo,index) in modelInfoLists" :key="index" class="p-4 md:w-1/4">
+      <div class="flex items-center justify-evenly">
+        <div v-for="(modelInfo, index) in modelInfoLists" :key="index" class="p-4 md:w-1/4">
           <div class="h-full overflow-hidden border-2 border-gray-200 rounded-lg border-opacity-60">
             <img
               class="object-cover object-center w-full lg:h-48 md:h-36"
-              src="@/assets/images/example2.png"
+              :src="basicImageUrl + modelInfo.modelImage"
               alt="blog"
             />
             <div class="p-6">
               <h2 class="mb-1 text-xs font-medium tracking-widest text-gray-400 title-font">
-                CATEGORY
+                {{ modelInfo.modelPattern }}
               </h2>
               <h1 class="mb-3 text-lg font-medium text-gray-900 title-font dark:text-white">
-                ROC曲线
+                {{ modelInfo.modelName }}
               </h1>
-              <p class="mb-3 leading-relaxed">
-                两组患者第3天、第5天、第7天误吸风险等级人数情况相比如表10所示，第3天和第5天P＞0.05差异无统计学意义，第7天误吸风险等级人数情况相比P＜0.05差异有统计学意义。
+              <p class="mb-3 leading-relaxed line-clamp-6 indent-8">
+                {{ modelInfo.modelAbstract }}
               </p>
               <div class="flex flex-wrap items-center">
                 <a class="flex items-center text-indigo-500 md:mb-2 lg:mb-0">
-                  <router-link class="flex items-center" to="/model/modelDescription"
-                    >Learn More</router-link
+                  <router-link
+                    class="flex items-center"
+                    :to="{ path: '/model/modelDescription', query: { modelId: modelInfo.modelId } }"
+                    >了解详情</router-link
                   >
                   <svg
                     class="w-4 h-4 ml-2"
