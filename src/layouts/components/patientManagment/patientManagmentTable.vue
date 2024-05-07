@@ -550,9 +550,6 @@ const filterGender = (value: string, row: any, column: any) => {
       <el-table-column sortable label="年龄" prop="age" />
       <el-table-column label="联系方式" prop="contact" />
       <el-table-column label="住址" prop="address" />
-      <el-table-column label="健康状况" prop="healthStatus" />
-      <el-table-column label="就诊原因" prop="reasonForVisit" />
-      <el-table-column label="诊断结果" prop="diagnosis" />
       <el-table-column fixed="right" label="操作" width="200">
         <template #default>
           <el-button link type="primary" size="small" @click=""><template #icon>
@@ -568,7 +565,6 @@ const filterGender = (value: string, row: any, column: any) => {
                 删除</el-button>
             </template>
           </el-popconfirm>
-
           <el-button :icon="IonEllipsisHorizontal" link type="primary" />
         </template>
       </el-table-column>

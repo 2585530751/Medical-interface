@@ -20,6 +20,8 @@
     "@cornerstonejs/streaming-image-volume-loader": "^1.45.1",
     "@cornerstonejs/tools": "^1.45.1",
     "@pureadmin/utils": "^1.9.10",
+    "@rollup/plugin-commonjs": "^25.0.7",
+    "@rollup/plugin-node-resolve": "^15.2.3",
     "@vue/runtime-core": "^3.4.21",
     "@vueuse/core": "^10.1.2",
     "animate.css": "^4.1.1",
@@ -37,6 +39,7 @@
     "pinia": "^2.0.36",
     "qs": "^6.11.2",
     "splitpanes": "^3.1.5",
+    "vite-plugin-wasm": "^3.3.0",
     "vue-baidu-map-3x": "^1.0.37",
     "vue-echarts": "^6.6.9",
     "vue-router": "^4.2.0"

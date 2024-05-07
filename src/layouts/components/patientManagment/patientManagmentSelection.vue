@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, watch } from 'vue'
 import type { IconifyIconOffline } from '@/components/ReIcon'
 import plus from '@iconify-icons/ep/circle-plus'
 import search from '@iconify-icons/ep/search'
@@ -7,17 +7,76 @@ import fold from '@iconify-icons/ep/fold'
 import refresh from '@iconify-icons/ep/refresh'
 import setUp from '@iconify-icons/ep/set-up'
 import rank from '@iconify-icons/ep/rank'
-
-
 import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { Action } from 'element-plus'
-
+import { postPatientInformationApi } from '@/api/user'
+import { message } from '@/utils/message'
+import type { FormInstance, FormRules } from 'element-plus'
+import {
+  provinceAndCityDataPlus,
+  provinceAndCityData,
+  convertTextToCode,
+  regionDataPlus,
+  regionData,
+  CodeToText
+} from '@/utils/chinaArea'
+const isShow = ref(true)
 const dialogOverflowVisible = ref(false)
 const emit = defineEmits<{
-  changeTableSize: [size: string]
+  changeTableSize: [size: string],
+  uploadWindowClose: [] // 具名元组语法
 }>()
+interface patientRuleForm {
+  patientName: string,
+  patientIdCardNumber:string,
+  patientGender: string,
+  patientHeight:string,
+  patientWeight:string,
+  dateOfBirth:string,
+  phoneNumber:string,
+  telePhoneNumber:string,
+  faxNumber:string,
+  email:string,
+  address: string[],
+}
+const userRuleForm = reactive<patientRuleForm>({
+  patientName:'',
+  patientIdCardNumber:'',
+  patientGender:'',
+  patientHeight:'',
+  patientWeight:'',
+  dateOfBirth:'',
+  phoneNumber:'',
+  telePhoneNumber:'',
+  faxNumber:'',
+  email:'',
+  address:['','',''],
+})
+
+function postPatientInformation(){
+  const updatePlace = userRuleForm.address.length == 3 ? userRuleForm.address[2] : userRuleForm.address[1]
+  postPatientInformationApi({
+    patientName: userRuleForm.patientName,
+    patientIdCardNumber:userRuleForm.patientIdCardNumber,
+    patientGender: userRuleForm.patientGender,
+    patientHeight:userRuleForm.patientHeight,
+    patientWeight:userRuleForm.patientWeight,
+    dateOfBirth:userRuleForm.dateOfBirth,
+    phoneNumber:userRuleForm.phoneNumber,
+    telephoneNumber:userRuleForm.telePhoneNumber,
+    faxNumber:userRuleForm.faxNumber,
+    email:userRuleForm.email,
+    address:updatePlace,
+  }).then((data) => {
+    if (data.success == true) {
+      console.log(data)
+    } else {
+      console.log(data)
+    }
+  })
+}
 
 const formInline = reactive({
   user: '',
@@ -33,13 +92,24 @@ const visible = ref(false)
 // do not use same name with ref
 const form = reactive({
   patientName: '',
+  patientIdCardNumber:'',
+  patientGender: '',
+  patientHeight:0,
+  patientWeight:0,
+  dateOfBirth:'',
+  phoneNumber:'',
+  telePhoneNumber:'',
+  faxNumber:'',
+  email:'',
+  address:'',
+
+
+
   ageBegin: '',
   ageEnd: '',
-  gender: '',
   dateBegin: '',
   dateEnd: '',
   contact: '',
-  address: '',
   healthStatus: '',
   reasonForVisit: '',
   diagnosis: ''
@@ -79,6 +149,11 @@ const handleCheckedColsChange = (value: string[]) => {
   const checkedCount = value.length
   checkAll.value = checkedCount === cols.length
   isIndeterminate.value = checkedCount > 0 && checkedCount < cols.length
+}
+
+
+function test(){
+  console.log('1223')
 }
 </script>
 
@@ -130,20 +205,92 @@ const handleCheckedColsChange = (value: string[]) => {
         </el-button>
         <el-button round :icon="applicationImport">导入患者</el-button>
         <el-button round :icon="applicationExport">导出患者</el-button>
-        
-        <el-dialog
-          v-model="dialogOverflowVisible"
-          title="添加患者"
-          width="50%"
-          draggable
-          overflow
+
+        <el-dialog 
+        v-model="dialogOverflowVisible" 
+        title="添加患者" 
+        width="800px" 
+        @close="$emit('uploadWindowClose')" 
+        center
         >
-          <span>It's a overflow draggable Dialog</span>
+         
+            <div class="common-layout">
+              <el-container>
+                <el-main width="400px" class="font-black">
+                  <el-col :span="17">
+                    <el-form-item label="患者姓名:" prop="patientName">
+                      <el-input v-model="userRuleForm.patientName" placeholder="请输入患者姓名" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="17">
+                    <el-form-item label="患者性别:" prop="patientGender">
+                      <el-radio-group v-model="userRuleForm.patientGender">
+                        <el-radio label="男性" value="male" />
+                        <el-radio label="女性" value="female" />
+                      </el-radio-group>
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="17">
+                    <el-form-item label="患者体重:" prop="patientWeight">
+                      <el-input v-model="userRuleForm.patientWeight" placeholder="请输入患者体重" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="17">
+                    <el-form-item label="座机号码:" prop="phoneNumber">
+                      <el-input v-model="userRuleForm.phoneNumber" placeholder="请输入座机号码" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="17">
+                    <el-form-item label="传真号码:" prop="faxNumber">
+                      <el-input v-model="userRuleForm.faxNumber" placeholder="请输入传真号码" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="17">
+                    <el-form-item label="患者住址:" prop="address">
+                      <el-cascader v-model="userRuleForm.address" :options="regionData"  placeholder="请选择患者住址" />
+                      
+                    </el-form-item>
+                  </el-col>
+                  
+                 
+                </el-main>
+
+                <el-main width="400px" class="font-black">
+                  <el-col :span="17">
+                    <el-form-item label="身份证号:" prop="patientIdCardNumber">
+                      <el-input v-model="userRuleForm.patientIdCardNumber" placeholder="请输入身份证号" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="17">
+                    <el-form-item label="患者身高:" prop="patientHeight">
+                      <el-input v-model="userRuleForm.patientHeight" placeholder="请输入患者身高" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="17">
+                    <el-form-item label="患者生日:" prop="dateOfBirth">
+                      <el-input v-model="userRuleForm.dateOfBirth" placeholder="请输入患者生日" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="17">
+                    <el-form-item label="手机号码:" prop="telePhoneNumber">
+                      <el-input v-model="userRuleForm.telePhoneNumber" placeholder="请输入手机号码" />
+                    </el-form-item>
+                  </el-col>
+                  <el-col :span="17">
+                    <el-form-item label="电子邮件:" prop="email">
+                      <el-input v-model="userRuleForm.email" placeholder="请输入电子邮箱" />
+                    </el-form-item>
+                  </el-col>
+                  
+                </el-main>
+              </el-container>
+            </div>
+          
           <template #footer>
             <div class="dialog-footer">
-              <el-button @click="dialogOverflowVisible = false">取消</el-button>
-              <el-button type="primary" @click="dialogOverflowVisible = false">
-                下一步
+              <el-button @click="dialogOverflowVisible = false">关闭</el-button>
+              <el-button type="primary" @click="dialogOverflowVisible = false,postPatientInformation()" >
+                确认添加
               </el-button>
             </div>
           </template>
@@ -209,7 +356,7 @@ const handleCheckedColsChange = (value: string[]) => {
         </el-col>
       </el-form-item>
       <el-form-item label="性别">
-        <el-radio-group v-model="form.gender">
+        <el-radio-group v-model="form.patientGender">
           <el-radio label="1" border>男性</el-radio>
           <el-radio label="2" border>女性</el-radio>
         </el-radio-group>

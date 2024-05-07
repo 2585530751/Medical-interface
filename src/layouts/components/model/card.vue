@@ -68,7 +68,7 @@ watch(
 <template>
   <section class="text-gray-600 body-font">
     <div class="container px-5 py-24 mx-auto">
-      <div class="flex items-center justify-evenly">
+      <div class="flex flex-wrap items-center justify-evenly">
         <div v-for="(modelInfo, index) in modelInfoLists" :key="index" class="p-4 md:w-1/4">
           <div class="h-full overflow-hidden border-2 border-gray-200 rounded-lg border-opacity-60">
             <img

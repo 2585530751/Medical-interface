@@ -35,7 +35,7 @@ import { type ViewportColorbar } from '@cornerstonejs/tools/src/utilities/voi/co
 
 const { Enums: csToolsEnums } = cornerstoneTools
 const { MouseBindings } = csToolsEnums
-await initDemo()
+initDemo()
 
 export const useImageStateStore = defineStore('imageState', () => {
   const imageList = reactive<SingleImage>({

@@ -151,3 +151,16 @@ export const setHeadIconApi = (data?: object) => {
 export const getHeadIconApi = (params?: object) => {
   return http.request<any>('get', baseUrlApi('user/getHeadIcon'))
 }
+
+export const postPatientInformationApi = (data?: object) => {
+  return http.request<any>(
+    'post',
+    baseUrlApi('patient/addOne'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  )
+}

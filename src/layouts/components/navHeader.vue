@@ -71,7 +71,9 @@ const errorHandler = () => {
       <el-menu-item index="/patient">患者详情</el-menu-item></role-permission
     >
 
-
+    <role-permission :value="['radiologist','doctor']">
+      <el-menu-item index="/study">检查管理</el-menu-item></role-permission
+    >
     <role-permission :value="['radiologist']">
       <el-menu-item index="/patientManagment">患者管理</el-menu-item></role-permission
     >
