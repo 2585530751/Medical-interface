@@ -52,7 +52,7 @@ async function singleImageSegmentationOfThyroidNodules() {
           singleImage!.modelType = 'model'
           seriesInfo.imageList = [singleImage!]
           pushseriesModelsListsSession(seriesInfo)
-          imageOperationStateStore.pushImagesModelsList(seriesInfo)
+          imageOperationStateStore.pushSeriesModelsList(seriesInfo)
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -98,7 +98,7 @@ async function imageSegmentationOfThyroidNodules() {
             imageInfo.singleImageList[j].modelType = 'model'
           }
           pushseriesModelsListsSession(imageInfo)
-          imageOperationStateStore.pushImagesModelsList(imageInfo)
+          imageOperationStateStore.pushSeriesModelsList(imageInfo)
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -196,7 +196,7 @@ async function singleImageDetectionOfPulmonaryNodules() {
           singleImage!.singleImageModelData = singleImageModelData
           singleImage!.modelType = 'model'
           imageInfo.singleImageList = [singleImage!]
-          imageOperationStateStore.pushImagesModelsList(imageInfo)
+          imageOperationStateStore.pushSeriesModelsList(imageInfo)
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -237,7 +237,7 @@ async function imageDetectionOfPulmonaryNodules() {
             imageInfo.singleImageList[j].modelType = 'model'
           }
           pushseriesModelsListsSession(imageInfo)
-          imageOperationStateStore.pushImagesModelsList(imageInfo)
+          imageOperationStateStore.pushSeriesModelsList(imageInfo)
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -271,7 +271,7 @@ async function singleImageIntestinalPolypsSegmentation() {
           singleImage!.modelType = 'model'
           imageInfo.singleImageList = [singleImage!]
           pushseriesModelsListsSession(imageInfo)
-          imageOperationStateStore.pushImagesModelsList(imageInfo)
+          imageOperationStateStore.pushSeriesModelsList(imageInfo)
 
           message(data.msg, { type: 'success' })
         } else {
@@ -317,7 +317,7 @@ async function imageIntestinalPolypsSegmentation() {
             imageInfo.singleImageList[j].modelType = 'model'
           }
           pushseriesModelsListsSession(imageInfo)
-          imageOperationStateStore.pushImagesModelsList(imageInfo)
+          imageOperationStateStore.pushSeriesModelsList(imageInfo)
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })

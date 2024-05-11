@@ -378,7 +378,7 @@ function changeSplineScaleForToolGroup(splineToolName: string, scale: number) {
   toolGroup.setToolConfiguration(splineToolName, { spline: splineConfig })
 }
 
-function deleteImagesListWindowsToSession(
+function deleteSeriesListWindowsToSession(
   index: number,
   renderingEngineId: string,
   viewportId: string
@@ -398,10 +398,10 @@ function deleteImagesListWindowsToSession(
   }
 }
 
-function removeAllImagesListWindowsToSession(renderingEngineId: string) {
+function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
   imageOperationStateStore.seriesListWindows.forEach((item, index) => {
     if (item != 0) {
-      deleteImagesListWindowsToSession(
+      deleteSeriesListWindowsToSession(
         index,
         renderingEngineId,
         imageOperationStateStore.viewports[index].id
@@ -1604,7 +1604,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
           <remove
             style="height: 30px; width: 30px; fill: currentColor"
             @click="
-              deleteImagesListWindowsToSession(
+              deleteSeriesListWindowsToSession(
                 imageOperationStateStore.selectSeriesWindows,
                 imageOperationStateStore.renderingEngine.id,
                 imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
@@ -1614,7 +1614,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
         </imageOperation>
         <imageOperation
           operation="清空视窗"
-          @click="removeAllImagesListWindowsToSession(imageOperationStateStore.renderingEngine.id)"
+          @click="removeAllSeriesListWindowsToSession(imageOperationStateStore.renderingEngine.id)"
         >
           <removals style="height: 30px; width: 30px; fill: currentColor"></removals>
         </imageOperation>

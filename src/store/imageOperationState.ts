@@ -196,7 +196,7 @@ export const useImageOperationStateStore = defineStore('imageOperationState', ()
     }
   }
 
-  function pushImagesModelsList(imagesListParameter: SeriesInfo) {
+  function pushSeriesModelsList(imagesListParameter: SeriesInfo) {
     let existingElement = seriesModelsLists.find(
       (element) =>
         element.imageList.length === imagesListParameter.imageList.length &&
@@ -266,6 +266,6 @@ export const useImageOperationStateStore = defineStore('imageOperationState', ()
     bindSeriesList,
     getImagesListData,
     pushSeriesList,
-    pushImagesModelsList
+    pushSeriesModelsList
   }
 })

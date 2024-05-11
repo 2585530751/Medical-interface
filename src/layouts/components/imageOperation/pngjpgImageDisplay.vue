@@ -44,7 +44,7 @@ const totalCells = computed(() => {
 })
 
 const imagesInfoWindows = computed(() => {
-  return imageOperationStateStore.imagesListWindows
+  return imageOperationStateStore.seriesListWindows
 })
 </script>
 
@@ -65,4 +65,3 @@ const imagesInfoWindows = computed(() => {
   height: calc(100vh - 50px);
 }
 </style>
-@/router/modules/imageList@/store/imageOperationState
