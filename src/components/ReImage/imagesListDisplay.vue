@@ -5,51 +5,59 @@ import folder from '@iconify-icons/ep/folder'
 import { basicImageUrl } from '@/api/utils'
 
 import { ref, onMounted } from 'vue'
-import { useImageStateStore } from '@/store/imageState'
-import type { ImageInfo, ImageInfoWindows } from '@/types/image'
-import { changeImagesListWindowsToSession } from '@/composables/image/utils'
+import { useImageOperationStateStore } from '@/store/imageOperationState'
+import type { SeriesInfoWindows } from '@/types/image'
+import { changeSeriesListWindowsToSession } from '@/composables/image/utils'
 import { Enums } from '@cornerstonejs/core'
 import { generateImageUrl } from '@/composables/image/utils'
 import type IStackViewport from '@cornerstonejs/core/src/types/IStackViewport'
-import { set } from 'nprogress'
+import type { SeriesInfo } from '@/types/series'
 
 const props = defineProps<{
-  imagesList: ImageInfo
+  seriesList: SeriesInfo
   index: number
 }>()
 
 const emit = defineEmits<{
-  addSelectImagesLists: [imagesList: ImageInfo,checked:boolean]
+  addSelectImagesLists: [imagesList: SeriesInfo, checked: boolean]
 }>()
 
 const checked = ref(false)
 const imageIds: string[] = []
 const { ViewportType } = Enums
-const imageStateStore = useImageStateStore()
-let elementId = ref('cornerstone-element-imagesList-' + props.imagesList.imageId)
-const viewportId = 'stackViewPort-imagesList-' + props.imagesList.imageId
-const renderingEngine = imageStateStore.renderingEngine
-const imagesListUrl = generateImageUrl(props.imagesList.singleImageList[0].singleImagePath)
+const imageOperationStateStore = useImageOperationStateStore()
+let elementId = ref('cornerstone-element-imagesList-' + props.seriesList.seriesId)
+const viewportId = 'stackViewPort-imagesList-' + props.seriesList.seriesId
+const renderingEngine = imageOperationStateStore.renderingEngine
+const imagesListUrl = generateImageUrl(props.seriesList.imageList[0].imagePath as string)
 const imagesListUrlCheck = ref(true)
 
 function selectImagesListToWindows() {
-  imageStateStore.selectImagesList = props.imagesList.imageId
-  const ImageInfoWindows: ImageInfoWindows = {
-    imageInfo: props.imagesList,
-    singleImage: props.imagesList.singleImageList[0]
+  imageOperationStateStore.selectSeriesList = props.seriesList.seriesId
+  const seriesInfoWindows: SeriesInfoWindows = {
+    seriesInfo: props.seriesList,
+    imageInfo: props.seriesList.imageList[0]
   }
-  //imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows] = ImageInfoWindows
+  //imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows] = seriesInfoWindows
 
-  imageStateStore.imagesListWindows = [
-    ...imageStateStore.imagesListWindows.slice(0, imageStateStore.selectImagesListWindows),
-    ImageInfoWindows,
-    ...imageStateStore.imagesListWindows.slice(imageStateStore.selectImagesListWindows + 1)
+  imageOperationStateStore.seriesListWindows = [
+    ...imageOperationStateStore.seriesListWindows.slice(
+      0,
+      imageOperationStateStore.selectSeriesWindows
+    ),
+    seriesInfoWindows,
+    ...imageOperationStateStore.seriesListWindows.slice(
+      imageOperationStateStore.selectSeriesWindows + 1
+    )
   ]
-  changeImagesListWindowsToSession(ImageInfoWindows, imageStateStore.selectImagesListWindows)
+  changeSeriesListWindowsToSession(
+    seriesInfoWindows,
+    imageOperationStateStore.selectSeriesWindows
+  )
 }
 
 function checkInputCheckbox() {
-  emit('addSelectImagesLists', props.imagesList, checked.value)
+  emit('addSelectImagesLists', props.seriesList, checked.value)
 }
 
 onMounted(() => {
@@ -77,16 +85,16 @@ onMounted(() => {
 <template>
   <div class="flex justify-center w-5/6 flex-nowrap">
     <div class="w-1/6">
-      <el-checkbox v-model="checked" size="large" @change="checkInputCheckbox"/>
+      <el-checkbox v-model="checked" size="large" @change="checkInputCheckbox" />
     </div>
     <div
       class="flex flex-col justify-center w-4/6 gap-1"
-      :class="{ highlighted: imageStateStore.selectImagesList === imagesList.imageId }"
+      :class="{ highlighted: imageOperationStateStore.selectSeriesList === props.seriesList.seriesId }"
       @click="selectImagesListToWindows()"
     >
       <div class="flex items-center justify-between">
         <span class="text-xs text-gray-500">
-          {{ props.imagesList.imageEquipment }}
+          {{ props.seriesList.seriesModality }}
         </span>
         <span class="text-xs text-gray-500"
           ><IconifyIconOffline
@@ -94,13 +102,13 @@ onMounted(() => {
             :icon="timer"
             :style="{ fontSize: '10px' }"
           ></IconifyIconOffline
-          >{{ props.imagesList.imageCheckTime }}</span
+          >{{ props.seriesList.seriesCheckTime }}</span
         >
       </div>
       <div class="border-2 border-solid rounded-lg border-slate-300">
         <el-image
           fit="cover"
-          :src="basicImageUrl + props.imagesList.singleImageList[0].singleImagePath"
+          :src="basicImageUrl + props.seriesList.imageList[0].imagePath"
           :crossorigin="'anonymous'"
           v-show="!imagesListUrlCheck"
         />
@@ -110,7 +118,7 @@ onMounted(() => {
       </div>
       <div class="flex items-center justify-between">
         <span class="text-xs text-gray-500">
-          {{ props.imagesList.patientName }}
+          {{ props.seriesList.patientName }}
         </span>
         <span class="text-xs text-gray-500"
           ><IconifyIconOffline
@@ -118,7 +126,7 @@ onMounted(() => {
             :icon="files"
             :style="{ fontSize: '10px' }"
           ></IconifyIconOffline
-          >{{ props.imagesList.imageCount }}</span
+          >{{ props.seriesList.seriesCount }}</span
         >
       </div>
     </div>

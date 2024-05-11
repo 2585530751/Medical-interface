@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref, watch } from 'vue'
-import { useImageStateStore } from '@/store/imageState'
+import { useImageOperationStateStore } from '@/store/imageOperationState'
 import { Enums } from '@cornerstonejs/core'
 import type IStackViewport from '@cornerstonejs/core/src/types/IStackViewport'
 import html2canvas from 'html2canvas'
@@ -39,7 +39,7 @@ const imageInfo = reactive({
   imageAnnotation: true
 })
 
-const imageStateStore = useImageStateStore()
+const imageOperationStateStore =useImageOperationStateStore()
 
 var parentNode: HTMLElement | null = null
 var divElement: HTMLElement | null = null
@@ -47,7 +47,7 @@ var divForDownloadViewport: HTMLDivElement | null = null
 
 function onOpened() {
   divForDownloadViewport = document.querySelector(
-    `div[data-viewport-uid='stackViewPort${imageStateStore.selectImagesListWindows}']`
+    `div[data-viewport-uid='stackViewPort${imageOperationStateStore.selectSeriesWindows}']`
   ) as HTMLDivElement
   parentNode = divForDownloadViewport.parentNode as HTMLDivElement
   divElement = document.getElementById('previewCanvas') as HTMLDivElement
@@ -82,18 +82,18 @@ const changeWidthHeight = () => {
 function handleSwitchChange(newVal: Boolean) {
   console.log(newVal)
   selectAllAnnotations(
-    imageStateStore.renderingEngine.id,
-    imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+    imageOperationStateStore.renderingEngine.id,
+    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
   )
   if (newVal) {
     showAllAnnotations(
-      imageStateStore.renderingEngine.id,
-      imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+      imageOperationStateStore.renderingEngine.id,
+      imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
     )
   } else {
     hideSelectedAnnotation(
-      imageStateStore.renderingEngine.id,
-      imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+      imageOperationStateStore.renderingEngine.id,
+      imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
     )
   }
 }
@@ -168,3 +168,4 @@ function handleSwitchChange(newVal: Boolean) {
 </template>
 
 <style lang="scss" scoped></style>
+@/store/imageOperationState

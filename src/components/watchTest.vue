@@ -38,7 +38,7 @@ setup() {
 </script>
 
 <template>
-  <button @click=""><imageOperation operation="会诊" @click="imageStateStore.bindLeftMouse('')">
+  <button @click=""><imageOperation operation="会诊" @click="imageOperationStateStore.bindLeftMouse('')">
           <diagnosisOutline style="height: 30px; width: 30px"></diagnosisOutline>
         </imageOperation>
         <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
@@ -91,14 +91,14 @@ setup() {
           <cuboid style="height: 30px; width: 30px; fill: currentColor"></cuboid>
         </imageOperation>
         <imageOperation
-          v-show="imageStateStore.leftMouseActive == 'ScissorsEraser'"
+          v-show="imageOperationStateStore.leftMouseActive == 'ScissorsEraser'"
           operation="3D探针"
-          @click="imageStateStore.bindLeftMouse('ThresholdCircle')"
+          @click="imageOperationStateStore.bindLeftMouse('ThresholdCircle')"
         >
           <probes style="height: 30px; width: 30px; fill: currentColor"></probes>
         </imageOperation>
 
-        <imageOperation operation="复制" @click="imageStateStore.bindLeftMouse('CircularEraser')">
+        <imageOperation operation="复制" @click="imageOperationStateStore.bindLeftMouse('CircularEraser')">
           <copy style="height: 30px; width: 30px; fill: currentColor"></copy>
         </imageOperation></button>
 </template>

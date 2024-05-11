@@ -16,13 +16,13 @@ import OrientationAxis from '@cornerstonejs/core/src/enums/OrientationAxis'
 import createTools from '@/composables/toolsManage'
 import hardcodedMetaDataProvider from '@/utils/helpers//hardcodedMetaDataProvider'
 import registerWebImageLoader from '@/utils/helpers/registerWebImageLoader'
-import { useImageStateStore } from '@/store/imageState'
+import { useImageOperationStateStore } from '@/store/imageOperationState'
 import { generateImageUrl } from '@/composables/image/utils'
 import { imageKeyValueStore } from '@/composables/image/imageKeyValueStore'
 import stackViewPortWindows from '@/layouts/components/imageOperation/stackViewPortWindows.vue'
 import image from '@/router/modules/image'
 
-const imageStateStore = useImageStateStore()
+const imageOperationStateStore =useImageOperationStateStore()
 
 
 
@@ -35,16 +35,16 @@ createTools()
 
 const gridStyle = computed(() => ({
   display: 'grid',
-  gridTemplateRows: `repeat(${imageStateStore.windowRowsColumns.rows}, 1fr)`,
-  gridTemplateColumns: `repeat(${imageStateStore.windowRowsColumns.columns}, 1fr)`,
+  gridTemplateRows: `repeat(${imageOperationStateStore.windowRowsColumns.rows}, 1fr)`,
+  gridTemplateColumns: `repeat(${imageOperationStateStore.windowRowsColumns.columns}, 1fr)`,
   gap: '8px' // 格子间隔
 }))
 const totalCells = computed(() => {
-  return imageStateStore.windowRowsColumns.rows * imageStateStore.windowRowsColumns.columns
+  return imageOperationStateStore.windowRowsColumns.rows * imageOperationStateStore.windowRowsColumns.columns
 })
 
 const imagesInfoWindows = computed(() => {
-  return imageStateStore.imagesListWindows
+  return imageOperationStateStore.imagesListWindows
 })
 </script>
 
@@ -65,3 +65,4 @@ const imagesInfoWindows = computed(() => {
   height: calc(100vh - 50px);
 }
 </style>
+@/router/modules/imageList@/store/imageOperationState

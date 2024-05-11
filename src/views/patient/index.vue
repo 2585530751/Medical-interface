@@ -2,33 +2,39 @@
 import patientTable from '@/layouts/components/patient/patientTable.vue'
 import patientSelection from '@/layouts/components/patient/selection.vue'
 import { ref, onMounted } from 'vue'
+import { usePatientStateStore } from '@/store/modules/patientState'
 
+const patientStateStore = usePatientStateStore()
 const tableSize = ref('default')
+const tableCols = ref(['姓名', '性别', '电话', '邮箱', '住址', '出生日期'])
 
-const pageSize = ref(100)
-const currentPage = ref(4)
 const handleSizeChange = (val: number) => {
-  console.log(`${val} items per page`)
+  patientStateStore.patientPagination.pageSize = val
+  patientStateStore.getPatientListPage()
 }
 const handleCurrentChange = (val: number) => {
-  console.log(`current page: ${val}`)
+  patientStateStore.patientPagination.currentPage = val
+  patientStateStore.getPatientListPage()
 }
 </script>
 
 <template>
-  <div class="flex flex-col h-full w-4/5 mx-auto gap-y-5">
-    <patient-selection @change-table-size="(size) => (tableSize = size)"></patient-selection>
-    <patient-table :tableSize="tableSize"></patient-table>
-    <el-card >
-      <el-pagination class=" justify-center"
-        v-model:current-page="currentPage"
-        v-model:page-size="pageSize"
-        :page-sizes="[100, 200, 300, 400]"
+  <div class="flex flex-col w-4/5 h-full mx-auto gap-y-5">
+    <patient-selection
+      @change-table-size="(size) => (tableSize = size)"
+      @change-table-cols="(cols) => (tableCols = cols)"
+    ></patient-selection>
+    <patient-table :tableSize="tableSize" :tableCols="tableCols"></patient-table>
+    <el-card>
+      <el-pagination
+        class="justify-center"
+        :current-page="patientStateStore.patientPagination.currentPage"
+        :page-size="patientStateStore.patientPagination.pageSize"
         :small="false"
         :disabled="false"
         :background="true"
-        layout="total, sizes, prev, pager, next, jumper" 
-        :total="400"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="patientStateStore.patientPagination.total"
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
       />

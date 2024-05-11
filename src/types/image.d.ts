@@ -1,7 +1,7 @@
+import type { SeriesInfo,ImageInfo } from '@/types/series'
 
-
-interface SingleImage {
-  imageId: number
+export interface SingleImage {
+  seriesId: number
   isDeleted: number // 通常，布尔值使用boolean类型，但如果你的后端返回的是0和1，也可以保持为number
   operateId: number
   operateName: string
@@ -13,20 +13,20 @@ interface SingleImage {
   singleImageDesc: string
   singleImageEquipment: string
   singleImageFormat: string
-  singleImageId: number
+  imageId: number
   singleImageRel: number
   singleImageName: string
-  singleImagePath: string // 路径通常是字符串，确保它匹配你的文件结构
+  imagePath: string // 路径通常是字符串，确保它匹配你的文件结构
   status: number
   type: string // 如果type有固定的几个值，可以使用枚举(enum)来定义
   modelType: string
   singleImageModelData:SingleImageModelData
 }
 
-interface SingleImageModelData {
+export interface SingleImageModelData {
   modelResId: number
+  seriesId: number
   imageId: number
-  singleImageId: number
   creatorId: number
   modelId: number
   creatorName: string
@@ -36,7 +36,7 @@ interface SingleImageModelData {
   resData: String // 如果resData是一个JSON字符串，可以使用JSON.parse()来解析
 }
 
-interface ImageInfo {
+export interface ImageInfo {
   creatorId: number
   creatorName: string
   createTime: string // ISO 8601日期字符串，或者可以使用Date类型
@@ -46,7 +46,7 @@ interface ImageInfo {
   imageDesc: string
   imageEquipment: string
   imageFormat: string
-  imageId: number
+  seriesId: number
   imageName: string
   imagePath: string
   imageStatus: string // 根据实际情况，可能需要定义为一个枚举或特定的字符串字面量类型
@@ -56,7 +56,7 @@ interface ImageInfo {
   singleImageList: SingleImage[] // 如果singleImageList是一个包含相同结构对象的数组，则定义其类型
 }
 
-interface ImageInfoWindows{
-  imageInfo: ImageInfo,
-  singleImage: SingleImage
+export interface SeriesInfoWindows{
+  seriesInfo: SeriesInfo,
+  imageInfo: ImageInfo
 }

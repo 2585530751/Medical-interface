@@ -7,9 +7,9 @@ import IonEllipsisHorizontal from '@/assets/svg/IonEllipsisHorizontal.svg?compon
 import { getImagePageByDoctorId, deleteSingleImageById, deleteImageById } from '@/api/image'
 import router from '@/router'
 import { basicImageUrl } from '@/api/utils'
-import { useImageStateStore } from '@/store/imageState'
-import { changeImagesListWindowsToSession, pushImageListToSession } from '@/composables/image/utils'
-import type { ImageInfo, ImageInfoWindows, SingleImage } from '@/types/image'
+import { useImageOperationStateStore } from '@/store/imageOperationState'
+import { changeSeriesListWindowsToSession, pushSeriesToSession } from '@/composables/image/utils'
+import type { ImageInfo, SeriesInfoWindows, SingleImage } from '@/types/image'
 import imageDicom from '@/components/ReImage/imageDicom.vue'
 import { message } from '@/utils/message'
 
@@ -17,66 +17,67 @@ defineProps<{
   tableSize: string
 }>()
 
-const imageStateStore = useImageStateStore()
+const imageOperationStateStore =useImageOperationStateStore()
 
 const tableRef = ref<TableInstance>()
 
 onMounted(async () => {
-  // imageStateStore.tableData.length=0
-  imageStateStore.getImagesListData()
+  // imageOperationStateStore.tableData.length=0
+  imageOperationStateStore.getImagesListData()
 })
+
 function imageOperation(imageList: SingleImage, imagesList: ImageInfo) {
-  imageStateStore.bindImageList(imageList)
-  imageStateStore.bindImagesList(imagesList)
-  imageStateStore.pushImagesList(imagesList)
-  const imageInfoWindows: ImageInfoWindows = {
+  imageOperationStateStore.bindImageList(imageList)
+  imageOperationStateStore.bindSeriesList(imagesList)
+  imageOperationStateStore.pushSeriesList(imagesList)
+  const seriesInfoWindows: SeriesInfoWindows = {
     imageInfo: imagesList,
     singleImage: imageList
   }
-  imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows] = imageInfoWindows
-  changeImagesListWindowsToSession(imageInfoWindows, imageStateStore.selectImagesListWindows)
-  pushImageListToSession(imagesList)
+  imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows] = seriesInfoWindows
+  changeSeriesListWindowsToSession(seriesInfoWindows, imageOperationStateStore.selectSeriesWindows)
+  pushSeriesToSession(imagesList)
   router.push('/imageOperation')
 }
 
 function imagesOperation(imagesList: ImageInfo) {
-  imageStateStore.bindImagesList(imagesList)
-  imageStateStore.bindImageList((imagesList as { singleImageList: any }).singleImageList[0])
-  imageStateStore.pushImagesList(imagesList)
-  const imageInfoWindows: ImageInfoWindows = {
+  imageOperationStateStore.bindSeriesList(imagesList)
+  imageOperationStateStore.bindImageList((imagesList as { singleImageList: any }).singleImageList[0])
+  imageOperationStateStore.pushSeriesList(imagesList)
+  const seriesInfoWindows: SeriesInfoWindows = {
     imageInfo: imagesList,
     singleImage: imagesList.singleImageList[0]
   }
-  imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows] = imageInfoWindows
-  changeImagesListWindowsToSession(imageInfoWindows, imageStateStore.selectImagesListWindows)
-  pushImageListToSession(imagesList)
+  imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows] = seriesInfoWindows
+  changeSeriesListWindowsToSession(seriesInfoWindows, imageOperationStateStore.selectSeriesWindows)
+  pushSeriesToSession(imagesList)
   router.push('/imageOperation')
 }
 
-async function singleImageDelete(imageRow: object, singleImageId: number) {
-  const params = { singleImageId: singleImageId }
-  const imageId = (imageRow as { imageId: number }).imageId
+async function singleImageDelete(imageRow: object, imageId: number) {
+  const params = { imageId: imageId }
+  const seriesId = imageRow.imageId
   await deleteSingleImageById(params)
     .then((data) => {
       let index = 0
       // 遍历数组
-      while (index < imageStateStore.tableData.length) {
-        const currentObject = imageStateStore.tableData[index]
+      while (index < imageOperationStateStore.tableData.length) {
+        const currentObject = imageOperationStateStore.tableData[index]
         // 如果 imageId 等于 imageId，则使用 splice 方法删除该对象
-        if (currentObject.imageId === imageId) {
+        if (currentObject.seriesId === seriesId) {
           const currentSingleImageList = currentObject.singleImageList!.filter(
-            (object) => object.singleImageId !== singleImageId
+            (object) => object.imageId !== imageId
           )
-          imageStateStore.tableData[index].singleImageList = currentSingleImageList
-          console.log(imageStateStore.tableData[index].singleImageList)
+          imageOperationStateStore.tableData[index].singleImageList = currentSingleImageList
+          console.log(imageOperationStateStore.tableData[index].singleImageList)
           break
-          // imageStateStore.tableData.splice(index, imageId)
+          // imageOperationStateStore.tableData.splice(index, imageId)
         } else {
           // 如果不需要删除，则移动到下一个元素
           index++
         }
       }
-      //imageStateStore.tableData[imagesIndex].singleImageList!.splice(imageIndex,1)
+      //imageOperationStateStore.tableData[imagesIndex].singleImageList!.splice(imageIndex,1)
     })
     .catch((error) => {
       console.log(error)
@@ -86,17 +87,17 @@ async function singleImageDelete(imageRow: object, singleImageId: number) {
   }, 100)
 }
 
-function imageDelete(imageId: number) {
+function imageDelete(seriesId: number) {
   const params = { imageId: imageId }
   deleteImageById(params).then((res) => {
     if (res.success) {
       let index = 0
       // 遍历数组
-      while (index < imageStateStore.tableData.length) {
-        const currentObject = imageStateStore.tableData[index]
+      while (index < imageOperationStateStore.tableData.length) {
+        const currentObject = imageOperationStateStore.tableData[index]
         // 如果 imageId 等于 imageId，则使用 splice 方法删除该对象
         if (currentObject.imageId === imageId) {
-          imageStateStore.tableData.splice(index, 1)
+          imageOperationStateStore.tableData.splice(index, 1)
           break
         } else {
           // 如果不需要删除，则移动到下一个元素
@@ -116,7 +117,7 @@ function imageDelete(imageId: number) {
   <el-card class="box-card">
     <el-table
       ref="tableRef"
-      :data="imageStateStore.tableData"
+      :data="imageOperationStateStore.tableData"
       style="width: 100%"
       :default-sort="{ prop: 'imageCheckTime', order: 'descending' }"
       :size="tableSize"
@@ -132,14 +133,14 @@ function imageDelete(imageId: number) {
               <el-table-column label="图片" width="150px">
                 <template #default="scope">
                   <el-image
-                    :src="basicImageUrl + scope.row.singleImagePath"
+                    :src="basicImageUrl + scope.row.imagePath"
                     :crossorigin="'anonymous'"
-                    v-show="scope.row.singleImagePath.endsWith('.png')||scope.row.singleImagePath.endsWith('.jpg')||scope.row.singleImagePath.endsWith('.jpeg')"
+                    v-show="scope.row.imagePath.endsWith('.png')||scope.row.imagePath.endsWith('.jpg')||scope.row.imagePath.endsWith('.jpeg')"
                   />
-                  <imageDicom :singleImage="scope.row" v-show="scope.row.singleImagePath.endsWith('.dcm')"/>
+                  <imageDicom :singleImage="scope.row" v-show="scope.row.imagePath.endsWith('.dcm')"/>
                 </template>
               </el-table-column>
-              <el-table-column label="图像ID" prop="singleImageId" />
+              <el-table-column label="图像ID" prop="imageId" />
               <el-table-column label="图像名称" prop="singleImageName" />
               <el-table-column fixed="right" label="操作" width="200">
                 <template #default="scope">
@@ -155,7 +156,7 @@ function imageDelete(imageId: number) {
                   >
                   <el-popconfirm
                     title="你确定要删除他吗?"
-                    @confirm="singleImageDelete(props.row, scope.row.singleImageId)"
+                    @confirm="singleImageDelete(props.row, scope.row.imageId)"
                   >
                     <template #reference>
                       <el-button link type="primary" size="small">

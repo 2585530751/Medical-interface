@@ -7,7 +7,7 @@ export default {
     children: [
       {
         path: "/patient/index",
-        name: "patientList",
+        name: "PatientTable",
         component: () => import("@/views/patient/index.vue"),
         meta: {
           title: "患者列表"

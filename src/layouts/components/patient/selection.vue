@@ -7,119 +7,116 @@ import fold from '@iconify-icons/ep/fold'
 import refresh from '@iconify-icons/ep/refresh'
 import setUp from '@iconify-icons/ep/set-up'
 import rank from '@iconify-icons/ep/rank'
-
-
+import { chineseStandardTimeFormat,setAllPropertiesToNull } from '@/utils/commonUtils'
 import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
+import { usePatientStateStore } from '@/store/modules/patientState'
 
 defineOptions({
   name: 'patientSelection'
 })
-const emit = defineEmits<{
+
+const emits = defineEmits<{
   changeTableSize: [size: string]
+  changeTableCols: [cols: string[]]
 }>()
 
-const formInline = reactive({
-  user: '',
-  region: '',
-  date: ''
-})
-const tableSize = ref('small')
-const onSubmit = () => {
-  console.log('submit!')
-}
+const patientStateStore = usePatientStateStore()
+
+const filterSelect = ref('patientName')
+const filterSearch = ref('')
+
 const visible = ref(false)
 
-// do not use same name with ref
-const form = reactive({
-  patientName: '',
-  ageBegin: '',
-  ageEnd: '',
-  gender: '',
-  dateBegin: '',
-  dateEnd: '',
-  contact: '',
-  address: '',
-  healthStatus: '',
-  reasonForVisit: '',
-  diagnosis: ''
+const patientForm: Record<string, any> = reactive({
+  patientName: null,
+  patientGender: null,
+  dateOfBirthBegin: null,
+  dateOfBirthEnd: null,
+  phoneNumber: null,
+  address: null,
+  email: null
 })
 
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
-const checkedCols = ref([
-  '姓名',
-  '性别',
-  '年龄',
-  '联系方式',
-  '住址',
-  '健康状况',
-  '就诊原因',
-  '就诊日期',
-  '诊断结果'
-])
-const cols = [
-  '姓名',
-  '性别',
-  '年龄',
-  '联系方式',
-  '住址',
-  '健康状况',
-  '就诊原因',
-  '就诊日期',
-  '诊断结果',
-  '是否复诊'
-]
+const checkedCols = ref(['姓名', '性别', '电话', '邮箱', '住址', '出生日期'])
+const cols = ['姓名', '性别', '电话', '邮箱', '住址', '体重', '身高', '身份证号', '出生日期']
 
 const handleCheckAllChange = (val: boolean) => {
   checkedCols.value = val ? cols : []
   isIndeterminate.value = false
+  emits('changeTableCols', checkedCols.value)
 }
 const handleCheckedColsChange = (value: string[]) => {
   const checkedCount = value.length
   checkAll.value = checkedCount === cols.length
   isIndeterminate.value = checkedCount > 0 && checkedCount < cols.length
+  emits('changeTableCols', value)
+}
+
+function singleConditionSearch() {
+  setAllPropertiesToNull(patientStateStore.patientFilterCriteria)
+  patientStateStore.patientFilterCriteria[filterSelect.value] = filterSearch.value
+  patientStateStore.patientPagination.currentPage = 1
+  patientStateStore.getPatientListPage()
+}
+
+function conditionalFilter() {
+  setAllPropertiesToNull(patientStateStore.patientFilterCriteria)
+  for (const key in patientForm) {
+    if (patientForm.hasOwnProperty(key) && patientForm[key] !== null) {
+      // 确保属性是对象自身的，而不是原型链上的
+      patientStateStore.patientFilterCriteria[key] = patientForm[key] // 将属性和值复制到目标对象
+      if (key === 'dateOfBirthBegin') {
+        let dateFormat = chineseStandardTimeFormat(patientForm[key])
+        patientStateStore.patientFilterCriteria[key] = dateFormat
+      } else if (key === 'dateOfBirthEnd') {
+        let dateFormat = chineseStandardTimeFormat(patientForm[key])
+        // 使用split方法按空格分割字符串为日期和时间两部分
+        let [datePart, timePart] = dateFormat.split(' ')
+        // 替换时间部分为23:59:59
+        let newTimePart = '23:59:59'
+        // 拼接新的日期时间字符串
+        let newDateTimeString = `${datePart} ${newTimePart}`
+        patientStateStore.patientFilterCriteria[key] = newDateTimeString
+      }
+    }
+  }
+  patientStateStore.patientPagination.currentPage = 1
+  patientStateStore.getPatientListPage()
 }
 </script>
 
 <template>
   <el-card class="box-card">
     <template #header>
-      <div class="flex justify-between items-center">
-        <div class="flex flex-wrap w-30 gap-4 h-14 items-center">
-          <a class="font-medium tracking-wide text-2xl text-gray-600">患者列表</a>
+      <div class="flex items-center justify-between">
+        <div class="flex flex-wrap items-center gap-4 w-30 h-14">
+          <a class="text-2xl font-medium tracking-wide text-gray-600">患者列表</a>
         </div>
 
-        <div class="w-30 h-14 flex flex-wrap items-center">
-          <el-form
-            :inline="true"
-            :model="formInline"
-            class="demo-form-inline"
-            style="margin-top: 1.125rem"
-          >
-            <el-form-item>
-              <el-input
-                style="width: 500px"
-                placeholder="请输入查询的数据"
-                class="input-with-select"
-              >
-                <template #prepend>
-                  <el-select placeholder="选择" style="width: 100px">
-                    <el-option label="姓名" value="patientName" />
-                    <el-option label="联系方式" value="contact" />
-                    <el-option label="住址" value="address" />
-                  </el-select>
+        <div class="flex flex-wrap items-center gap-5 w-30 h-14">
+          <el-input style="width: 500px" placeholder="请输入查询的数据" v-model="filterSearch">
+            <template #prepend>
+              <el-select placeholder="选择" style="width: 100px" v-model="filterSelect">
+                <el-option label="姓名" value="patientName" />
+                <el-option label="性别" value="patientGender" />
+                <el-option label="电话" value="phoneNumber" />
+                <el-option label="邮箱" value="email" />
+                <el-option label="住址" value="address" />
+                <el-option label="出生日期" value="dateOfBirth" />
+              </el-select>
+            </template>
+            <template #append>
+              <el-button round @click="singleConditionSearch">
+                <template #icon>
+                  <IconifyIconOffline :icon="search"></IconifyIconOffline>
                 </template>
-                <template #append>
-                  <el-button round @click="onSubmit">
-                    <template #icon>
-                      <IconifyIconOffline :icon="search"></IconifyIconOffline>
-                    </template>
-                  </el-button>
-                </template>
-              </el-input>
-            </el-form-item>
-          </el-form>
+              </el-button>
+            </template>
+          </el-input>
+
           <el-button round @click="visible = true">
             <template #icon>
               <IconifyIconOffline :icon="fold"></IconifyIconOffline>
@@ -129,7 +126,7 @@ const handleCheckedColsChange = (value: string[]) => {
         </div>
       </div>
     </template>
-    <div class="flex justify-between items-center">
+    <div class="flex items-center justify-between">
       <div class="flex flex-wrap w-auto h-auto">
         <el-button round>
           <template #icon>
@@ -137,12 +134,18 @@ const handleCheckedColsChange = (value: string[]) => {
           </template>
           新增患者</el-button
         >
-        <el-button round :icon="applicationImport">导入患者</el-button>
+        <el-button round :icon="applicationImport" @click="patientStateStore.getPatientListPage"
+          >导入患者</el-button
+        >
         <el-button round :icon="applicationExport">导出患者</el-button>
       </div>
-      <div class="flex flex-wrap w-auto h-auto gap-x-3 items-center">
+      <div class="flex flex-wrap items-center w-auto h-auto gap-x-3">
         <el-tooltip content="刷新" placement="top" effect="light">
           <IconifyIconOffline
+            @click="
+              setAllPropertiesToNull(patientStateStore.patientFilterCriteria),
+                patientStateStore.getPatientListPage()
+            "
             :icon="refresh"
             class="hover:text-blue-500"
             :style="{ fontSize: '24px' }"
@@ -183,10 +186,10 @@ const handleCheckedColsChange = (value: string[]) => {
                     >列展示</el-checkbox
                   >
                 </el-dropdown-item>
-                <el-dropdown-item divided="true"></el-dropdown-item>
+                <el-dropdown-item :divided="true"></el-dropdown-item>
 
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
-                  <el-dropdown-item v-for="(col,index) in cols" :key="index">
+                  <el-dropdown-item v-for="(col, index) in cols" :key="index">
                     <el-checkbox :key="col" :label="col">{{ col }}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
@@ -198,34 +201,23 @@ const handleCheckedColsChange = (value: string[]) => {
     </div>
   </el-card>
   <el-drawer v-model="visible" title="高级筛选">
-    <el-form :model="form" label-width="120px">
+    <el-form :model="patientForm" label-width="120px">
       <el-form-item label="姓名">
-        <el-input v-model="form.patientName" />
-      </el-form-item>
-      <el-form-item label="年龄">
-        <el-col :span="11">
-          <el-select v-model="form.ageBegin" placeholder="选择年龄范围" style="width: 100%" />
-        </el-col>
-        <el-col :span="2" class="text-center">
-          <span class="text-gray-500">-</span>
-        </el-col>
-        <el-col :span="11">
-          <el-select v-model="form.ageEnd" placeholder="选择年龄范围" style="width: 100%" />
-        </el-col>
+        <el-input v-model="patientForm.patientName" />
       </el-form-item>
       <el-form-item label="性别">
-        <el-radio-group v-model="form.gender">
-          <el-radio label="1" border>男性</el-radio>
-          <el-radio label="2" border>女性</el-radio>
+        <el-radio-group v-model="patientForm.patientGender">
+          <el-radio label="男性" border>男性</el-radio>
+          <el-radio label="女性" border>女性</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="住址">
-        <el-input v-model="form.address" />
+        <el-input v-model="patientForm.address" />
       </el-form-item>
-      <el-form-item label="就诊日期">
+      <el-form-item label="出生日期">
         <el-col :span="11">
           <el-date-picker
-            v-model="form.dateBegin"
+            v-model="patientForm.dateOfBirthBegin"
             type="date"
             placeholder="请选择日期范围"
             style="width: 100%"
@@ -235,24 +227,22 @@ const handleCheckedColsChange = (value: string[]) => {
           <span class="text-gray-500">-</span>
         </el-col>
         <el-col :span="11">
-          <el-date-picker v-model="form.dateEnd" placeholder="请选择日期范围" style="width: 100%" />
+          <el-date-picker
+            v-model="patientForm.dateOfBirthEnd"
+            placeholder="请选择日期范围"
+            style="width: 100%"
+          />
         </el-col>
       </el-form-item>
-      <el-form-item label="联系方式">
-        <el-input v-model="form.contact" />
+      <el-form-item label="电话">
+        <el-input v-model="patientForm.phoneNumber" />
       </el-form-item>
-      <el-form-item label="健康状况">
-        <el-input v-model="form.healthStatus" />
-      </el-form-item>
-      <el-form-item label="就诊原因">
-        <el-input v-model="form.reasonForVisit" />
-      </el-form-item>
-      <el-form-item label="诊断结果">
-        <el-input v-model="form.diagnosis" />
+      <el-form-item label="邮箱">
+        <el-input v-model="patientForm.email" />
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" @click="onSubmit">查询</el-button>
-        <el-button>清空</el-button>
+        <el-button type="primary" @click="conditionalFilter">查询</el-button>
+        <el-button @click="setAllPropertiesToNull(patientForm)">清空</el-button>
       </el-form-item>
     </el-form>
   </el-drawer>

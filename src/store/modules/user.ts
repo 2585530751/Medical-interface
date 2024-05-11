@@ -59,6 +59,7 @@ export const useUserStore = defineStore({
       this.roles = []
       removeToken()
       resetRouter()
+      console.log(router.options.routes)
       router.push('/welcome')
     },
     /** 刷新`token` */

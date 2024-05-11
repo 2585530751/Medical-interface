@@ -102,7 +102,7 @@ export const isAccountExisted = (params?: object) => {
 }
 
 export const deleteSingleImageById = (params?: object) => {
-  return http.request<any>('get', baseUrlApi('singleImage/deleteSingleImageById'), { params })
+  return http.request<any>('get', baseUrlApi('image/deleteSingleImageById'), { params })
 }
 
 export const getUserInformationApi = (params?: object) => {
@@ -163,4 +163,42 @@ export const postPatientInformationApi = (data?: object) => {
       }
     }
   )
+}
+
+export const getPatientInformationApi = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('patient/getAllPatientInformation'))
+}
+
+export const getPatientStudyPageApi = (data?: object) => {
+  return http.request<any>(
+    'post',
+    baseUrlApi('study/getPatientStudyPage'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  )
+}
+
+export const setExcelApi = (data?: object) => {
+  return http.request<any>(
+    'post',
+    baseUrlApi('tool/addTool'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+  )
+}
+
+export const getExcelApi = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('tool/getToolInfoByUserId'))
+}
+
+export const getExcelByToolIdApi = (params?: object) => {
+  return http.request<any>('get', baseUrlApi('tool/getToolInfoByToolId'), { params })
 }

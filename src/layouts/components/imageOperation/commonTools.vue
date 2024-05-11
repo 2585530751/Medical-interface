@@ -54,8 +54,8 @@ import livewireContour from '@/assets/svg/livewireContour.svg?component'
 import splineROI from '@/assets/svg/splineROI.svg?component'
 
 import { storageSession } from '@pureadmin/utils'
-import { imagesListWindowsSession } from '@/composables/image/utils'
-import type { ImageInfoWindows } from '@/types/image'
+import { seriesListWindowsSession } from '@/composables/image/utils'
+import type { SeriesInfoWindows } from '@/types/image'
 import type { Types } from '@cornerstonejs/core'
 import { getRenderingEngine } from '@cornerstonejs/core'
 import type { IconifyIconOffline } from '@/components/ReIcon'
@@ -63,7 +63,7 @@ import imageOperation from '@/components/ReButton/imageOperation.vue'
 import imageOperationText from '@/components/ReButton/imageOperationText.vue'
 import * as cornerstoneTools from '@cornerstonejs/tools'
 import type { Types as cstTypes } from '@cornerstonejs/tools'
-import { useImageStateStore } from '@/store/imageState'
+import { useImageOperationStateStore } from '@/store/imageOperationState'
 import {
   resetOriginal,
   flipH,
@@ -146,7 +146,7 @@ const {
   Enums: csToolsEnums
 } = cornerstoneTools
 
-const imageStateStore = useImageStateStore()
+const imageOperationStateStore =useImageOperationStateStore()
 const segmentationTools = ref(true)
 const operateTools = ref(true)
 const annotationTools = ref(true)
@@ -211,8 +211,8 @@ const layouts = [
   { label: '3X3', rows: 3, columns: 3 }
 ]
 const setLayout = (r: number, c: number) => {
-  imageStateStore.windowRowsColumns.rows = r
-  imageStateStore.windowRowsColumns.columns = c
+  imageOperationStateStore.windowRowsColumns.rows = r
+  imageOperationStateStore.windowRowsColumns.columns = c
 }
 
 const windowLevelPresetValues = [
@@ -238,31 +238,31 @@ const playbackFramesPerSecond = ref(1)
 const checkPlaybackFramesPerSecond = ref(true)
 function playClipPlayer() {
   csToolsUtilities.cine.playClip(
-    imageStateStore.viewports[imageStateStore.selectImagesListWindows].element,
+    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].element,
     { framesPerSecond: playbackFramesPerSecond.value }
   )
   checkPlaybackFramesPerSecond.value = false
 }
 function stopClipPlayer() {
   csToolsUtilities.cine.stopClip(
-    imageStateStore.viewports[imageStateStore.selectImagesListWindows].element
+    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].element
   )
   checkPlaybackFramesPerSecond.value = true
 }
 function changeClipPlayerValue() {
   if (!checkPlaybackFramesPerSecond.value) {
     csToolsUtilities.cine.playClip(
-      imageStateStore.viewports[imageStateStore.selectImagesListWindows].element,
+      imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].element,
       { framesPerSecond: playbackFramesPerSecond.value }
     )
   }
 }
 watch(
-  () => imageStateStore.selectImagesListWindows,
+  () => imageOperationStateStore.selectSeriesWindows,
   () => {
-    if (imageStateStore.viewports[imageStateStore.selectImagesListWindows]) {
+    if (imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]) {
       let toolState = csToolsUtilities.cine.getToolState(
-        imageStateStore.viewports[imageStateStore.selectImagesListWindows].element
+        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].element
       )
       if (!toolState) {
         checkPlaybackFramesPerSecond.value = true
@@ -296,12 +296,12 @@ const segmentationToolsConfiguration = reactive({
 })
 
 function changeBrushSizeForToolGroup(radius: number) {
-  csToolsUtilities.segmentation.setBrushSizeForToolGroup(imageStateStore.toolGroup.id, radius)
+  csToolsUtilities.segmentation.setBrushSizeForToolGroup(imageOperationStateStore.toolGroup.id, radius)
 }
 
 function changeBrushThresholdForToolGroup() {
   csToolsUtilities.segmentation.setBrushThresholdForToolGroup(
-    imageStateStore.toolGroup.id,
+    imageOperationStateStore.toolGroup.id,
     segmentationToolsConfiguration.thresholdCircle.threshold as Types.Point2
   )
 }
@@ -315,17 +315,17 @@ function changeThresholdCirclePresetValue(threshold: number[]) {
 function updateSegmentationConfig(config: ContourConfig) {
   const segmentationRepresentation =
     segmentation.activeSegmentation.getActiveSegmentationRepresentation(
-      imageStateStore.toolGroup.id
+      imageOperationStateStore.toolGroup.id
     )
   const segmentationConfig = getSegmentationConfig(
-    imageStateStore.toolGroup.id,
+    imageOperationStateStore.toolGroup.id,
     segmentationRepresentation.segmentationRepresentationUID
   )
 
   Object.assign(segmentationConfig.CONTOUR as ContourConfig, config)
 
   segmentation.config.setSegmentationRepresentationSpecificConfig(
-    imageStateStore.toolGroup.id,
+    imageOperationStateStore.toolGroup.id,
     segmentationRepresentation.segmentationRepresentationUID,
     segmentationConfig
   )
@@ -363,7 +363,7 @@ const annotationToolsConfiguration = reactive({
 })
 
 function changeSplineResolutionForToolGroup(splineToolName: string, resolution: number) {
-  const toolGroup = imageStateStore.toolGroup
+  const toolGroup = imageOperationStateStore.toolGroup
   const { splineType } = Splines1[splineToolName as keyof typeof Splines1]
   const splineConfig = toolGroup.getToolConfiguration(splineToolName, 'spline')
   splineConfig.configuration[splineType].resolution = resolution
@@ -371,7 +371,7 @@ function changeSplineResolutionForToolGroup(splineToolName: string, resolution: 
 }
 
 function changeSplineScaleForToolGroup(splineToolName: string, scale: number) {
-  const toolGroup = imageStateStore.toolGroup
+  const toolGroup = imageOperationStateStore.toolGroup
   const { splineType } = Splines1[splineToolName as keyof typeof Splines1]
   const splineConfig = toolGroup.getToolConfiguration(splineToolName, 'spline')
   splineConfig.configuration[splineType].scale = scale
@@ -386,25 +386,25 @@ function deleteImagesListWindowsToSession(
   const session = storageSession()
   const renderingEngine = getRenderingEngine(renderingEngineId)
   // const viewport = <Types.IStackViewport>renderingEngine!.getViewport(viewportId)
-  if (session.getItem(imagesListWindowsSession)) {
-    const list: (ImageInfoWindows | 0)[] = session.getItem(imagesListWindowsSession)
+  if (session.getItem(seriesListWindowsSession)) {
+    const list: (SeriesInfoWindows | 0)[] = session.getItem(seriesListWindowsSession)
     list[index] = 0
-    session.setItem(imagesListWindowsSession, list)
-    imageStateStore.viewports[index]=0 as any
-    imageStateStore.viewportColorbar[index].destroy()
-    imageStateStore.viewportColorbar[index]=0 as any
-    imageStateStore.imagesListWindows[index] = 0
+    session.setItem(seriesListWindowsSession, list)
+    imageOperationStateStore.viewports[index]=0 as any
+    imageOperationStateStore.viewportColorbar[index].destroy()
+    imageOperationStateStore.viewportColorbar[index]=0 as any
+    imageOperationStateStore.seriesListWindows[index] = 0
     renderingEngine!.disableElement(viewportId)
   }
 }
 
 function removeAllImagesListWindowsToSession(renderingEngineId: string) {
-  imageStateStore.imagesListWindows.forEach((item, index) => {
+  imageOperationStateStore.seriesListWindows.forEach((item, index) => {
     if (item != 0) {
       deleteImagesListWindowsToSession(
         index,
         renderingEngineId,
-        imageStateStore.viewports[index].id
+        imageOperationStateStore.viewports[index].id
       )
     }
   })
@@ -454,8 +454,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
               <el-dropdown-item
                 @click="
                   resetToDefaultViewportProperties(
-                    imageStateStore.renderingEngine.id,
-                    imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                    imageOperationStateStore.renderingEngine.id,
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
                   )
                 "
                 >重置视口默认属性</el-dropdown-item
@@ -463,8 +463,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
               <el-dropdown-item
                 @click="
                   removeCurrentImageIdProperties(
-                    imageStateStore.renderingEngine.id,
-                    imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                    imageOperationStateStore.renderingEngine.id,
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
                   )
                 "
                 >去除视口已有属性</el-dropdown-item
@@ -473,9 +473,9 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
                 @click="
                   setViewportColorbar(
                     'Grayscale',
-                    imageStateStore.renderingEngine.id,
-                    imageStateStore.viewports[imageStateStore.selectImagesListWindows].id,
-                    imageStateStore.viewportColorbar[imageStateStore.selectImagesListWindows]
+                    imageOperationStateStore.renderingEngine.id,
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id,
+                    imageOperationStateStore.viewportColorbar[imageOperationStateStore.selectSeriesWindows]
                   )
                 "
                 >重置视口默认彩条</el-dropdown-item
@@ -483,14 +483,14 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
               <el-dropdown-item
                 @click="
                   resetToDefaultViewportProperties(
-                    imageStateStore.renderingEngine.id,
-                    imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                    imageOperationStateStore.renderingEngine.id,
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
                   ),
                     setViewportColorbar(
                       'Grayscale',
-                      imageStateStore.renderingEngine.id,
-                      imageStateStore.viewports[imageStateStore.selectImagesListWindows].id,
-                      imageStateStore.viewportColorbar[imageStateStore.selectImagesListWindows]
+                      imageOperationStateStore.renderingEngine.id,
+                      imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id,
+                      imageOperationStateStore.viewportColorbar[imageOperationStateStore.selectSeriesWindows]
                     )
                 "
                 >恢复视口初始状态</el-dropdown-item
@@ -521,8 +521,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
                   setWindowLevel(
                     windowLevelPresetValue.window,
                     windowLevelPresetValue.level,
-                    imageStateStore.renderingEngine.id,
-                    imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                    imageOperationStateStore.renderingEngine.id,
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
                   )
                 "
               >
@@ -551,9 +551,9 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
                 @click="
                   setViewportColorbar(
                     colormap.Name,
-                    imageStateStore.renderingEngine.id,
-                    imageStateStore.viewports[imageStateStore.selectImagesListWindows].id,
-                    imageStateStore.viewportColorbar[imageStateStore.selectImagesListWindows]
+                    imageOperationStateStore.renderingEngine.id,
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id,
+                    imageOperationStateStore.viewportColorbar[imageOperationStateStore.selectSeriesWindows]
                   )
                 "
                 >{{ colormap.ColorSpace }} {{ colormap.Name }}</el-dropdown-item
@@ -581,8 +581,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
           operation="翻图"
           @click="
             flipH(
-              imageStateStore.renderingEngine.id,
-              imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+              imageOperationStateStore.renderingEngine.id,
+              imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
             )
           "
         >
@@ -590,17 +590,17 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
         ></imageOperation>
         <imageOperation
           operation="调窗"
-          @click="imageStateStore.bindLeftMouse(WindowLevelTool.toolName)"
+          @click="imageOperationStateStore.bindLeftMouse(WindowLevelTool.toolName)"
         >
           <darkThemeFilled style="height: 30px; width: 30px"></darkThemeFilled>
         </imageOperation>
-        <imageOperation operation="移动" @click="imageStateStore.bindLeftMouse(PanTool.toolName)">
+        <imageOperation operation="移动" @click="imageOperationStateStore.bindLeftMouse(PanTool.toolName)">
           <dragOutlined style="height: 30px; width: 30px"></dragOutlined>
         </imageOperation>
         <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
           <div
             class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
-            @click="imageStateStore.bindLeftMouse(ZoomTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(ZoomTool.toolName)"
           >
             <zoom style="height: 30px; width: 30px"></zoom>
             <span class="text-sm text-gray-500 dark:text-white">缩放</span>
@@ -614,8 +614,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
                 class="self-center"
                 @click="
                   changeZoom(
-                    imageStateStore.renderingEngine.id,
-                    imageStateStore.viewports[imageStateStore.selectImagesListWindows].id,
+                    imageOperationStateStore.renderingEngine.id,
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id,
                     1.05
                   )
                 "
@@ -630,8 +630,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
                 class="self-center"
                 @click="
                   changeZoom(
-                    imageStateStore.renderingEngine.id,
-                    imageStateStore.viewports[imageStateStore.selectImagesListWindows].id,
+                    imageOperationStateStore.renderingEngine.id,
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id,
                     0.95
                   )
                 "
@@ -642,7 +642,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
         </div>
         <imageOperation
           operation="旋转"
-          @click="imageStateStore.bindLeftMouse(PlanarRotateTool.toolName)"
+          @click="imageOperationStateStore.bindLeftMouse(PlanarRotateTool.toolName)"
         >
           <IconifyIconOffline
             :icon="refreshRight"
@@ -653,8 +653,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
           operation="反片"
           @click="
             invert(
-              imageStateStore.renderingEngine.id,
-              imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+              imageOperationStateStore.renderingEngine.id,
+              imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
             )
           "
         >
@@ -662,7 +662,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
         </imageOperation>
         <imageOperation operation="放大镜">
           <IconifyIconOffline
-            @click="imageStateStore.bindLeftMouse(MagnifyTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(MagnifyTool.toolName)"
             :icon="videoCamera"
             :style="{ fontSize: '30px' }"
           ></IconifyIconOffline>
@@ -672,8 +672,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
             class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
             @click="
               resetOriginal(
-                imageStateStore.renderingEngine.id,
-                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                imageOperationStateStore.renderingEngine.id,
+                imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
               )
             "
           >
@@ -695,8 +695,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
                   <el-dropdown-item
                     @click="
                       resetPan(
-                        imageStateStore.renderingEngine.id,
-                        imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                        imageOperationStateStore.renderingEngine.id,
+                        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
                       )
                     "
                     >重置移动</el-dropdown-item
@@ -704,8 +704,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
                   <el-dropdown-item
                     @click="
                       resetZoom(
-                        imageStateStore.renderingEngine.id,
-                        imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                        imageOperationStateStore.renderingEngine.id,
+                        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
                       )
                     "
                     >重置大小</el-dropdown-item
@@ -726,8 +726,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
               style="height: 25px; width: 25px"
               @click="
                 changePreviousImage(
-                  imageStateStore.renderingEngine.id,
-                  imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                  imageOperationStateStore.renderingEngine.id,
+                  imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
                 )
               "
             ></playerStart
@@ -750,8 +750,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
               style="height: 25px; width: 25px"
               @click="
                 changeNextImage(
-                  imageStateStore.renderingEngine.id,
-                  imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                  imageOperationStateStore.renderingEngine.id,
+                  imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
                 )
               "
             ></playerEnd
@@ -823,82 +823,82 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
         <div class="flex flex-wrap gap-1 pt-1 pb-1">
           <imageOperation
             operation="箭头"
-            @click="imageStateStore.bindLeftMouse(ArrowAnnotateTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(ArrowAnnotateTool.toolName)"
             ><arrowUpDuotone style="height: 30px; width: 30px"></arrowUpDuotone>
           </imageOperation>
           <imageOperation
             operation="直线"
-            @click="imageStateStore.bindLeftMouse(LengthTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(LengthTool.toolName)"
           >
             <straightPipe style="height: 30px; width: 30px"></straightPipe>
           </imageOperation>
 
           <imageOperation
             operation="十字线"
-            @click="imageStateStore.bindLeftMouse(BidirectionalTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(BidirectionalTool.toolName)"
           >
             <addFill style="height: 30px; width: 30px"></addFill>
           </imageOperation>
           <imageOperation
             operation="角度"
-            @click="imageStateStore.bindLeftMouse(AngleTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(AngleTool.toolName)"
           >
             <angle style="height: 30px; width: 30px"></angle>
           </imageOperation>
           <imageOperation
             operation="Cobb"
-            @click="imageStateStore.bindLeftMouse(CobbAngleTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(CobbAngleTool.toolName)"
           >
             <cobb style="height: 30px; width: 30px; fill: currentColor"></cobb>
           </imageOperation>
 
           <imageOperation
             operation="椭圆"
-            @click="imageStateStore.bindLeftMouse(EllipticalROITool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(EllipticalROITool.toolName)"
           >
             <ellipses style="height: 30px; width: 30px; fill: currentColor"></ellipses>
           </imageOperation>
           <imageOperation
             operation="圆形"
-            @click="imageStateStore.bindLeftMouse(CircleROITool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(CircleROITool.toolName)"
           >
             <circleEmpty style="height: 30px; width: 30px; fill: currentColor"></circleEmpty>
           </imageOperation>
           <imageOperation
             operation="矩形"
-            @click="imageStateStore.bindLeftMouse(RectangleROITool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(RectangleROITool.toolName)"
           >
             <rectangles style="height: 30px; width: 30px; fill: currentColor"></rectangles>
           </imageOperation>
 
           <imageOperation
             operation="铅笔"
-            @click="imageStateStore.bindLeftMouse(PlanarFreehandROITool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(PlanarFreehandROITool.toolName)"
           >
             <pencil style="height: 30px; width: 30px; fill: currentColor"></pencil>
           </imageOperation>
           <imageOperation
             operation="探测"
-            @click="imageStateStore.bindLeftMouse(ProbeTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(ProbeTool.toolName)"
           >
             <circleCenter style="height: 30px; width: 30px; fill: currentColor"></circleCenter>
           </imageOperation>
           <imageOperation
             operation="超声定向"
-            @click="imageStateStore.bindLeftMouse(UltrasoundDirectionalTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(UltrasoundDirectionalTool.toolName)"
           >
             <circleTwoLine style="height: 30px; width: 30px; fill: currentColor"></circleTwoLine
           ></imageOperation>
           <imageOperation
             operation="实时轮廓"
-            @click="imageStateStore.bindLeftMouse(LivewireContourTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(LivewireContourTool.toolName)"
           >
             <livewireContour style="height: 30px; width: 30px; fill: currentColor"></livewireContour
           ></imageOperation>
           <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
             <div
               class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
-              @click="imageStateStore.bindLeftMouse(splineAnnotationToolsNames[0])"
+              @click="imageOperationStateStore.bindLeftMouse(splineAnnotationToolsNames[0])"
             >
               <splineROI style="height: 30px; width: 30px; fill: currentColor"></splineROI>
               <span class="text-sm text-gray-500 dark:text-white">曲线</span>
@@ -917,7 +917,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
                   <el-dropdown-menu>
                     <el-dropdown-item
                       v-for="splineAnnotationToolsName in splineAnnotationToolsNames"
-                      @click="imageStateStore.bindLeftMouse(splineAnnotationToolsName)"
+                      @click="imageOperationStateStore.bindLeftMouse(splineAnnotationToolsName)"
                       :key="splineAnnotationToolsName"
                       >{{ splineAnnotationToolsName }}</el-dropdown-item
                     >
@@ -931,9 +931,9 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
               class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
               @click="
                 selectAnnotationsByToolName(
-                  imageStateStore.leftMouseActive,
-                  imageStateStore.renderingEngine.id,
-                  imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                  imageOperationStateStore.leftMouseActive,
+                  imageOperationStateStore.renderingEngine.id,
+                  imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
                 )
               "
             >
@@ -957,8 +957,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
                       @click="
                         selectAnnotationsByToolName(
                           annotationTools.toolName,
-                          imageStateStore.renderingEngine.id,
-                          imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                          imageOperationStateStore.renderingEngine.id,
+                          imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
                         )
                       "
                       :key="annotationTools.label"
@@ -975,8 +975,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
             operation="隐藏"
             @click="
               hideSelectedAnnotation(
-                imageStateStore.renderingEngine.id,
-                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                imageOperationStateStore.renderingEngine.id,
+                imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
               )
             "
           ></imageOperationText>
@@ -984,8 +984,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
             operation="显示"
             @click="
               showAllAnnotations(
-                imageStateStore.renderingEngine.id,
-                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                imageOperationStateStore.renderingEngine.id,
+                imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
               )
             "
           ></imageOperationText>
@@ -993,8 +993,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
             operation="锁定"
             @click="
               lockSelectedAnnotation(
-                imageStateStore.renderingEngine.id,
-                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                imageOperationStateStore.renderingEngine.id,
+                imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
               )
             "
           ></imageOperationText>
@@ -1003,8 +1003,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
             operation="删除"
             @click="
               removeAnnotation(
-                imageStateStore.renderingEngine.id,
-                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                imageOperationStateStore.renderingEngine.id,
+                imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
               )
             "
           ></imageOperationText>
@@ -1012,8 +1012,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
             operation="全选"
             @click="
               selectAllAnnotations(
-                imageStateStore.renderingEngine.id,
-                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                imageOperationStateStore.renderingEngine.id,
+                imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
               )
             "
           ></imageOperationText>
@@ -1021,8 +1021,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
             operation="反选"
             @click="
               reverseSelectionAnnotations(
-                imageStateStore.renderingEngine.id,
-                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                imageOperationStateStore.renderingEngine.id,
+                imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
               )
             "
           ></imageOperationText>
@@ -1030,15 +1030,15 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
             operation="撤销"
             @click="
               revokePreviousAnnotation(
-                imageStateStore.renderingEngine.id,
-                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                imageOperationStateStore.renderingEngine.id,
+                imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
               )
             "
           ></imageOperationText>
         </div>
         <div
           class="px-2 pt-1 pb-1"
-          v-show="imageStateStore.leftMouseActive == splineAnnotationToolsNames[0]"
+          v-show="imageOperationStateStore.leftMouseActive == splineAnnotationToolsNames[0]"
         >
           <div class="flex flex-col">
             <div class="flex justify-between">
@@ -1107,7 +1107,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
         </div>
         <div
           class="px-2 pt-1 pb-1"
-          v-show="imageStateStore.leftMouseActive == splineAnnotationToolsNames[1]"
+          v-show="imageOperationStateStore.leftMouseActive == splineAnnotationToolsNames[1]"
         >
           <div class="flex flex-col">
             <div class="flex justify-between">
@@ -1143,7 +1143,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
         </div>
         <div
           class="px-2 pt-1 pb-1"
-          v-show="imageStateStore.leftMouseActive == splineAnnotationToolsNames[3]"
+          v-show="imageOperationStateStore.leftMouseActive == splineAnnotationToolsNames[3]"
         >
           <div class="flex flex-col">
             <div class="flex justify-between">
@@ -1200,7 +1200,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
         <div class="flex flex-wrap gap-1 pt-1 pb-1">
           <imageOperation
             operation="矩形分割"
-            @click="imageStateStore.bindLeftMouse(RectangleScissorsTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(RectangleScissorsTool.toolName)"
           >
             <rectangleScissor
               style="height: 30px; width: 30px; fill: currentColor"
@@ -1208,26 +1208,26 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
           </imageOperation>
           <imageOperation
             operation="圆形分割"
-            @click="imageStateStore.bindLeftMouse(CircleScissorsTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(CircleScissorsTool.toolName)"
           >
             <circleScissor style="height: 30px; width: 30px; fill: currentColor"></circleScissor>
           </imageOperation>
           <imageOperation
             operation="圆形擦除"
-            @click="imageStateStore.bindLeftMouse('ScissorsEraser')"
+            @click="imageOperationStateStore.bindLeftMouse('ScissorsEraser')"
           >
             <scissorsEraser style="height: 30px; width: 30px; fill: currentColor"></scissorsEraser>
           </imageOperation>
           <imageOperation
             operation="画笔填充"
-            @click="imageStateStore.bindLeftMouse(PaintFillTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(PaintFillTool.toolName)"
           >
             <paintFill style="height: 30px; width: 30px; fill: currentColor"></paintFill>
           </imageOperation>
 
           <imageOperation
             operation="毛刷"
-            @click="imageStateStore.bindLeftMouse('CircularBrush')"
+            @click="imageOperationStateStore.bindLeftMouse('CircularBrush')"
             @mouseup="
               changeBrushSizeForToolGroup(segmentationToolsConfiguration.circularBrush.radius)
             "
@@ -1237,7 +1237,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
 
           <imageOperation
             operation="橡皮"
-            @click="imageStateStore.bindLeftMouse('CircularEraser')"
+            @click="imageOperationStateStore.bindLeftMouse('CircularEraser')"
             @mouseup="
               changeBrushSizeForToolGroup(segmentationToolsConfiguration.circularEraser.radius)
             "
@@ -1247,7 +1247,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
 
           <imageOperation
             operation="阈值"
-            @click="imageStateStore.bindLeftMouse('ThresholdCircle')"
+            @click="imageOperationStateStore.bindLeftMouse('ThresholdCircle')"
             @mouseup="
               changeBrushSizeForToolGroup(segmentationToolsConfiguration.thresholdCircle.radius)
             "
@@ -1259,7 +1259,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
 
           <imageOperation
             operation="实时轮廓"
-            @click="imageStateStore.bindLeftMouse(LivewireContourSegmentationTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(LivewireContourSegmentationTool.toolName)"
           >
             <livewireSegmentation
               style="height: 30px; width: 30px; fill: currentColor"
@@ -1269,7 +1269,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
           <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
             <div
               class="flex flex-col items-center justify-center w-10 h-16 rounded-sm cursor-pointer hover:bg-gray-300 dark:hover:bg-cyan-900"
-              @click="imageStateStore.bindLeftMouse(splineToolsNames[0])"
+              @click="imageOperationStateStore.bindLeftMouse(splineToolsNames[0])"
             >
               <splineSegmentation
                 style="height: 30px; width: 30px; fill: currentColor"
@@ -1290,7 +1290,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
                   <el-dropdown-menu>
                     <el-dropdown-item
                       v-for="splineToolsName in splineToolsNames"
-                      @click="imageStateStore.bindLeftMouse(splineToolsName)"
+                      @click="imageOperationStateStore.bindLeftMouse(splineToolsName)"
                       :key="splineToolsName"
                       >{{ splineToolsName }}</el-dropdown-item
                     >
@@ -1301,14 +1301,14 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
           </div>
           <imageOperation
             operation="手绘轮廓"
-            @click="imageStateStore.bindLeftMouse(PlanarFreehandContourSegmentationTool.toolName)"
+            @click="imageOperationStateStore.bindLeftMouse(PlanarFreehandContourSegmentationTool.toolName)"
           >
             <planarFreehandSegmentation
               style="height: 30px; width: 30px; fill: currentColor"
             ></planarFreehandSegmentation>
           </imageOperation>
         </div>
-        <div class="px-2 pt-1 pb-1" v-show="imageStateStore.leftMouseActive == 'CircularBrush'">
+        <div class="px-2 pt-1 pb-1" v-show="imageOperationStateStore.leftMouseActive == 'CircularBrush'">
           <div class="flex justify-between">
             <el-text>毛刷半径(mm)</el-text
             ><el-input-number
@@ -1331,7 +1331,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
             />
           </div>
         </div>
-        <div class="px-2 pt-1 pb-1" v-show="imageStateStore.leftMouseActive == 'CircularEraser'">
+        <div class="px-2 pt-1 pb-1" v-show="imageOperationStateStore.leftMouseActive == 'CircularEraser'">
           <div class="flex justify-between">
             <el-text>橡皮半径(mm)</el-text
             ><el-input-number
@@ -1354,7 +1354,7 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
             />
           </div>
         </div>
-        <div class="px-2 pt-1 pb-1" v-show="imageStateStore.leftMouseActive == 'ThresholdCircle'">
+        <div class="px-2 pt-1 pb-1" v-show="imageOperationStateStore.leftMouseActive == 'ThresholdCircle'">
           <div class="flex justify-between">
             <el-text>阈值半径(mm)</el-text
             ><el-input-number
@@ -1431,9 +1431,9 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
         <div
           class="px-2 pt-1 pb-1"
           v-show="
-            imageStateStore.leftMouseActive == LivewireContourSegmentationTool.toolName ||
-            imageStateStore.leftMouseActive == PlanarFreehandContourSegmentationTool.toolName ||
-            splineToolsNames.includes(imageStateStore.leftMouseActive)
+            imageOperationStateStore.leftMouseActive == LivewireContourSegmentationTool.toolName ||
+            imageOperationStateStore.leftMouseActive == PlanarFreehandContourSegmentationTool.toolName ||
+            splineToolsNames.includes(imageOperationStateStore.leftMouseActive)
           "
         >
           <div class="flex flex-col">
@@ -1593,8 +1593,8 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
           operation="截屏"
           @click="
             downloadCanvasAsImage(
-              `div[data-viewport-uid='stackViewPort${imageStateStore.selectImagesListWindows}']`,
-              `image${imageStateStore.selectImagesListWindows}`
+              `div[data-viewport-uid='stackViewPort${imageOperationStateStore.selectSeriesWindows}']`,
+              `image${imageOperationStateStore.selectSeriesWindows}`
             )
           "
         >
@@ -1605,16 +1605,16 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
             style="height: 30px; width: 30px; fill: currentColor"
             @click="
               deleteImagesListWindowsToSession(
-                imageStateStore.selectImagesListWindows,
-                imageStateStore.renderingEngine.id,
-                imageStateStore.viewports[imageStateStore.selectImagesListWindows].id
+                imageOperationStateStore.selectSeriesWindows,
+                imageOperationStateStore.renderingEngine.id,
+                imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
               )
             "
           ></remove>
         </imageOperation>
         <imageOperation
           operation="清空视窗"
-          @click="removeAllImagesListWindowsToSession(imageStateStore.renderingEngine.id)"
+          @click="removeAllImagesListWindowsToSession(imageOperationStateStore.renderingEngine.id)"
         >
           <removals style="height: 30px; width: 30px; fill: currentColor"></removals>
         </imageOperation>
@@ -1625,3 +1625,4 @@ function removeAllImagesListWindowsToSession(renderingEngineId: string) {
 </template>
 
 <style lang="scss" scoped></style>
+@/store/imageOperationState

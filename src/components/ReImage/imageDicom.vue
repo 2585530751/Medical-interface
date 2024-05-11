@@ -1,23 +1,24 @@
 <script setup lang="ts">
-import type { SingleImage } from '@/types/image'
-import { useImageStateStore } from '@/store/imageState'
+import { useImageOperationStateStore } from '@/store/imageOperationState'
 import { generateImageUrl } from '@/composables/image/utils'
 import type IStackViewport from '@cornerstonejs/core/src/types/IStackViewport'
 import { Enums } from '@cornerstonejs/core'
 import { ref, onMounted, onUnmounted } from 'vue'
+import type { SeriesInfo, ImageInfo } from '@/types/series'
+
 const props = defineProps<{
-  singleImage: SingleImage
+  imageInfo: ImageInfo
 }>()
 const imageIds: string[] = []
 const { ViewportType } = Enums
-const imageStateStore = useImageStateStore()
-let elementId = ref('cornerstone-element-imageDicom-' + props.singleImage.singleImageId)
-const viewportId = 'stackViewPort-imageDicom-' + props.singleImage.singleImageId
-const renderingEngine = imageStateStore.renderingEngine
-const imagesListUrl = generateImageUrl(props.singleImage.singleImagePath)
+const imageOperationStateStore =useImageOperationStateStore()
+let elementId = ref('cornerstone-element-imageDicom-' + props.imageInfo.imageId)
+const viewportId = 'stackViewPort-imageDicom-' + props.imageInfo.imageId
+const renderingEngine = imageOperationStateStore.renderingEngine
+const imagesListUrl = generateImageUrl(props.imageInfo.imagePath as string)
 
 onMounted(() => {
-  if (props.singleImage.singleImagePath.endsWith('.dcm')) {
+  if (props.imageInfo.imagePath!.endsWith('.dcm')) {
     const element: HTMLDivElement = document.getElementById(elementId.value) as HTMLDivElement
     const viewportInput = {
       viewportId: viewportId,
@@ -34,7 +35,7 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
-  if (props.singleImage.singleImagePath.endsWith('.dcm')) {
+  if (props.imageInfo.imagePath!.endsWith('.dcm')) {
     renderingEngine.disableElement(viewportId)
   }
 })
@@ -47,3 +48,4 @@ onUnmounted(() => {
 </template>
 
 <style lang="scss" scoped></style>
+@/store/imageOperationState

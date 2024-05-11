@@ -1,18 +1,17 @@
 <script setup lang="ts">
 import files from '@iconify-icons/ep/files'
 import folder from '@iconify-icons/ep/folder'
-import { useImageStateStore } from '@/store/imageState'
+import { useImageOperationStateStore } from '@/store/imageOperationState'
 import imagesListDisplay from '@/components/ReImage/imagesListDisplay.vue'
 import imagesModelsListDisplay from '@/components/ReImage/imagesModelsListDisplay.vue'
 import { storageSession } from '@pureadmin/utils'
 import { onMounted, reactive, ref, watch } from 'vue'
-import type { ImageInfo } from '@/types/image'
-import { imagesModelsListsSession, imagesListsSession } from '@/composables/image/utils'
-import { image } from 'html2canvas/dist/types/css/types/image'
+import { seriesModelsListsSession, seriesListsSession } from '@/composables/image/utils'
+import type { SeriesInfo } from '@/types/series'
 
-const imageStateStore = useImageStateStore()
-const imagesLists = reactive(imageStateStore.imagesLists)
-const imagesModelsLists = reactive(imageStateStore.imagesModelsLists)
+const imageOperationStateStore =useImageOperationStateStore()
+const imagesLists = imageOperationStateStore.seriesLists
+const imagesModelsLists = imageOperationStateStore.seriesModelsLists
 const mainShow = ref(true)
 
 const imagesListsInfo = reactive({
@@ -40,17 +39,17 @@ const formattedDate = `${year}-${month}-${day}`
 
 watch(
   () => {
-    return imageStateStore.imagesLists.length
+    return imageOperationStateStore.seriesLists.length
   },
   (value, prevValue) => {
     imagesListsInfo.imagesNumber = 0
     imagesListsInfo.imagesSetNumber = 0
     for (let i = 0; i < imagesLists.length; i++) {
-      imagesListsInfo.imagesNumber += imagesLists[i].singleImageList.length
+      imagesListsInfo.imagesNumber += imagesLists[i].imageList.length
       imagesListsInfo.imagesSetNumber += 1
     }
     // 提取所有不同的 imageType 并存储到 Set 中以去除重复项
-    const uniqueImageTypes = new Set(imagesLists.map((image) => image.imageEquipment))
+    const uniqueImageTypes = new Set(imagesLists.map((image) => image.seriesEquipment))
     // 将 Set 转换回数组，并使用 join 方法将 imageType 串联成一个字符串
     const imageTypesString = Array.from(uniqueImageTypes).join('/')
     imagesListsInfo.imagesEquipment = imageTypesString
@@ -60,17 +59,17 @@ watch(
 
 watch(
   () => {
-    return imageStateStore.imagesModelsLists.length
+    return imageOperationStateStore.seriesModelsLists.length
   },
   (value, prevValue) => {
     imagesModelsListsInfo.imagesModelsNumber = 0
     imagesModelsListsInfo.imagesModelsSetNumber = 0
     for (let i = 0; i < imagesModelsLists.length; i++) {
-      imagesModelsListsInfo.imagesModelsNumber += imagesModelsLists[i].singleImageList.length
+      imagesModelsListsInfo.imagesModelsNumber += imagesModelsLists[i].imageList.length
       imagesModelsListsInfo.imagesModelsSetNumber += 1
     }
     // 提取所有不同的 imageType 并存储到 Set 中以去除重复项
-    const uniqueImageTypes = new Set(imagesModelsLists.map((image) => image.imageEquipment))
+    const uniqueImageTypes = new Set(imagesModelsLists.map((image) => image.seriesEquipment))
     // 将 Set 转换回数组，并使用 join 方法将 imageType 串联成一个字符串
     const imageTypesString = Array.from(uniqueImageTypes).join('/')
     imagesModelsListsInfo.imagesEquipment = imageTypesString
@@ -80,29 +79,29 @@ watch(
 
 onMounted(() => {
   for (let i = 0; i < imagesLists.length; i++) {
-    imagesListsInfo.imagesNumber += imagesLists[i].singleImageList.length
+    imagesListsInfo.imagesNumber += imagesLists[i].imageList.length
     imagesListsInfo.imagesSetNumber += 1
   }
   for (let i = 0; i < imagesModelsLists.length; i++) {
-    imagesModelsListsInfo.imagesModelsNumber += imagesModelsLists[i].singleImageList.length
+    imagesModelsListsInfo.imagesModelsNumber += imagesModelsLists[i].imageList.length
     imagesModelsListsInfo.imagesModelsSetNumber += 1
   }
   // 提取所有不同的 imageType 并存储到 Set 中以去除重复项
-  const uniqueImageTypes = new Set(imagesModelsLists.map((image) => image.imageEquipment))
+  const uniqueImageTypes = new Set(imagesModelsLists.map((image) => image.seriesEquipment))
   // 将 Set 转换回数组，并使用 join 方法将 imageType 串联成一个字符串
   const imageTypesString = Array.from(uniqueImageTypes).join('/')
   imagesModelsListsInfo.imagesEquipment = imageTypesString
   // 提取所有不同的 imageType 并存储到 Set 中以去除重复项
-  const uniqueImageTypes1 = new Set(imagesLists.map((image) => image.imageEquipment))
+  const uniqueImageTypes1 = new Set(imagesLists.map((image) => image.seriesEquipment))
   // 将 Set 转换回数组，并使用 join 方法将 imageType 串联成一个字符串
   const imageTypesString1 = Array.from(uniqueImageTypes).join('/')
   imagesListsInfo.imagesEquipment = imageTypesString1
 })
 
-const selectImagesLists: ImageInfo[] = []
-const selectImagesModelsLists: ImageInfo[] = []
+const selectImagesLists: SeriesInfo[] = []
+const selectImagesModelsLists: SeriesInfo[] = []
 
-function addSelectImagesLists(imagesList: ImageInfo, checked: boolean) {
+function addSelectImagesLists(imagesList: SeriesInfo, checked: boolean) {
   if (checked) {
     selectImagesLists.push(imagesList)
   } else {
@@ -110,7 +109,7 @@ function addSelectImagesLists(imagesList: ImageInfo, checked: boolean) {
   }
 }
 
-function addSelectImagesModelsLists(imagesModelsList: ImageInfo, checked: boolean) {
+function addSelectImagesModelsLists(imagesModelsList: SeriesInfo, checked: boolean) {
   if (checked) {
     selectImagesModelsLists.push(imagesModelsList)
   } else {
@@ -119,35 +118,35 @@ function addSelectImagesModelsLists(imagesModelsList: ImageInfo, checked: boolea
 }
 
 function deleteSelectedImagesLists() {
-  const list: ImageInfo[] = storageSession().getItem(imagesListsSession)
+  const list: SeriesInfo[] = storageSession().getItem(seriesListsSession)
   selectImagesLists.forEach((imagesList) => {
     imagesLists.splice(imagesLists.indexOf(imagesList), 1)
     // 检查数组中是否存在具有相同imageId的元素
-    let existingElement = list.find((element) => element.imageId === imagesList.imageId)
+    let existingElement = list.find((element) => element.seriesId === imagesList.seriesId)
     if (existingElement) {
       // 如果存在相同imageId的元素，则删除它并添加新元素
       const index = list.indexOf(existingElement)
       list.splice(index, 1) // 删除找到的元素
-      storageSession().setItem(imagesListsSession, list)
+      storageSession().setItem(seriesListsSession, list)
     }
   })
 }
 
 function deleteAllImagesLists() {
   // imagesLists.splice(0, imagesLists.length)
-  imageStateStore.imagesLists.length = 0
-  storageSession().setItem(imagesListsSession, [])
+  imageOperationStateStore.seriesLists.length = 0
+  storageSession().setItem(seriesListsSession, [])
 }
 
 function deleteSelectedImagesModelsLists() {
-  const list: ImageInfo[] = storageSession().getItem(imagesModelsListsSession)
+  const list: SeriesInfo[] = storageSession().getItem(seriesModelsListsSession)
   selectImagesModelsLists.forEach((imagesModelsList) => {
     imagesModelsLists.splice(imagesModelsLists.indexOf(imagesModelsList), 1)
     let existingElement = list.find((element) => {
       return (
-        element.singleImageList.length === imagesModelsList.singleImageList.length &&
-          element.singleImageList[0].singleImageModelData.modelId ===
-          imagesModelsList.singleImageList[0].singleImageModelData.modelId
+        element.imageList.length === imagesModelsList.imageList.length &&
+          element.imageList[0].singleImageModelData.modelId ===
+          imagesModelsList.imageList[0].singleImageModelData.modelId
       )
     })
     console.log(existingElement)
@@ -155,15 +154,15 @@ function deleteSelectedImagesModelsLists() {
       // 如果存在相同imageId的元素，则删除它并添加新元素
       const index = list.indexOf(existingElement)
       list.splice(index, 1) // 删除找到的元素
-      storageSession().setItem(imagesModelsListsSession, list)
+      storageSession().setItem(seriesModelsListsSession, list)
     }
   })
 }
 
 function deleteAllImagesModelsLists() {
   // imagesModelsLists.splice(0, imagesModelsLists.length)
-  imageStateStore.imagesModelsLists.length = 0
-  storageSession().setItem(imagesModelsListsSession, [])
+  imageOperationStateStore.seriesModelsLists.length = 0
+  storageSession().setItem(seriesModelsListsSession, [])
 }
 </script>
 
@@ -212,7 +211,7 @@ function deleteAllImagesModelsLists() {
       <imagesListDisplay
         v-for="(item, index) in imagesLists"
         @addSelectImagesLists="addSelectImagesLists"
-        :imagesList="item"
+        :series-list="item"
         :key="index"
         :index="index"
       ></imagesListDisplay>
@@ -277,3 +276,4 @@ function deleteAllImagesModelsLists() {
 </template>
 
 <style lang="scss" scoped></style>
+@/store/imageOperationState

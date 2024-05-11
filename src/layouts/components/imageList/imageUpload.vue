@@ -10,9 +10,9 @@ import { message } from '@/utils/message'
 import type { UploadUserFile } from 'element-plus'
 import type { UploadInstance } from 'element-plus'
 import { uploadImages } from '@/api/image'
-import { useImageStateStore } from '@/store/imageState'
+import { useImageOperationStateStore } from '@/store/imageOperationState'
 
-const imageStateStore = useImageStateStore()
+const imageOperationStateStore =useImageOperationStateStore()
 
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
@@ -84,8 +84,8 @@ function submitFileForm() {
   uploadImages(formData)
     .then((res) => {
       if (res.success) {
-        imageStateStore.tableData.length = 0
-        imageStateStore.getImagesListData()
+        imageOperationStateStore.tableData.length = 0
+        imageOperationStateStore.getImagesListData()
         emits('uploadWindowClose')
       } else {
         message(res.msg, { type: 'error' })
@@ -249,3 +249,4 @@ function handleDownload(file: UploadFile) {
   margin-right: 10px;
 }
 </style>
+@/store/imageOperationState

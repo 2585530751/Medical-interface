@@ -5,46 +5,47 @@ import folder from '@iconify-icons/ep/folder'
 import { basicImageUrl } from '@/api/utils'
 
 import { ref, onMounted } from 'vue'
-import { useImageStateStore } from '@/store/imageState'
-import type { ImageInfo, ImageInfoWindows } from '@/types/image'
-import { changeImagesListWindowsToSession } from '@/composables/image/utils'
+import { useImageOperationStateStore } from '@/store/imageOperationState'
+import type { SeriesInfoWindows } from '@/types/image'
+import { changeSeriesListWindowsToSession } from '@/composables/image/utils'
 import { Enums } from '@cornerstonejs/core'
 import { generateImageUrl } from '@/composables/image/utils'
 import type IStackViewport from '@cornerstonejs/core/src/types/IStackViewport'
+import type { SeriesInfo } from '@/types/series'
 
 const props = defineProps<{
-  imagesModelsList: ImageInfo
+  imagesModelsList: SeriesInfo
   index: number
 }>()
 
 const emit = defineEmits<{
-  addSelectImagesModelsLists: [imagesList: ImageInfo,checked:boolean]
+  addSelectImagesModelsLists: [imagesList: SeriesInfo,checked:boolean]
 }>()
 
 const checked = ref(false)
 const imageIds: string[] = []
 const { ViewportType } = Enums
-const imageStateStore = useImageStateStore()
-let elementId = ref('cornerstone-element-imagesModelsList-' + props.imagesModelsList.imageId)
-const viewportId = 'stackViewPort-imagesModelsList-' + props.imagesModelsList.imageId
-const renderingEngine = imageStateStore.renderingEngine
-const imagesModelsListUrl = generateImageUrl(props.imagesModelsList.singleImageList[0].singleImageModelData.modelResultPath)
+const imageOperationStateStore =useImageOperationStateStore()
+let elementId = ref('cornerstone-element-imagesModelsList-' + props.imagesModelsList.seriesId)
+const viewportId = 'stackViewPort-imagesModelsList-' + props.imagesModelsList.seriesId
+const renderingEngine = imageOperationStateStore.renderingEngine
+const imagesModelsListUrl = generateImageUrl(props.imagesModelsList.imageList[0].singleImageModelData.modelResultPath)
 const imagesModelsListUrlCheck = ref(true)
 console.log(imagesModelsListUrl)
 function selectimagesModelsListToWindows() {
-  imageStateStore.selectImagesModelsList = props.index
-  const ImageInfoWindows: ImageInfoWindows = {
-    imageInfo: props.imagesModelsList,
-    singleImage: props.imagesModelsList.singleImageList[0]
+  imageOperationStateStore.selectSeriesModelsList = props.index
+  const seriesInfoWindows: SeriesInfoWindows = {
+    seriesInfo: props.imagesModelsList,
+    imageInfo: props.imagesModelsList.imageList[0]
   }
-  //imageStateStore.imagesModelsListWindows[imageStateStore.selectimagesModelsListWindows] = ImageInfoWindows
+  //imageOperationStateStore.imagesModelsListWindows[imageOperationStateStore.selectSeriesModelsListWindows] = seriesInfoWindows
 
-  imageStateStore.imagesListWindows = [
-    ...imageStateStore.imagesListWindows.slice(0, imageStateStore.selectImagesListWindows),
-    ImageInfoWindows,
-    ...imageStateStore.imagesListWindows.slice(imageStateStore.selectImagesListWindows + 1)
+  imageOperationStateStore.seriesListWindows = [
+    ...imageOperationStateStore.seriesListWindows.slice(0, imageOperationStateStore.selectSeriesWindows),
+    seriesInfoWindows,
+    ...imageOperationStateStore.seriesListWindows.slice(imageOperationStateStore.selectSeriesWindows + 1)
   ]
-  changeImagesListWindowsToSession(ImageInfoWindows, imageStateStore.selectImagesListWindows)
+  changeSeriesListWindowsToSession(seriesInfoWindows, imageOperationStateStore.selectSeriesWindows)
 }
 onMounted(() => {
 
@@ -76,12 +77,12 @@ onMounted(() => {
     </div>
     <div
       class="flex flex-col justify-center w-4/6 gap-1"
-      :class="{ highlighted: imageStateStore.selectImagesModelsList === index }"
+      :class="{ highlighted: imageOperationStateStore.selectSeriesModelsList === index }"
       @click="selectimagesModelsListToWindows()"
     >
       <div class="flex items-center justify-between">
         <span class="text-xs text-gray-500">
-          {{ props.imagesModelsList.imageEquipment }}
+          {{ props.imagesModelsList.seriesEquipment }}
         </span>
         <span class="text-xs text-gray-500"
           ><IconifyIconOffline
@@ -89,13 +90,13 @@ onMounted(() => {
             :icon="timer"
             :style="{ fontSize: '10px' }"
           ></IconifyIconOffline
-          >{{ props.imagesModelsList.imageCheckTime }}</span
+          >{{ props.imagesModelsList.seriesCheckTime }}</span
         >
       </div>
       <div class="border-2 border-solid rounded-lg border-slate-300">
         <el-image
           fit="cover"
-          :src="basicImageUrl + props.imagesModelsList.singleImageList[0].singleImageModelData.modelResultPath"
+          :src="basicImageUrl + props.imagesModelsList.imageList[0].singleImageModelData.modelResultPath"
           :crossorigin="'anonymous'"
           v-show="!imagesModelsListUrlCheck"
         />
@@ -114,7 +115,7 @@ onMounted(() => {
             :icon="files"
             :style="{ fontSize: '10px' }"
           ></IconifyIconOffline
-          >{{ props.imagesModelsList.imageCount }}</span
+          >{{ props.imagesModelsList.seriesCount }}</span
         >
       </div>
     </div>
@@ -130,3 +131,4 @@ onMounted(() => {
   padding: 4px; /* 内边距 */
 }
 </style>
+@/store/imageOperationState

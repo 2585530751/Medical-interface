@@ -5,7 +5,7 @@ import { baseUrlApi } from './utils'
 export const uploadImages = (data?: object) => {
   return http.request<any>(
     'post',
-    baseUrlApi('image/uploadImages'),
+    baseUrlApi('series/uploadImages'),
     { data },
     {
       headers: {
@@ -18,7 +18,7 @@ export const uploadImages = (data?: object) => {
 export const getImagePageByDoctorId = (data?: object) => {
   return http.request<any>(
     'post',
-    baseUrlApi('image/getImagePageByDoctorId'),
+    baseUrlApi('series/getImagePageByDoctorId'),
     { data },
     {
       headers: {
@@ -29,11 +29,11 @@ export const getImagePageByDoctorId = (data?: object) => {
 }
 
 export const deleteImageById = (params?: object) => {
-  return http.request<any>('get', baseUrlApi('image/deleteImageById'), { params })
+  return http.request<any>('get', baseUrlApi('series/deleteImageById'), { params })
 }
 
 export const deleteSingleImageById = (params?: object) => {
-  return http.request<any>('get', baseUrlApi('singleImage/deleteSingleImageById'), { params })
+  return http.request<any>('get', baseUrlApi('image/deleteSingleImageById'), { params })
 }
 
 export const imageSegmentationOfThyroidNodulesApi = (params?: object) => {

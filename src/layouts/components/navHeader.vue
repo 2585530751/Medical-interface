@@ -11,7 +11,6 @@ import { useUserStoreHook } from '@/store/modules/user'
 import { getHeadIconApi } from '@/api/user'
 import { basicImageUrl, serverUrl, emptyImageUrl } from '@/api/utils'
 
-
 const activeIndex = ref('')
 const imageUrl = ref('')
 
@@ -61,22 +60,28 @@ const errorHandler = () => {
     </el-menu-item>
 
     <div class="flex-grow" />
-    <role-permission :value="['doctor','radiologist']">
-      <el-menu-item index="/image">序列管理</el-menu-item>
+    <role-permission :value="['doctor', 'radiologist']">
+      <el-menu-item index="/tools">工具箱</el-menu-item>
     </role-permission>
     <role-permission :value="['doctor']"
       ><el-menu-item index="/model">算法模型</el-menu-item></role-permission
     >
     <role-permission :value="['doctor', 'radiologist']">
-      <el-menu-item index="/patient">患者详情</el-menu-item></role-permission
+      <el-menu-item index="/patient">患者管理</el-menu-item></role-permission
     >
 
-    <role-permission :value="['radiologist','doctor']">
+    <role-permission :value="['radiologist', 'doctor']">
       <el-menu-item index="/study">检查管理</el-menu-item></role-permission
     >
-    <role-permission :value="['radiologist']">
-      <el-menu-item index="/patientManagment">患者管理</el-menu-item></role-permission
-    >
+    <role-permission :value="['radiologist', 'doctor']">
+      <el-menu-item index="/series">序列管理</el-menu-item>
+    </role-permission>
+    <role-permission :value="['patient']">
+      <el-menu-item index="/study/myStudy">我的检查</el-menu-item>
+    </role-permission>
+    <role-permission :value="[]">
+      <el-menu-item index="/image">图像管理</el-menu-item>
+    </role-permission>
     <el-sub-menu index="2">
       <template #title>设置</template>
       <el-menu-item index="/setting/aboutUs">关于我们</el-menu-item>

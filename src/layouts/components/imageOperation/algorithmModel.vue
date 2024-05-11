@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import arrowDown from '@iconify-icons/ep/arrow-down'
-import { useImageStateStore } from '@/store/imageState'
+import { useImageOperationStateStore } from '@/store/imageOperationState'
 import { imageKeyValueStore } from '@/composables/image/imageKeyValueStore'
 import {
   singleImageSegmentationOfThyroidNodulesApi,
@@ -13,13 +13,13 @@ import {
   imageIntestinalPolypsSegmentationApi
 } from '@/api/image'
 import { message } from '@/utils/message'
-import type { ImageInfo } from '@/types/image'
-import { pushimagesModelsListsSession } from '@/composables/image/utils'
+import { pushseriesModelsListsSession } from '@/composables/image/utils'
 import { storageSession } from '@pureadmin/utils'
 
 import { reactive, ref } from 'vue'
 
 import pieChart from '@/components/ReChart/pieChart.vue'
+import type { SeriesInfo } from '@/types/series'
 
 const dialogVisible = ref(false)
 
@@ -27,58 +27,58 @@ const pieData=reactive([{value: 0, name: '良性'}])
 const pieName=ref('')
 const pieDescription=ref('')
 
-const imageStateStore = useImageStateStore()
+const imageOperationStateStore =useImageOperationStateStore()
 
 async function singleImageSegmentationOfThyroidNodules() {
-  const imageInfoWindows =
-    imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows]
-  if (imageInfoWindows != 0 ) {
+  const seriesInfoWindows =
+    imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+  if (seriesInfoWindows != 0 ) {
     const params = {
-      singleImageId: imageKeyValueStore.get(
-        imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
-      ).singleImageId
+      imageId: imageKeyValueStore.get(
+        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].getCurrentImageId()
+      ).imageId
     }
     await singleImageSegmentationOfThyroidNodulesApi(params)
       .then((data) => {
         if ((data.code = 200)) {
+          console.log(data.data)
           const singleImageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
-          const imageInfo = JSON.parse(JSON.stringify(imageInfoWindows.imageInfo))
+          const seriesInfo:SeriesInfo = JSON.parse(JSON.stringify(seriesInfoWindows.seriesInfo))
           const singleImage = Object.assign(
             {},
-            imageInfo.singleImageList.find((obj:any) => obj.singleImageId === params.singleImageId)
+            seriesInfo.imageList.find((obj:any) => obj.imageId === params.imageId)
           )
           singleImage!.singleImageModelData = singleImageModelData
           singleImage!.modelType = 'model'
-          imageInfo.singleImageList = [singleImage!]
-          pushimagesModelsListsSession(imageInfo)
-          imageStateStore.pushImagesModelsList(imageInfo)
-
+          seriesInfo.imageList = [singleImage!]
+          pushseriesModelsListsSession(seriesInfo)
+          imageOperationStateStore.pushImagesModelsList(seriesInfo)
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
         }
       })
-      .catch((error) => {
-        message(error, { type: 'error' })
-      })
+      // .catch((error) => {
+      //   message(error, { type: 'error' })
+      // })
   }
 }
 
 async function imageSegmentationOfThyroidNodules() {
-  const imageInfoWindows =
-    imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows]
-  if (imageInfoWindows != 0) {
+  const seriesInfoWindows =
+    imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+  if (seriesInfoWindows != 0) {
     const params = {
-      imageId: imageKeyValueStore.get(
-        imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
-      ).imageId
+      seriesId: imageKeyValueStore.get(
+        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].getCurrentImageId()
+      ).seriesId
     }
     
     await imageSegmentationOfThyroidNodulesApi(params)
       .then((data) => {
         
         if ((data.code = 200)) {
-          const imageInfo = JSON.parse(JSON.stringify(imageInfoWindows.imageInfo))
+          const imageInfo = JSON.parse(JSON.stringify(seriesInfoWindows.imageInfo))
           for (var i = 0; i < data.data.length; i++) {
             const singleImageModelData = Object.assign(
               {},
@@ -88,7 +88,7 @@ async function imageSegmentationOfThyroidNodules() {
             let j = 0
 
             while (j < imageInfo.singleImageList.length) {
-              if (imageInfo.singleImageList[j].singleImageId == data.data[i].singleImageId) {
+              if (imageInfo.singleImageList[j].imageId == data.data[i].imageId) {
                 
                 break
               }
@@ -97,8 +97,8 @@ async function imageSegmentationOfThyroidNodules() {
             imageInfo.singleImageList[j].singleImageModelData = singleImageModelData
             imageInfo.singleImageList[j].modelType = 'model'
           }
-          pushimagesModelsListsSession(imageInfo)
-          imageStateStore.pushImagesModelsList(imageInfo)
+          pushseriesModelsListsSession(imageInfo)
+          imageOperationStateStore.pushImagesModelsList(imageInfo)
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -111,13 +111,13 @@ async function imageSegmentationOfThyroidNodules() {
 }
 
 async function singleImageClassifyOfThyroidNodules() {
-  const imageInfoWindows =
-    imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows]
-  if (imageInfoWindows != 0) {
+  const seriesInfoWindows =
+    imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+  if (seriesInfoWindows != 0) {
     const params = {
-      singleImageId: imageKeyValueStore.get(
-        imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
-      ).singleImageId
+      imageId: imageKeyValueStore.get(
+        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].getCurrentImageId()
+      ).imageId
     }
     await singleImageClassifyOfThyroidNodulesApi(params)
       .then((data) => {
@@ -136,13 +136,13 @@ async function singleImageClassifyOfThyroidNodules() {
 }
 
 async function imageClassifyOfThyroidNodules() {
-  const imageInfoWindows =
-    imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows]
-  if (imageInfoWindows != 0) {
+  const seriesInfoWindows =
+    imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+  if (seriesInfoWindows != 0) {
     const params = {
-      imageId: imageKeyValueStore.get(
-        imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
-      ).imageId
+      seriesId: imageKeyValueStore.get(
+        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].getCurrentImageId()
+      ).seriesId
     }
     await imageClassifyOfThyroidNodulesApi(params)
       .then((data) => {
@@ -176,27 +176,27 @@ async function imageClassifyOfThyroidNodules() {
 }
 
 async function singleImageDetectionOfPulmonaryNodules() {
-  const imageInfoWindows =
-    imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows]
-  if (imageInfoWindows != 0) {
+  const seriesInfoWindows =
+    imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+  if (seriesInfoWindows != 0) {
     const params = {
-      singleImageId: imageKeyValueStore.get(
-        imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
-      ).singleImageId
+      imageId: imageKeyValueStore.get(
+        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].getCurrentImageId()
+      ).imageId
     }
     await singleImageDetectionOfPulmonaryNodulesApi(params)
       .then((data) => {
         if ((data.code = 200)) {
           const singleImageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
-          const imageInfo = JSON.parse(JSON.stringify(imageInfoWindows.imageInfo))
+          const imageInfo = JSON.parse(JSON.stringify(seriesInfoWindows.imageInfo))
           const singleImage = Object.assign(
             {},
-            imageInfo.singleImageList.find((obj:any) => obj.singleImageId === params.singleImageId)
+            imageInfo.singleImageList.find((obj:any) => obj.imageId === params.imageId)
           )
           singleImage!.singleImageModelData = singleImageModelData
           singleImage!.modelType = 'model'
           imageInfo.singleImageList = [singleImage!]
-          imageStateStore.pushImagesModelsList(imageInfo)
+          imageOperationStateStore.pushImagesModelsList(imageInfo)
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -208,18 +208,18 @@ async function singleImageDetectionOfPulmonaryNodules() {
   }
 }
 async function imageDetectionOfPulmonaryNodules() {
-  const imageInfoWindows =
-    imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows]
-  if (imageInfoWindows != 0) {
+  const seriesInfoWindows =
+    imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+  if (seriesInfoWindows != 0) {
     const params = {
-      imageId: imageKeyValueStore.get(
-        imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
-      ).imageId
+      seriesId: imageKeyValueStore.get(
+        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].getCurrentImageId()
+      ).seriesId
     }
     await imageDetectionOfPulmonaryNodulesApi(params)
       .then((data) => {
         if ((data.code = 200)) {
-          const imageInfo = JSON.parse(JSON.stringify(imageInfoWindows.imageInfo))
+          const imageInfo = JSON.parse(JSON.stringify(seriesInfoWindows.imageInfo))
           for (var i = 0; i < data.data.length; i++) {
             const singleImageModelData = Object.assign(
               {},
@@ -228,7 +228,7 @@ async function imageDetectionOfPulmonaryNodules() {
             )
             let j = 0
             while (j < imageInfo.singleImageList.length) {
-              if (imageInfo.singleImageList[j].singleImageId == data.data[i].singleImageId) {
+              if (imageInfo.singleImageList[j].imageId == data.data[i].imageId) {
                 break
               }
               j++
@@ -236,8 +236,8 @@ async function imageDetectionOfPulmonaryNodules() {
             imageInfo.singleImageList[j].singleImageModelData = singleImageModelData
             imageInfo.singleImageList[j].modelType = 'model'
           }
-          pushimagesModelsListsSession(imageInfo)
-          imageStateStore.pushImagesModelsList(imageInfo)
+          pushseriesModelsListsSession(imageInfo)
+          imageOperationStateStore.pushImagesModelsList(imageInfo)
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -250,28 +250,28 @@ async function imageDetectionOfPulmonaryNodules() {
 }
 
 async function singleImageIntestinalPolypsSegmentation() {
-  const imageInfoWindows =
-    imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows]
-  if (imageInfoWindows != 0) {
+  const seriesInfoWindows =
+    imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+  if (seriesInfoWindows != 0) {
     const params = {
-      singleImageId: imageKeyValueStore.get(
-        imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
-      ).singleImageId
+      imageId: imageKeyValueStore.get(
+        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].getCurrentImageId()
+      ).imageId
     }
     await singleImageIntestinalPolypsSegmentationApi(params)
       .then((data) => {
         if ((data.code = 200)) {
           const singleImageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
-          const imageInfo = JSON.parse(JSON.stringify(imageInfoWindows.imageInfo))
+          const imageInfo = JSON.parse(JSON.stringify(seriesInfoWindows.imageInfo))
           const singleImage = Object.assign(
             {},
-            imageInfo.singleImageList.find((obj:any) => obj.singleImageId === params.singleImageId)
+            imageInfo.singleImageList.find((obj:any) => obj.imageId === params.imageId)
           )
           singleImage!.singleImageModelData = singleImageModelData
           singleImage!.modelType = 'model'
           imageInfo.singleImageList = [singleImage!]
-          pushimagesModelsListsSession(imageInfo)
-          imageStateStore.pushImagesModelsList(imageInfo)
+          pushseriesModelsListsSession(imageInfo)
+          imageOperationStateStore.pushImagesModelsList(imageInfo)
 
           message(data.msg, { type: 'success' })
         } else {
@@ -285,19 +285,19 @@ async function singleImageIntestinalPolypsSegmentation() {
 }
 
 async function imageIntestinalPolypsSegmentation() {
-  const imageInfoWindows =
-    imageStateStore.imagesListWindows[imageStateStore.selectImagesListWindows]
-  if (imageInfoWindows != 0) {
+  const seriesInfoWindows =
+    imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+  if (seriesInfoWindows != 0) {
     const params = {
-      imageId: imageKeyValueStore.get(
-        imageStateStore.viewports[imageStateStore.selectImagesListWindows].getCurrentImageId()
-      ).imageId
+      seriesId: imageKeyValueStore.get(
+        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].getCurrentImageId()
+      ).seriesId
     }
    
     await imageIntestinalPolypsSegmentationApi(params)
       .then((data) => {
         if ((data.code = 200)) {
-          const imageInfo = JSON.parse(JSON.stringify(imageInfoWindows.imageInfo))
+          const imageInfo = JSON.parse(JSON.stringify(seriesInfoWindows.imageInfo))
           for (var i = 0; i < data.data.length; i++) {
             const singleImageModelData = Object.assign(
               {},
@@ -307,7 +307,7 @@ async function imageIntestinalPolypsSegmentation() {
             let j = 0
             
             while (j < imageInfo.singleImageList.length) {
-              if (imageInfo.singleImageList[j].singleImageId == data.data[i].singleImageId) {
+              if (imageInfo.singleImageList[j].imageId == data.data[i].imageId) {
                 
                 break
               }
@@ -316,8 +316,8 @@ async function imageIntestinalPolypsSegmentation() {
             imageInfo.singleImageList[j].singleImageModelData = singleImageModelData
             imageInfo.singleImageList[j].modelType = 'model'
           }
-          pushimagesModelsListsSession(imageInfo)
-          imageStateStore.pushImagesModelsList(imageInfo)
+          pushseriesModelsListsSession(imageInfo)
+          imageOperationStateStore.pushImagesModelsList(imageInfo)
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -443,3 +443,4 @@ async function imageIntestinalPolypsSegmentation() {
 </template>
 
 <style lang="scss" scoped></style>
+@/store/imageOperationState

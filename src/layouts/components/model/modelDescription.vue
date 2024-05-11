@@ -32,6 +32,8 @@ const modelInformation = reactive<information>({
   modelCodeLink: ''
 })
 
+
+
 function getModelInfoByModelId(modelId: number) {
   const param = { modelId: modelId }
   getModelInfoByModelIdApi(param).then((res: any) => {

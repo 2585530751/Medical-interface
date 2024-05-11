@@ -7,7 +7,7 @@ export default {
     children: [
       {
         path: "/study/index",
-        name: "studyList",
+        name: "StudyTable",
         component: () => import("@/views/study/index.vue"),
         meta: {
           title: "检查列表"

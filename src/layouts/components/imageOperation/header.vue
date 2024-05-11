@@ -10,7 +10,7 @@ import type { IconifyIconOffline } from '@/components/ReIcon'
 import back from '@iconify-icons/ep/back'
 import setting from '@iconify-icons/ep/setting'
 import Emessage from '@iconify-icons/ep/message'
-import { useImageStateStore } from '@/store/imageState'
+import { useImageOperationStateStore } from '@/store/imageOperationState'
 import { onMounted, reactive, ref } from 'vue'
 import downloadImage from '@/layouts/components/imageOperation/downloadImage.vue'
 import { message } from '@/utils/message'
@@ -28,11 +28,11 @@ import {
 } from '@cornerstonejs/core'
 import type { Types } from '@cornerstonejs/core'
 import * as cornerstoneTools from '@cornerstonejs/tools'
-import type { ImageInfo, ImageInfoWindows } from '@/types/image'
+import type { ImageInfo, SeriesInfoWindows } from '@/types/image'
 
 const centerDialogVisible = ref(false)
 
-const imageStateStore = useImageStateStore()
+const imageOperationStateStore =useImageOperationStateStore()
 const { ViewportType } = Enums
 const {
   PanTool,
@@ -50,35 +50,35 @@ const segmentationRepresentationType = ref('Contour')
 const segmentationRepresentationLabelmaps = reactive([])
 
 onMounted(async () => {
-  await addContourSegmentation(imageStateStore.segmentationId + 'Contour')
+  await addContourSegmentation(imageOperationStateStore.segmentationId + 'Contour')
 })
 const centerDialogVisible1 = ref(false)
 
 async function switchSegmentationRepresentation() {
-  const stackViewport: Types.IStackViewport = imageStateStore.viewports[
-    imageStateStore.selectImagesListWindows
+  const stackViewport: Types.IStackViewport = imageOperationStateStore.viewports[
+    imageOperationStateStore.selectSeriesWindows
   ] as Types.IStackViewport
-  const imageInfoWindows = imageStateStore.imagesListWindows[
-    imageStateStore.selectImagesListWindows
-  ] as ImageInfoWindows
+  const seriesInfoWindows = imageOperationStateStore.seriesListWindows[
+    imageOperationStateStore.selectSeriesWindows
+  ] as SeriesInfoWindows
 
-  const segmentationId = imageStateStore.segmentationId + imageInfoWindows.imageInfo.imageId
-  const segmentationContourId = imageStateStore.segmentationId + 'Contour'
+  const segmentationId = imageOperationStateStore.segmentationId + seriesInfoWindows.imageInfo.imageId
+  const segmentationContourId = imageOperationStateStore.segmentationId + 'Contour'
 
   if (segmentationRepresentationType.value === 'Contour') {
     segmentation.state.removeSegmentationRepresentation(
-      imageStateStore.toolGroup.id,
+      imageOperationStateStore.toolGroup.id,
       segmentationContourId
     )
-    imageStateStore.segmentationRepresentationUIDList.delete(segmentationContourId)
+    imageOperationStateStore.segmentationRepresentationUIDList.delete(segmentationContourId)
     segmentationRepresentationType.value = 'Labelmap'
   } else {
     for (const segmentationRepresentationLabelmap of segmentationRepresentationLabelmaps) {
       segmentation.state.removeSegmentationRepresentation(
-        imageStateStore.toolGroup.id,
+        imageOperationStateStore.toolGroup.id,
         segmentationRepresentationLabelmap
       )
-      imageStateStore.segmentationRepresentationUIDList.delete(segmentationRepresentationLabelmap)
+      imageOperationStateStore.segmentationRepresentationUIDList.delete(segmentationRepresentationLabelmap)
     }
     segmentationRepresentationLabelmaps.length = 0
     await addContourSegmentation(segmentationContourId)
@@ -87,15 +87,15 @@ async function switchSegmentationRepresentation() {
 }
 
 async function checkAddStackSegmentation() {
-  const stackViewport: Types.IStackViewport = imageStateStore.viewports[
-    imageStateStore.selectImagesListWindows
+  const stackViewport: Types.IStackViewport = imageOperationStateStore.viewports[
+    imageOperationStateStore.selectSeriesWindows
   ] as Types.IStackViewport
-  const imageInfoWindows = imageStateStore.imagesListWindows[
-    imageStateStore.selectImagesListWindows
-  ] as ImageInfoWindows
+  const seriesInfoWindows = imageOperationStateStore.seriesListWindows[
+    imageOperationStateStore.selectSeriesWindows
+  ] as SeriesInfoWindows
 
-  const segmentationId:string = imageStateStore.segmentationId + imageInfoWindows.imageInfo.imageId
-  const segmentationContourId = imageStateStore.segmentationId + 'Contour'
+  const segmentationId:string = imageOperationStateStore.segmentationId + seriesInfoWindows.imageInfo.imageId
+  const segmentationContourId = imageOperationStateStore.segmentationId + 'Contour'
 
   if (
     stackViewport.getCurrentImageId().endsWith('.png') ||
@@ -106,7 +106,7 @@ async function checkAddStackSegmentation() {
     return
   }
 
-  if (imageStateStore.segmentationRepresentationUIDList.get(segmentationId)) {
+  if (imageOperationStateStore.segmentationRepresentationUIDList.get(segmentationId)) {
     message('该视窗已经是Labelmap分割层。', { type: 'error' })
     return
   } else {
@@ -137,7 +137,7 @@ async function addStackSegmentation(viewport: Types.IStackViewport, segmentation
     ])
   }
   const segmentationRepresentationUID = await segmentation.addSegmentationRepresentations(
-    imageStateStore.toolGroup.id,
+    imageOperationStateStore.toolGroup.id,
     [
       {
         segmentationId,
@@ -145,13 +145,13 @@ async function addStackSegmentation(viewport: Types.IStackViewport, segmentation
       }
     ]
   )
-  cstUtils.segmentation.triggerSegmentationRender(imageStateStore.toolGroup.id)
-  imageStateStore.segmentationRepresentationUIDList.set(
+  cstUtils.segmentation.triggerSegmentationRender(imageOperationStateStore.toolGroup.id)
+  imageOperationStateStore.segmentationRepresentationUIDList.set(
     segmentationId,
     segmentationRepresentationUID[0]
   )
   segmentation.activeSegmentation.setActiveSegmentationRepresentation(
-    imageStateStore.toolGroup.id,
+    imageOperationStateStore.toolGroup.id,
     segmentationRepresentationUID[0]
   )
 }
@@ -170,7 +170,7 @@ async function addContourSegmentation(segmentationId: string) {
   }
   // Create a segmentation representation associated to the toolGroupId
   const segmentationRepresentationUIDs = await segmentation.addSegmentationRepresentations(
-    imageStateStore.toolGroup.id,
+    imageOperationStateStore.toolGroup.id,
     [
       {
         segmentationId,
@@ -178,13 +178,13 @@ async function addContourSegmentation(segmentationId: string) {
       }
     ]
   )
-  cstUtils.segmentation.triggerSegmentationRender(imageStateStore.toolGroup.id)
+  cstUtils.segmentation.triggerSegmentationRender(imageOperationStateStore.toolGroup.id)
   // Make the segmentation created as the active one
   segmentation.activeSegmentation.setActiveSegmentationRepresentation(
-    imageStateStore.toolGroup.id,
+    imageOperationStateStore.toolGroup.id,
     segmentationRepresentationUIDs[0]
   )
-  imageStateStore.segmentationRepresentationUIDList.set(
+  imageOperationStateStore.segmentationRepresentationUIDList.set(
     segmentationId,
     segmentationRepresentationUIDs[0]
   )
@@ -192,31 +192,31 @@ async function addContourSegmentation(segmentationId: string) {
 
 function removeStackSegmentation(segmentationId: string) {
   // segmentation.state.removeSegmentationRepresentation(
-  //   imageStateStore.toolGroup.id,
-  //   imageStateStore.segmentationRepresentationUIDList[imageStateStore.selectImagesListWindows]
+  //   imageOperationStateStore.toolGroup.id,
+  //   imageOperationStateStore.segmentationRepresentationUIDList[imageOperationStateStore.selectSeriesWindows]
   // )
-  segmentation.state.removeSegmentationRepresentations(imageStateStore.toolGroup.id)
+  segmentation.state.removeSegmentationRepresentations(imageOperationStateStore.toolGroup.id)
   segmentation.state.removeSegmentation(segmentationId)
 }
 
 // async function switchStackViewportToVolumeViewport() {
 //   if (
 //     !segmentation.state.getSegmentation(
-//       imageStateStore.segmentationId + imageStateStore.selectImagesListWindows
+//       imageOperationStateStore.segmentationId + imageOperationStateStore.selectSeriesWindows
 //     )
 //   ) {
 //     await addStackSegmentation(
-//       imageStateStore.viewports[imageStateStore.selectImagesListWindows] as Types.IStackViewport,
-//       imageStateStore.segmentationId + imageStateStore.selectImagesListWindows
+//       imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows] as Types.IStackViewport,
+//       imageOperationStateStore.segmentationId + imageOperationStateStore.selectSeriesWindows
 //     )
 //   }
 
-//   const segmentationId = imageStateStore.segmentationId + imageStateStore.selectImagesListWindows
-//   const viewport = imageStateStore.viewports[imageStateStore.selectImagesListWindows]
+//   const segmentationId = imageOperationStateStore.segmentationId + imageOperationStateStore.selectSeriesWindows
+//   const viewport = imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]
 //   let newViewport: Types.IVolumeViewport | Types.IStackViewport
 //   console.log(viewport.type)
 //   if (viewport.type === ViewportType.STACK) {
-//     const volumeId = 'cornerstoneStreamingImageVolume' + imageStateStore.selectImagesListWindows
+//     const volumeId = 'cornerstoneStreamingImageVolume' + imageOperationStateStore.selectSeriesWindows
 //     console.log(volumeId)
 //     newViewport = (await csUtils.convertStackToVolumeViewport({
 //       viewport: viewport as Types.IStackViewport,
@@ -226,31 +226,31 @@ function removeStackSegmentation(segmentationId: string) {
 //       }
 //     })) as Types.IVolumeViewport
 
-//     if (imageStateStore.toolGroup) {
-//       imageStateStore.toolGroup.addViewport(newViewport.id, imageStateStore.renderingEngine.id)
+//     if (imageOperationStateStore.toolGroup) {
+//       imageOperationStateStore.toolGroup.addViewport(newViewport.id, imageOperationStateStore.renderingEngine.id)
 //     }
 //     await segmentation.convertStackToVolumeSegmentation({
 //       segmentationId,
 //       options: {
-//         toolGroupId: imageStateStore.toolGroup.id,
+//         toolGroupId: imageOperationStateStore.toolGroup.id,
 //         volumeId: volumeId
 //       }
 //     })
-//     if (imageStateStore.toolGroup) {
-//       imageStateStore.toolGroup.addViewport(newViewport.id, imageStateStore.renderingEngine.id)
+//     if (imageOperationStateStore.toolGroup) {
+//       imageOperationStateStore.toolGroup.addViewport(newViewport.id, imageOperationStateStore.renderingEngine.id)
 //     }
 //     console.log(cache.getVolume(volumeId))
 //   } else {
 //     // await segmentation.state.removeSegmentationRepresentation(
-//     //   imageStateStore.toolGroup.id,
-//     //   imageStateStore.segmentationRepresentationUIDList[imageStateStore.selectImagesListWindows]
+//     //   imageOperationStateStore.toolGroup.id,
+//     //   imageOperationStateStore.segmentationRepresentationUIDList[imageOperationStateStore.selectSeriesWindows]
 //     // )
-//     segmentation.state.removeSegmentationRepresentations(imageStateStore.toolGroup.id)
+//     segmentation.state.removeSegmentationRepresentations(imageOperationStateStore.toolGroup.id)
 //     setTimeout(async () => {
 //       segmentation.convertVolumeToStackSegmentation({
 //         segmentationId,
 //         options: {
-//           toolGroupId: imageStateStore.toolGroup.id
+//           toolGroupId: imageOperationStateStore.toolGroup.id
 //         }
 //       })
 
@@ -262,12 +262,12 @@ function removeStackSegmentation(segmentationId: string) {
 //       })) as Types.IStackViewport
 
 //       // Set the tool group on the viewport
-//       if (imageStateStore.toolGroup) {
-//         imageStateStore.toolGroup.addViewport(newViewport.id, imageStateStore.renderingEngine.id)
+//       if (imageOperationStateStore.toolGroup) {
+//         imageOperationStateStore.toolGroup.addViewport(newViewport.id, imageOperationStateStore.renderingEngine.id)
 //       }
-//       imageStateStore.viewports[imageStateStore.selectImagesListWindows] = newViewport
+//       imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows] = newViewport
 //     }, 1000)
-//     // cache.getVolume('cornerstoneStreamingImageVolume' + imageStateStore.selectImagesListWindows).destroy()
+//     // cache.getVolume('cornerstoneStreamingImageVolume' + imageOperationStateStore.selectSeriesWindows).destroy()
 //   }
 // }
 </script>
@@ -277,7 +277,7 @@ function removeStackSegmentation(segmentationId: string) {
     class="flex justify-between w-full h-10 border border-t-0 border-gray-200 border-solid shadow-md border-x-0 dark:border-gray-700 dark:bg-gray-800"
   >
     <div class="flex flex-wrap items-center justify-center h-10 gap-1 pl-2">
-      <el-button text @click="router.push('/image')">
+      <el-button text @click="router.go(-1)">
         <template #icon>
           <IconifyIconOffline :icon="back"></IconifyIconOffline>
         </template>
@@ -368,3 +368,4 @@ function removeStackSegmentation(segmentationId: string) {
 </template>
 
 <style lang="scss" scoped></style>
+@/store/imageOperationState

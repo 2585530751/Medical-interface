@@ -7,7 +7,7 @@ export default {
     children: [
         {
             path: "/model/index",
-            name: "模型卡片",
+            name: "ModelTable",
             component: () => import("@/views/model/index.vue"),
             meta: {
                 title: "模型卡片"
@@ -15,7 +15,7 @@ export default {
         },
         {
             path: "/model/modelDescription",
-            name: "modeldescription",
+            name: "ModelDescription",
             component: () => import('@/layouts/components/model/modelDescription.vue'),
             meta: {
                 title: "modeldescription"

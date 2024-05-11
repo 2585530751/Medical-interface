@@ -1,9 +1,9 @@
 import * as cornerstoneTools from '@cornerstonejs/tools'
 import type IToolGroup from '@cornerstonejs/tools/src/types/IToolGroup'
-import { useImageStateStore } from '@/store/imageState'
+import {useImageOperationStateStore } from '@/store/imageOperationState'
 import { volumeLoader } from '@cornerstonejs/core'
 
-const imageStateStore = useImageStateStore()
+const imageOperationStateStore =useImageOperationStateStore()
 const {
   Synchronizer,
   segmentation,
@@ -162,7 +162,7 @@ async function createTools(segmentationId: string = '', volumeId: string = '') {
 
   // Define a tool group, which defines how mouse events map to tool commands for
   // Any viewport using the group
-  const toolGroup = imageStateStore.toolGroup
+  const toolGroup = imageOperationStateStore.toolGroup
 
   // Add the tools to the tool group
   // toolGroup.addTool(AnnotationDisplayTool.toolName)
@@ -370,8 +370,8 @@ async function createTools(segmentationId: string = '', volumeId: string = '') {
 
   // toolGroup!.addViewport(viewportId, renderingEngineId)
 
-  imageStateStore.leftMouseActive = ArrowAnnotateTool.toolName
-  imageStateStore.bindLeftMouse(LengthTool.toolName)
+  imageOperationStateStore.leftMouseActive = ArrowAnnotateTool.toolName
+  imageOperationStateStore.bindLeftMouse(LengthTool.toolName)
 }
 
 export default createTools

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ImageInfoWindows, SingleImage } from '@/types/image'
+import type { SeriesInfoWindows, SingleImage } from '@/types/image'
 import { initDemo } from '@/utils/helpers/index.js'
 import registerWebImageLoader from '@/utils/helpers/registerWebImageLoader'
 import hardcodedMetaDataProvider from '@/utils/helpers//hardcodedMetaDataProvider'
@@ -20,25 +20,26 @@ import {
   volumeLoader,
   cache
 } from '@cornerstonejs/core'
-import { useImageStateStore } from '@/store/imageState'
+import { useImageOperationStateStore } from '@/store/imageOperationState'
 import { message } from '@/utils/message'
+import type { SeriesInfo,ImageInfo } from '@/types/series'
 
 defineOptions({
   name: 'stackViewPortWindows'
 })
 const props = defineProps<{
-  imagesInfoWindows: ImageInfoWindows | 0
+  imagesInfoWindows: SeriesInfoWindows | 0
   index: number
 }>()
 const imageIds: string[] = []
 const { ViewportType } = Enums
-const imageStateStore = useImageStateStore()
+const imageOperationStateStore =useImageOperationStateStore()
 let elementId = ref('cornerstone-element-' + props.index)
 const viewportId = 'stackViewPort' + props.index
-const renderingEngine = imageStateStore.renderingEngine
+const renderingEngine = imageOperationStateStore.renderingEngine
 let colorbarContainerId = ref('colorbarContainer' + props.index)
 var segmentationId = ''
-const segmentationContourId = imageStateStore.segmentationId + 'Contour'
+const segmentationContourId = imageOperationStateStore.segmentationId + 'Contour'
 const checkLabelmapSegmentationToolName = [
   'CircularBrush',
   'CircularEraser',
@@ -72,7 +73,7 @@ watch(
   (newValue, oldValue) => {
     if (oldValue !== 0) {
       if (JSON.stringify(newValue) != JSON.stringify(oldValue) && newValue != 0) {
-        imageStateStore.viewportColorbar[props.index].destroy()
+        imageOperationStateStore.viewportColorbar[props.index].destroy()
         renderingEngine.disableElement(viewportId)
         imageIds.length = 0
         renderStackViewport()
@@ -90,19 +91,19 @@ watch(
 function constructImagesId() {
   var singleImageIndex = 0
   if (props.imagesInfoWindows != 0) {
-    const temporarySingleImage = props.imagesInfoWindows.singleImage
-    props.imagesInfoWindows.imageInfo.singleImageList.forEach((item: SingleImage) => {
-      var temporarySingleImagePath
+    const temporarySingleImage = props.imagesInfoWindows.imageInfo
+    props.imagesInfoWindows.seriesInfo.imageList.forEach((item: ImageInfo) => {
+      var temporaryimagePath
       if (item.modelType === 'model') {
-        temporarySingleImagePath = generateImageUrl(
+        temporaryimagePath = generateImageUrl(
           item.singleImageModelData.modelResultPath
         ) as string
       } else {
-        temporarySingleImagePath = generateImageUrl(item.singleImagePath) as string
+        temporaryimagePath = generateImageUrl(item.imagePath) as string
       }
-      imageKeyValueStore.set(temporarySingleImagePath, item)
-      imageIds.push(temporarySingleImagePath)
-      if (temporarySingleImage && temporarySingleImage.singleImageId === item.singleImageId) {
+      imageKeyValueStore.set(temporaryimagePath, item)
+      imageIds.push(temporaryimagePath)
+      if (temporarySingleImage && temporarySingleImage.imageId === item.imageId) {
         singleImageIndex = imageIds.length - 1
       }
     })
@@ -110,29 +111,29 @@ function constructImagesId() {
   return singleImageIndex
 }
 
-async function selectImagesListWindows(event: Event) {
-  imageStateStore.selectImagesListWindows = props.index
+async function selectSeriesWindowsClick(event: Event) {
+  imageOperationStateStore.selectSeriesWindows = props.index
   if (props.imagesInfoWindows != 0) {
-    if (checkLabelmapSegmentationToolName.includes(imageStateStore.leftMouseActive)) {
-      if (imageStateStore.segmentationRepresentationUIDList.get(segmentationId)) {
+    if (checkLabelmapSegmentationToolName.includes(imageOperationStateStore.leftMouseActive)) {
+      if (imageOperationStateStore.segmentationRepresentationUIDList.get(segmentationId)) {
         console.log(segmentation.state.getSegmentationIdRepresentations(segmentationId))
         console.log(
-          imageStateStore.segmentationRepresentationUIDList.get(
-            imageStateStore.segmentationId + props.imagesInfoWindows.imageInfo.imageId
+          imageOperationStateStore.segmentationRepresentationUIDList.get(
+            imageOperationStateStore.segmentationId + props.imagesInfoWindows.imageInfo.imageId
           )
         )
         console.log(
-          segmentation.activeSegmentation.getActiveSegmentation(imageStateStore.toolGroup.id)
+          segmentation.activeSegmentation.getActiveSegmentation(imageOperationStateStore.toolGroup.id)
         )
-        console.log(segmentation.state.getSegmentationRepresentations(imageStateStore.toolGroup.id))
+        console.log(segmentation.state.getSegmentationRepresentations(imageOperationStateStore.toolGroup.id))
       } else {
         message('未添加Labelmap分割层，无需使用该分割工具。', { type: 'error' })
         event.preventDefault()
         event.stopPropagation()
       }
     }
-    if (checkContourSegmentationToolName.includes(imageStateStore.leftMouseActive)) {
-      if (!imageStateStore.segmentationRepresentationUIDList.get(segmentationContourId)) {
+    if (checkContourSegmentationToolName.includes(imageOperationStateStore.leftMouseActive)) {
+      if (!imageOperationStateStore.segmentationRepresentationUIDList.get(segmentationContourId)) {
         message('未切换为Contour分割层，无需使用该分割工具。', { type: 'error' })
         event.preventDefault()
         event.stopPropagation()
@@ -143,37 +144,37 @@ async function selectImagesListWindows(event: Event) {
 
 async function handleMouseEnter() {
   if (props.imagesInfoWindows != 0) {
-    if (checkLabelmapSegmentationToolName.includes(imageStateStore.leftMouseActive)) {
-      if (imageStateStore.segmentationRepresentationUIDList.get(segmentationId)) {
+    if (checkLabelmapSegmentationToolName.includes(imageOperationStateStore.leftMouseActive)) {
+      if (imageOperationStateStore.segmentationRepresentationUIDList.get(segmentationId)) {
         const segmentationRepresentationUID =
-          imageStateStore.segmentationRepresentationUIDList.get(segmentationId)
+          imageOperationStateStore.segmentationRepresentationUIDList.get(segmentationId)
         await segmentation.activeSegmentation.setActiveSegmentationRepresentation(
-          imageStateStore.toolGroup.id,
+          imageOperationStateStore.toolGroup.id,
           segmentationRepresentationUID
         )
-        cstUtils.segmentation.triggerSegmentationRender(imageStateStore.toolGroup.id)
+        cstUtils.segmentation.triggerSegmentationRender(imageOperationStateStore.toolGroup.id)
       } else {
-        imageStateStore.toolGroup.setToolPassive(imageStateStore.leftMouseActive)
+        imageOperationStateStore.toolGroup.setToolPassive(imageOperationStateStore.leftMouseActive)
       }
     }
   }
-  if (checkContourSegmentationToolName.includes(imageStateStore.leftMouseActive)) {
-    if (imageStateStore.segmentationRepresentationUIDList.get(segmentationContourId)) {
+  if (checkContourSegmentationToolName.includes(imageOperationStateStore.leftMouseActive)) {
+    if (imageOperationStateStore.segmentationRepresentationUIDList.get(segmentationContourId)) {
       const segmentationRepresentationUID =
-        imageStateStore.segmentationRepresentationUIDList.get(segmentationContourId)
+        imageOperationStateStore.segmentationRepresentationUIDList.get(segmentationContourId)
       await segmentation.activeSegmentation.setActiveSegmentationRepresentation(
-        imageStateStore.toolGroup.id,
+        imageOperationStateStore.toolGroup.id,
         segmentationRepresentationUID
       )
-      cstUtils.segmentation.triggerSegmentationRender(imageStateStore.toolGroup.id)
+      cstUtils.segmentation.triggerSegmentationRender(imageOperationStateStore.toolGroup.id)
     } else {
-      imageStateStore.toolGroup.setToolPassive(imageStateStore.leftMouseActive)
+      imageOperationStateStore.toolGroup.setToolPassive(imageOperationStateStore.leftMouseActive)
     }
   }
 }
 
 function handleMouseLeave() {
-  imageStateStore.toolGroup.setToolActive(imageStateStore.leftMouseActive, {
+  imageOperationStateStore.toolGroup.setToolActive(imageOperationStateStore.leftMouseActive, {
     bindings: [
       {
         mouseButton: csToolsEnums.MouseBindings.Primary // Left Click
@@ -191,7 +192,7 @@ async function renderStackViewport() {
   if (props.imagesInfoWindows != 0) {
     const element: HTMLDivElement = document.getElementById(elementId.value) as HTMLDivElement
     const singleImageIndex = constructImagesId()
-    var viewport = getRenderingEngine(imageStateStore.renderingEngine.id)!.getViewport(
+    var viewport = getRenderingEngine(imageOperationStateStore.renderingEngine.id)!.getViewport(
       viewportId
     ) as Types.IStackViewport
     if (!viewport) {
@@ -213,8 +214,8 @@ async function renderStackViewport() {
         elementId.value,
         colorbarContainerId.value
       )
-      imageStateStore.viewportColorbar[props.index] = colorbar
-      imageStateStore.toolGroup.addViewport(viewportId, renderingEngine.id)
+      imageOperationStateStore.viewportColorbar[props.index] = colorbar
+      imageOperationStateStore.toolGroup.addViewport(viewportId, renderingEngine.id)
       // 创建一个新的 ResizeObserver 实例
       let ro = new ResizeObserver((entries) => {
         setTimeout(() => {
@@ -231,8 +232,8 @@ async function renderStackViewport() {
     await viewport.setStack(imageIds, singleImageIndex)
     viewport.render()
     cstUtils.stackContextPrefetch.enable(viewport.element)
-    imageStateStore.viewports[props.index] = viewport
-    segmentationId = imageStateStore.segmentationId + props.imagesInfoWindows.imageInfo.imageId
+    imageOperationStateStore.viewports[props.index] = viewport
+    segmentationId = imageOperationStateStore.segmentationId + props.imagesInfoWindows.imageInfo.imageId
   }
 }
 </script>
@@ -240,12 +241,12 @@ async function renderStackViewport() {
 <template>
   <div
     class="flex justify-between border-stone-200"
-    :class="{ highlighted: imageStateStore.selectImagesListWindows === props.index }"
+    :class="{ highlighted: imageOperationStateStore.selectSeriesWindows === props.index }"
   >
     <div
       :id="elementId"
       class="w-full h-full"
-      @click="selectImagesListWindows"
+      @click="selectSeriesWindowsClick"
       @mouseenter="handleMouseEnter"
       @mouseleave="handleMouseLeave"
       @mousemove="null"
@@ -268,3 +269,4 @@ async function renderStackViewport() {
   cursor: initial;
 }
 </style>
+@/store/imageOperationState
