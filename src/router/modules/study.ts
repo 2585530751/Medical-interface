@@ -12,6 +12,14 @@ export default {
         meta: {
           title: "检查列表"
         }
+      },
+      {
+        path: "/study/myPatientStudy",
+        name: "MyPatientStudyTable",
+        component: () => import("@/views/study/myPatientStudy.vue"),
+        meta: {
+          title: "我的检查"
+        }
       }
     ]
   } as RouteConfigsTable;

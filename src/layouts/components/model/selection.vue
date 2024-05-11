@@ -5,6 +5,7 @@ import arrowUp from '@iconify-icons/ep/arrow-up'
 import { reactive, ref } from 'vue'
 import modelUpload from '@/layouts/components/model/modelUpload.vue'
 import { basicImageUrl } from '@/api/utils'
+import type{ ModelInfo } from '@/types/model'
 import 'animate.css'
 
 const props = defineProps<{
@@ -76,7 +77,7 @@ function uploadModelList(modelInfo: ModelInfo) {
 </script>
 
 <template>
-  <div class="container w-2/3 mx-auto">
+  <div class="container w-5/6 p-8 mx-auto bg-zinc-50 rounded-2xl dark:bg-zinc-900">
     <div class="flex justify-between h-10">
       <div class="text-xl">算法模型</div>
       <div class="flex items-center justify-center gap-5">
@@ -90,20 +91,20 @@ function uploadModelList(modelInfo: ModelInfo) {
     <div class="relative h-2 bottom-3"><el-divider border-style="dashed" /></div>
     <Transition name="zoom">
       <div v-if="collapsed">
-        <div class="space-y-4 overflow-x-auto">
+        <div class="p-2 space-y-4 overflow-x-auto">
           <div
             v-for="(item, key) in selectedList"
             :key="key"
             class="flex text-gray-600 flex-nowrap dark:text-gray-200"
           >
             <div class="w-20">
-              <a class="cursor-pointer">{{ item.name }}:</a>
+              <a class="cursor-pointer whitespace-nowrap">{{ item.name }}:</a>
             </div>
             <div class="flex w-full gap-8">
               <a
                 v-for="(value, index) in item.value"
                 :key="index"
-                class="cursor-pointer"
+                class="cursor-pointer whitespace-nowrap"
                 :class="{ selected: selectedOption[key] === value }"
                 @click="selectedOption[key] = value,emits('emitSelectedOption', selectedOption)"
                 >{{ value }}</a

@@ -1,4 +1,4 @@
-interface ModelInfo {
+export interface ModelInfo {
     modelId: number
     modelName: string
     modelPattern: string

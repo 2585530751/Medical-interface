@@ -3,7 +3,7 @@ import { RouterLink } from 'vue-router'
 import { getAllModelsInfoApi } from '@/api/model'
 import { watch, onMounted, ref } from 'vue'
 import { basicImageUrl } from '@/api/utils'
-import { ModelInfo } from '@/types/model'
+import type{ ModelInfo } from '@/types/model'
 
 defineOptions({
   name: 'card'
@@ -68,8 +68,12 @@ watch(
 <template>
   <section class="text-gray-600 body-font">
     <div class="container px-5 py-24 mx-auto">
-      <div class="flex flex-wrap items-center justify-evenly">
-        <div v-for="(modelInfo, index) in modelInfoLists" :key="index" class="p-4 md:w-1/4">
+      <div class="grid grid-cols-3 gap-4">
+        <div
+          v-for="(modelInfo, index) in modelInfoLists"
+          :key="index"
+          class="w-4/5 p-8 rounded-2xl bg-slate-50 dark:bg-slate-800"
+        >
           <div class="h-full overflow-hidden border-2 border-gray-200 rounded-lg border-opacity-60">
             <img
               class="object-cover object-center w-full lg:h-48 md:h-36"
@@ -87,13 +91,10 @@ watch(
                 {{ modelInfo.modelAbstract }}
               </p>
               <div class="flex flex-wrap items-center">
-                <a class="flex items-center text-indigo-500 md:mb-2 lg:mb-0">
-                  <router-link
-                    class="flex items-center"
-                    :to="{ path: '/model/modelDescription', query: { modelId: modelInfo.modelId } }"
-                    >了解详情</router-link
-                  >
-                  <svg
+                <router-link
+                  class="flex items-center text-blue-400 no-underline md:mb-2 lg:mb-0"
+                  :to="{ path: '/model/modelDescription', query: { modelId: modelInfo.modelId } }"
+                  >了解详情<svg
                     class="w-4 h-4 ml-2"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -103,9 +104,9 @@ watch(
                     stroke-linejoin="round"
                   >
                     <path d="M5 12h14"></path>
-                    <path d="M12 5l7 7-7 7"></path>
-                  </svg>
-                </a>
+                    <path d="M12 5l7 7-7 7"></path></svg
+                ></router-link>
+
                 <span
                   class="inline-flex items-center py-1 pr-3 ml-auto mr-3 text-sm leading-none text-gray-400 border-r-2 border-gray-200 lg:ml-auto md:ml-0"
                 >

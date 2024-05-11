@@ -13,3 +13,17 @@ export const getStudySeriesPageApi = (data?: object) => {
     }
   )
 }
+
+export const getUserPatientStudySeriesPage = (data?: object) => {
+  return http.request<any>(
+    'post',
+    baseUrlApi('study/getUserPatientStudySeriesPage'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  )
+}
+

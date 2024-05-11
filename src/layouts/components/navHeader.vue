@@ -77,7 +77,7 @@ const errorHandler = () => {
       <el-menu-item index="/series">序列管理</el-menu-item>
     </role-permission>
     <role-permission :value="['patient']">
-      <el-menu-item index="/study/myStudy">我的检查</el-menu-item>
+      <el-menu-item index="/study/myPatientStudy">我的检查</el-menu-item>
     </role-permission>
     <role-permission :value="[]">
       <el-menu-item index="/image">图像管理</el-menu-item>

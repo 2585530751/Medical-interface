@@ -161,7 +161,7 @@ function refreshTable() {
             <template #dropdown>
               <el-dropdown-menu>
                 <el-dropdown-item @click="$emit('changeTableSize', 'small')">紧凑</el-dropdown-item>
-                <el-dropdown-item @click="$emit('changeTableSize', 'defult')"
+                <el-dropdown-item @click="$emit('changeTableSize', 'default')"
                   >默认</el-dropdown-item
                 >
                 <el-dropdown-item @click="$emit('changeTableSize', 'large')">宽松</el-dropdown-item>

@@ -10,7 +10,7 @@ import rank from '@iconify-icons/ep/rank'
 import {  setAllPropertiesToNull } from '@/utils/commonUtils'
 import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
-import { useStudyStateStore } from '@/store/modules/studyState'
+import { useMyPatientStudyStateStore } from '@/store/modules/myPatientStudyState'
 
 defineOptions({
   name: 'studySelection'
@@ -21,14 +21,14 @@ const emits = defineEmits<{
   changeTableCols: [cols: string[]]
 }>()
 
-const studyStateStore = useStudyStateStore()
+const myPatientStudyStateStore = useMyPatientStudyStateStore()
 
 const filterSelect = ref('studyDate')
 const filterSearch = ref('')
 
 const visible = ref(false)
 
-const studyForm: Record<string, any> = reactive({
+const myPatientStudyForm: Record<string, any> = reactive({
   studyDate: null,
   studyTime: null,
   patientAge: null,
@@ -59,29 +59,28 @@ const handleCheckedColsChange = (value: string[]) => {
 }
 
 function singleConditionSearch() {
-  setAllPropertiesToNull(studyStateStore.studyFilterCriteria)
-  studyStateStore.studyFilterCriteria[filterSelect.value] = filterSearch.value
-  studyStateStore.studyPagination.currentPage = 1
-  studyStateStore.getStudyListPage()
+  setAllPropertiesToNull(myPatientStudyStateStore.myPatientStudyFilterCriteria)
+  myPatientStudyStateStore.myPatientStudyFilterCriteria[filterSelect.value] = filterSearch.value
+  myPatientStudyStateStore.myPatientStudyPagination.currentPage = 1
+  myPatientStudyStateStore.getMyPatientStudyListPage()
 }
 
 function conditionalFilter() {
-  setAllPropertiesToNull(studyStateStore.studyFilterCriteria)
-  for (const key in studyForm) {
-    if (studyForm.hasOwnProperty(key) && studyForm[key] !== null) {
+  setAllPropertiesToNull(myPatientStudyStateStore.myPatientStudyFilterCriteria)
+  for (const key in myPatientStudyForm) {
+    if (myPatientStudyForm.hasOwnProperty(key) && myPatientStudyForm[key] !== null) {
       // 确保属性是对象自身的，而不是原型链上的
-      studyStateStore.studyFilterCriteria[key] = studyForm[key] // 将属性和值复制到目标对象
+      myPatientStudyStateStore.myPatientStudyFilterCriteria[key] = myPatientStudyForm[key] // 将属性和值复制到目标对象
     }
   }
-  studyStateStore.studyPagination.currentPage = 1
-  studyStateStore.getStudyListPage()
+  myPatientStudyStateStore.myPatientStudyPagination.currentPage = 1
+  myPatientStudyStateStore.getMyPatientStudyListPage()
 }
 
 function refreshTable() {
-  setAllPropertiesToNull(studyStateStore.studyFilterCriteria)
-  studyStateStore.studyPatientId=null
-  studyStateStore.studyPagination.currentPage = 1
-  studyStateStore.getStudyListPage()
+  setAllPropertiesToNull(myPatientStudyStateStore.myPatientStudyFilterCriteria)
+  myPatientStudyStateStore.myPatientStudyPagination.currentPage = 1
+  myPatientStudyStateStore.getMyPatientStudyListPage()
 }
 </script>
 
@@ -90,7 +89,7 @@ function refreshTable() {
     <template #header>
       <div class="flex items-center justify-between">
         <div class="flex flex-wrap items-center gap-4 w-30 h-14">
-          <a class="text-2xl font-medium tracking-wide text-gray-600">检查列表</a>
+          <a class="text-2xl font-medium tracking-wide text-gray-600">我的检查</a>
         </div>
 
         <div class="flex flex-wrap items-center gap-5 w-30 h-14">
@@ -194,11 +193,11 @@ function refreshTable() {
     </div>
   </el-card>
   <el-drawer v-model="visible" title="高级筛选">
-    <el-form :model="studyForm" label-width="120px">
+    <el-form :model="myPatientStudyForm" label-width="120px">
       <el-form-item label="检查日期">
         <el-col :span="11">
           <el-date-picker
-            v-model="studyForm.dateOfStudyBegin"
+            v-model="myPatientStudyForm.dateOfStudyBegin"
             type="date"
             placeholder="请选择日期范围"
             style="width: 100%"
@@ -209,38 +208,38 @@ function refreshTable() {
         </el-col>
         <el-col :span="11">
           <el-date-picker
-            v-model="studyForm.dateOfStudyEnd"
+            v-model="myPatientStudyForm.dateOfStudyEnd"
             placeholder="请选择日期范围"
             style="width: 100%"
           />
         </el-col>
       </el-form-item>
       <el-form-item label="检查时间">
-        <el-input v-model="studyForm.studyTimebegin" />
+        <el-input v-model="myPatientStudyForm.studyTimebegin" />
       </el-form-item>
       <el-form-item label="患者年龄">
         <el-col :span="11">
-          <el-input v-model="studyForm.patientAgeBegin" />
+          <el-input v-model="myPatientStudyForm.patientAgeBegin" />
         </el-col>
         <el-col :span="2" class="text-center">
           <span class="text-gray-500">-</span>
         </el-col>
         <el-col :span="11">
-          <el-input v-model="studyForm.patientAgeEnd" />
+          <el-input v-model="myPatientStudyForm.patientAgeEnd" />
         </el-col>
       </el-form-item>
       <el-form-item label="检查次序">
-        <el-input v-model="studyForm.accessionNumber" />
+        <el-input v-model="myPatientStudyForm.accessionNumber" />
       </el-form-item>
       <el-form-item label="检查部位">
-        <el-input v-model="studyForm.bodyPartExamined" />
+        <el-input v-model="myPatientStudyForm.bodyPartExamined" />
       </el-form-item>
       <el-form-item label="检查描述">
-        <el-input v-model="studyForm.studyDescription" />
+        <el-input v-model="myPatientStudyForm.studyDescription" />
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="conditionalFilter">查询</el-button>
-        <el-button @click="setAllPropertiesToNull(studyForm)">清空</el-button>
+        <el-button @click="setAllPropertiesToNull(myPatientStudyForm)">清空</el-button>
       </el-form-item>
     </el-form>
   </el-drawer>
