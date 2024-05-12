@@ -9,7 +9,7 @@ import rolePermission from '@/components/rolePermission.vue'
 import { isLoggedIn, checkAuthStatus } from '@/utils/auth'
 import { useUserStoreHook } from '@/store/modules/user'
 import { getHeadIconApi } from '@/api/user'
-import { basicImageUrl, serverUrl, emptyImageUrl } from '@/api/utils'
+import { basicImageUrl } from '@/api/utils'
 
 const activeIndex = ref('')
 const imageUrl = ref('')
@@ -31,7 +31,7 @@ function getHeadIcon() {
 }
 
 const errorHandler = () => {
-  imageUrl.value = serverUrl + emptyImageUrl
+  imageUrl.value = '/images/emptyAvatar.jpg'
 }
 </script>
 

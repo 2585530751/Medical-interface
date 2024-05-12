@@ -6,7 +6,14 @@ import { usePatientStateStore } from '@/store/modules/patientState'
 
 const patientStateStore = usePatientStateStore()
 const tableSize = ref('default')
-const tableCols = ref(['姓名', '性别', '电话', '邮箱', '住址', '出生日期'])
+const tableCols = ref([
+  'patientName',
+  'patientGender',
+  'phoneNumber',
+  'email',
+  'address',
+  'dateOfBirth'
+])
 
 const handleSizeChange = (val: number) => {
   patientStateStore.patientPagination.pageSize = val

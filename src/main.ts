@@ -8,7 +8,7 @@ import BaiduMap from 'vue-baidu-map-3x'
 import ElementPlus from 'element-plus'
 import 'element-plus/dist/index.css'
 import '@/styles/tailwind.css'
-
+import { initDemo } from '@/utils/helpers/index.js'
 //dark mode
 import '@/styles/index.scss'
 
@@ -23,6 +23,8 @@ app.use(BaiduMap, {
   // v:'2.0',  // 默认使用3.0
   // type: 'WebGL' // ||API 默认API  (使用此模式 BMap=BMapGL)
 })
+
+initDemo()
 app.mount('#app')
 
 // 全局注册`@iconify/vue`图标�?

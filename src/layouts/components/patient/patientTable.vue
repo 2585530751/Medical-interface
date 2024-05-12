@@ -98,9 +98,9 @@ function viewSerieslistByStudyId(studyId: number) {
           </div>
         </template>
       </el-table-column>
-      <el-table-column v-if="props.tableCols.includes('姓名')" label="姓名" prop="patientName" />
+      <el-table-column v-if="props.tableCols.includes('patientName')" label="姓名" prop="patientName" />
       <el-table-column
-        v-if="props.tableCols.includes('性别')"
+        v-if="props.tableCols.includes('patientGender')"
         label="性别"
         prop="patientGender"
         :filters="[
@@ -110,18 +110,18 @@ function viewSerieslistByStudyId(studyId: number) {
         :filter-method="filterGender"
         filter-placement="top-end"
       />
-      <el-table-column label="电话" v-if="props.tableCols.includes('电话')" prop="phoneNumber" />
-      <el-table-column label="邮箱" v-if="props.tableCols.includes('邮箱')" prop="email" />
-      <el-table-column label="住址" v-if="props.tableCols.includes('住址')" prop="address" />
-      <el-table-column label="身高" v-if="props.tableCols.includes('身高')" prop="patientHeight" />
-      <el-table-column label="体重" v-if="props.tableCols.includes('体重')" prop="patientWeight" />
+      <el-table-column label="电话" v-if="props.tableCols.includes('phoneNumber')" prop="phoneNumber" />
+      <el-table-column label="邮箱" v-if="props.tableCols.includes('email')" prop="email" />
+      <el-table-column label="住址" v-if="props.tableCols.includes('address')" prop="address" />
+      <el-table-column label="身高" v-if="props.tableCols.includes('patientHeight')" prop="patientHeight" />
+      <el-table-column label="体重" v-if="props.tableCols.includes('patientWeight')" prop="patientWeight" />
       <el-table-column
         label="身份证号"
-        v-if="props.tableCols.includes('身份证号')"
+        v-if="props.tableCols.includes('patientIdCardNumber')"
         prop="patientIdCardNumber"
       />
       <el-table-column
-        v-if="props.tableCols.includes('出生日期')"
+        v-if="props.tableCols.includes('dateOfBirth')"
         sortable
         label="出生日期"
         prop="dateOfBirth"

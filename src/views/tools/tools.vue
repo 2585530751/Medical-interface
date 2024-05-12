@@ -1,15 +1,6 @@
 ﻿<script setup lang='ts'>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted ,reactive} from 'vue'
 import { Search } from '@element-plus/icons-vue'
-//通过toolId获取相应的Excel文件
-import { getExcelByToolIdApi} from '@/api/user'
-function getExcelByToolId(value:any){
-    getExcelByToolIdApi(value).then((data)=>{
-          console.log(data)
-    })
-}
-
-
 //定义点击按钮跳转到相应界面
 function scrollToTarget(target: any) {
     const targetPosition = document.getElementById(target)?.offsetTop;
@@ -61,19 +52,20 @@ const loadAll = () => {
 }
 onMounted(() => {
   restaurants.value = loadAll()
-  getExcelByToolId(toolId)
+  
 })
 //下面使用上一个界面传来的文件路径参数
 import { useRoute } from 'vue-router';
 const param = useRoute();  
-const toolId = param.query.route;         //routeValue就是上一个界面的值
+const toolRoute = param.query.toolRoute;         //routeValue就是上一个界面的值
 
 //实现router-link局部切换
 import { shallowRef } from 'vue'
-import dataEditing from "@/views/tools/dataEditing.vue"
-var currentComp = shallowRef(dataEditing)
-
-function changeCurrentComp(comp: any): void {
+import dataEditing from "@/views/tools/1_1_dataEditing.vue"
+import  preferenceMatching from "@/views/tools/1_2_preferenceMatching.vue"
+import { basicImageUrl } from '@/api/utils'
+var currentComp = shallowRef(dataEditing)    //右端界面初始界面
+function changeCurrentComp(comp: any): void {    //右端界面切换
   currentComp.value = comp
 }
 </script>
@@ -100,7 +92,7 @@ function changeCurrentComp(comp: any): void {
                     <button  @click="changeCurrentComp(dataEditing)"
                         class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">1.数据编辑
                     </button>
-                    <button @click=""
+                    <button @click="changeCurrentComp(preferenceMatching)"
                         class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">2.倾向性匹配
                     </button>
                     <button @click=""
@@ -143,42 +135,7 @@ function changeCurrentComp(comp: any): void {
 
             <el-main class="bg-gray-50">
                 <component :is="currentComp" />
-
             </el-main>
-
-            <el-aside width="300px" class="flex-align">
-                <el-container>
-                    <div>
-                        <el-card style="width: 99%">
-
-                            <img src="https://pics1.baidu.com/feed/35a85edf8db1cb13c53a6574f525294993584bfa.jpeg?token=78585a61ddf3f4fff2343f556d62dc4b"
-                                style="width: 100%" />
-                        </el-card>
-                        <div class="block text-center">
-                            <el-carousel height="300px">
-                                <el-carousel-item style="height: 180px">
-                                    <div class="bg-white">
-                                        <img src="https://img1.baidu.com/it/u=1265080550,1732343281&fm=253&fmt=auto&app=138&f=JPEG?w=824&h=500"
-                                            style="width: 100%" />
-                                    </div>
-                                </el-carousel-item>
-                                <el-carousel-item style="height: 260px">
-                                    <div class="bg-white">
-                                        <img src="https://5b0988e595225.cdn.sohucs.com/images/20190819/9a7ca57153d1410c932c76c01dd71c86.jpeg"
-                                            style="width: 100%" />
-                                    </div>
-                                </el-carousel-item>
-                                <el-carousel-item style="height: 200px">
-                                    <div class="bg-white">
-                                        <img src="https://www.sinaimg.cn/dy/slidenews/11_img/2009_36/271_1652_712306.jpg"
-                                            style="width: 100%" />
-                                    </div>
-                                </el-carousel-item>
-                            </el-carousel>
-                        </div>
-                    </div>
-                </el-container>
-            </el-aside>
         </el-container>
     </div>
 </template>

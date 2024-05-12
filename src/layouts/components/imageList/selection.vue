@@ -47,33 +47,33 @@ const form = reactive({
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
 const checkedCols = ref([
-  '姓名',
-  '性别',
-  '年龄',
-  '联系方式',
-  '住址',
-  '健康状况',
-  '就诊原因',
-  '就诊日期',
-  '诊断结果'
+  'name',
+  'gender',
+  'age',
+  'contact',
+  'address',
+  'healthStatus',
+  'reasonForVisit',
+  'date',
+  'diagnosis'
 ])
 const cols = [
-  '姓名',
-  '性别',
-  '年龄',
-  '联系方式',
-  '住址',
-  '健康状况',
-  '就诊原因',
-  '就诊日期',
-  '诊断结果',
-  '是否复诊'
+  { label: '姓名', prop: 'name' },
+  { label: '性别', prop: 'gender' },
+  { label: '年龄', prop: 'age' },
+  { label: '联系方式', prop: 'contact' },
+  { label: '住址', prop: 'address' },
+  { label: '健康状况', prop: 'healthStatus' },
+  { label: '就诊原因', prop: 'reasonForVisit' },
+  { label: '就诊日期', prop: 'date' },
+  { label: '诊断结果', prop: 'diagnosis' }
 ]
 
 const handleCheckAllChange = (val: boolean) => {
-  checkedCols.value = val ? cols : []
+  checkedCols.value = val ? cols.map((item) => item.prop) : []
   isIndeterminate.value = false
 }
+
 const handleCheckedColsChange = (value: string[]) => {
   const checkedCount = value.length
   checkAll.value = checkedCount === cols.length
@@ -182,8 +182,8 @@ const handleCheckedColsChange = (value: string[]) => {
                 </el-dropdown-item>
                 <el-dropdown-item :divided="true"></el-dropdown-item>
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
-                  <el-dropdown-item v-for="(col,index) in cols" :key="index">
-                    <el-checkbox :key="col" :label="col">{{ col }}</el-checkbox>
+                  <el-dropdown-item v-for="(col, index) in cols" :key="index">
+                    <el-checkbox :key="col.prop" :label="col.prop">{{ col.label }}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>

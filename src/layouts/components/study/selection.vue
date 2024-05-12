@@ -7,7 +7,7 @@ import fold from '@iconify-icons/ep/fold'
 import refresh from '@iconify-icons/ep/refresh'
 import setUp from '@iconify-icons/ep/set-up'
 import rank from '@iconify-icons/ep/rank'
-import {  setAllPropertiesToNull } from '@/utils/commonUtils'
+import { setAllPropertiesToNull,exportExcel } from '@/utils/commonUtils'
 import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
 import { useStudyStateStore } from '@/store/modules/studyState'
@@ -43,14 +43,29 @@ const studyForm: Record<string, any> = reactive({
 
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
-const checkedCols = ref(['检查日期', '检查时间', '患者年龄', '检查次序', '检查部位', '检查描述'])
-const cols = ['检查日期', '检查时间', '患者年龄', '检查次序', '检查部位', '检查描述']
+const checkedCols = ref([
+  'studyDate',
+  'studyTime',
+  'patientAge',
+  'accessionNumber',
+  'bodyPartExamined',
+  'studyDescription'
+])
+const cols = [
+  { label: '检查日期', prop: 'studyDate' },
+  { label: '检查时间', prop: 'studyTime' },
+  { label: '患者年龄', prop: 'patientAge' },
+  { label: '检查次序', prop: 'accessionNumber' },
+  { label: '检查部位', prop: 'bodyPartExamined' },
+  { label: '检查描述', prop: 'studyDescription' }
+]
 
 const handleCheckAllChange = (val: boolean) => {
-  checkedCols.value = val ? cols : []
+  checkedCols.value = val ? cols.map((item) => item.prop) : []
   isIndeterminate.value = false
   emits('changeTableCols', checkedCols.value)
 }
+
 const handleCheckedColsChange = (value: string[]) => {
   const checkedCount = value.length
   checkAll.value = checkedCount === cols.length
@@ -79,7 +94,7 @@ function conditionalFilter() {
 
 function refreshTable() {
   setAllPropertiesToNull(studyStateStore.studyFilterCriteria)
-  studyStateStore.studyPatientId=null
+  studyStateStore.studyPatientId = null
   studyStateStore.studyPagination.currentPage = 1
   studyStateStore.getStudyListPage()
 }
@@ -131,14 +146,12 @@ function refreshTable() {
           新增检查</el-button
         >
         <el-button round :icon="applicationImport">导入检查</el-button>
-        <el-button round :icon="applicationExport">导出检查</el-button>
+        <el-button round :icon="applicationExport" @click="exportExcel(JSON.parse(JSON.stringify(studyStateStore.studyListTableData)),cols,checkedCols,'检查列表.xlsx')">导出检查</el-button>
       </div>
       <div class="flex flex-wrap items-center w-auto h-auto gap-x-3">
         <el-tooltip content="刷新" placement="top" effect="light">
           <IconifyIconOffline
-            @click="
-              refreshTable()
-            "
+            @click="refreshTable()"
             :icon="refresh"
             class="hover:text-blue-500"
             :style="{ fontSize: '24px' }"
@@ -180,10 +193,9 @@ function refreshTable() {
                   >
                 </el-dropdown-item>
                 <el-dropdown-item :divided="true"></el-dropdown-item>
-
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
                   <el-dropdown-item v-for="(col, index) in cols" :key="index">
-                    <el-checkbox :key="col" :label="col">{{ col }}</el-checkbox>
+                    <el-checkbox :key="col.prop" :label="col.prop">{{ col.label }}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>

@@ -7,7 +7,7 @@ import select from '@/assets/svg/select.svg?component'
 import upload from '@/assets/svg/upload.svg?component'
 import { Iphone, Location, OfficeBuilding, Tickets, User } from '@element-plus/icons-vue'
 import { getUserInformationApi } from '@/api/user'
-import { basicImageUrl, serverUrl, emptyImageUrl } from '@/api/utils'
+import { basicImageUrl} from '@/api/utils'
 import { CodeToText } from '@/utils/chinaArea'
 
 interface userInfo {
@@ -23,7 +23,7 @@ const codeToText: Record<string, string> = CodeToText as unknown as Record<strin
 
 const imageUrl = ref('')
 const errorHandler = () => {
-  imageUrl.value = serverUrl + emptyImageUrl
+  imageUrl.value =  '/images/emptyAvatar.jpg'
 }
 
 const uploadRef = ref<UploadInstance>()

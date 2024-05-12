@@ -2,11 +2,19 @@
 import seriesTable from '@/layouts/components/series/seriesTable.vue'
 import seriesSelection from '@/layouts/components/series/selection.vue'
 import { ref, onMounted } from 'vue'
-import {useSeriesStateStore } from '@/store/modules/seriesState'
+import { useSeriesStateStore } from '@/store/modules/seriesState'
 
-const seriesStateStore =useSeriesStateStore()
+const seriesStateStore = useSeriesStateStore()
 const tableSize = ref('default')
-const tableCols = ref(['序列名称', '序列格式', '图像数量', '患者姓名', '序列日期', '序列时间', '序列描述'])
+const tableCols = ref([
+  'seriesName',
+  'seriesFormat',
+  'seriesCount',
+  'patientName',
+  'seriesDate',
+  'seriesTime',
+  'seriesDesc'
+])
 
 const handleSizeChange = (val: number) => {
   seriesStateStore.seriesPagination.pageSize = val

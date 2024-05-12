@@ -77,9 +77,9 @@ onMounted(() => {
 
 <template>
   <div>
-    <!-- https://www.sitapix.com/2018/05/22/adult-business-care-305565.html -->
+
     <section
-      class="kenburns-bottom bg-cover bg-center dark:bg-slate-300 bg-no-repeat bg-[url('@/assets/images/adult-business-care.jpeg')] bg-blur bg-blend-multiply"
+      class="kenburns-bottom bg-cover bg-center dark:bg-slate-300 bg-no-repeat bg-[url('@/assets/images/homePageBackground.jpeg')] bg-blur bg-blend-multiply"
     >
       <div class="relative px-6 isolate pt-14 lg:px-8">
         <div class="max-w-2xl py-32 mx-auto sm:py-48 lg:py-56">
@@ -149,7 +149,7 @@ onMounted(() => {
           >
             <div class="flex-shrink-0">
               <div
-                class="flex items-center justify-center w-12 h-12 mx-auto text-white bg-indigo-500 rounded-md  dark:bg-gray-600" 
+                class="flex items-center justify-center w-12 h-12 mx-auto text-white bg-indigo-500 rounded-md dark:bg-gray-600" 
               >
               <svg xmlns="http://www.w3.org/2000/svg" width="3em" height="3em" viewBox="0 0 24 24"><path fill="currentColor" d="M12 3L2 12h3v8h14v-8h3zm-2 5h4v10h-2v-8h-2z"/></svg>
               </div>

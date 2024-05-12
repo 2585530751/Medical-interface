@@ -22,13 +22,21 @@
         }
       },
       {
-        path: "/tools/dataEditing",
+        path: "/tools/1_1_dataEditing",
         name: "tools2",
-        component: () => import("@/views/tools/dataEditing.vue"),
+        component: () => import("@/views/tools/1_1_dataEditing.vue"),
         meta: {
           title: "数据编辑"
         }
-      }
+      },
+      {
+        path: "/tools/1_2_preferenceMatching",
+        name: "tools3",
+        component: () => import("@/views/tools/1_2_preferenceMatching.vue"),
+        meta: {
+          title: "倾向性匹配"
+        }
+      },
     ]
   } as RouteConfigsTable;
   

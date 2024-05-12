@@ -139,7 +139,7 @@ function imageOperation(imageInfo: ImageInfo, seriesInfo: SeriesInfo) {
         </template>
       </el-table-column>
       <el-table-column
-        v-if="props.tableCols.includes('序列日期')"
+        v-if="props.tableCols.includes('seriesDate')"
         label="序列日期"
         prop="seriesDate"
         sortable
@@ -149,7 +149,7 @@ function imageOperation(imageInfo: ImageInfo, seriesInfo: SeriesInfo) {
         </template>
       </el-table-column>
       <el-table-column
-        v-if="props.tableCols.includes('序列时间')"
+        v-if="props.tableCols.includes('seriesTime')"
         label="序列时间"
         prop="seriesTime"
       >
@@ -161,27 +161,27 @@ function imageOperation(imageInfo: ImageInfo, seriesInfo: SeriesInfo) {
         </template>
       </el-table-column>
       <el-table-column
-        v-if="props.tableCols.includes('序列名称')"
+        v-if="props.tableCols.includes('seriesName')"
         label="序列名称"
         prop="seriesName"
       />
       <el-table-column
-        v-if="props.tableCols.includes('序列格式')"
+        v-if="props.tableCols.includes('seriesFormat')"
         label="序列格式"
         prop="seriesFormat"
       />
       <el-table-column
-        v-if="props.tableCols.includes('图像数量')"
+        v-if="props.tableCols.includes('seriesCount')"
         label="图像数量"
         prop="seriesCount"
       />
       <el-table-column
-        v-if="props.tableCols.includes('患者姓名')"
+        v-if="props.tableCols.includes('patientName')"
         label="患者姓名"
         prop="patientName"
       />
       <el-table-column
-        v-if="props.tableCols.includes('序列描述')"
+        v-if="props.tableCols.includes('seriesDesc')"
         label="序列描述"
         prop="seriesDesc"
       />

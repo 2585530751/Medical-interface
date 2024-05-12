@@ -7,10 +7,11 @@ import fold from '@iconify-icons/ep/fold'
 import refresh from '@iconify-icons/ep/refresh'
 import setUp from '@iconify-icons/ep/set-up'
 import rank from '@iconify-icons/ep/rank'
-import { setAllPropertiesToNull } from '@/utils/commonUtils'
+import { setAllPropertiesToNull,exportExcel } from '@/utils/commonUtils'
 import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
 import { useSeriesStateStore } from '@/store/modules/seriesState'
+
 
 defineOptions({
   name: 'seriesSelection'
@@ -43,21 +44,30 @@ const seriesForm: Record<string, any> = reactive({
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
 const checkedCols = ref([
-  '序列日期',
-  '序列时间',
-  '序列名称',
-  '序列格式',
-  '图像数量',
-  '患者姓名',
-  '序列描述'
+  'seriesName',
+  'seriesFormat',
+  'seriesCount',
+  'patientName',
+  'seriesDate',
+  'seriesTime',
+  'seriesDesc'
 ])
-const cols = ['序列日期', '序列时间', '序列名称', '序列格式', '图像数量', '患者姓名', '序列描述']
+const cols = [
+  { label: '序列名称', prop: 'seriesName' },
+  { label: '序列格式', prop: 'seriesFormat' },
+  { label: '图像数量', prop: 'seriesCount' },
+  { label: '患者姓名', prop: 'patientName' },
+  { label: '序列日期', prop: 'seriesDate' },
+  { label: '序列时间', prop: 'seriesTime' },
+  { label: '序列描述', prop: 'seriesDesc' }
+]
 
 const handleCheckAllChange = (val: boolean) => {
-  checkedCols.value = val ? cols : []
+  checkedCols.value = val ? cols.map((item) => item.prop) : []
   isIndeterminate.value = false
   emits('changeTableCols', checkedCols.value)
 }
+
 const handleCheckedColsChange = (value: string[]) => {
   const checkedCount = value.length
   checkAll.value = checkedCount === cols.length
@@ -91,6 +101,7 @@ function refreshTable() {
   seriesStateStore.seriesPagination.currentPage = 1
   seriesStateStore.getSeriesListPage()
 }
+
 </script>
 
 <template>
@@ -140,7 +151,7 @@ function refreshTable() {
           新增序列</el-button
         >
         <el-button round :icon="applicationImport">导入序列</el-button>
-        <el-button round :icon="applicationExport">导出序列</el-button>
+        <el-button round :icon="applicationExport" @click="exportExcel(JSON.parse(JSON.stringify(seriesStateStore.seriesListTableData)),cols,checkedCols,'序列列表.xlsx')">导出序列</el-button>
       </div>
       <div class="flex flex-wrap items-center w-auto h-auto gap-x-3">
         <el-tooltip content="刷新" placement="top" effect="light">
@@ -190,7 +201,7 @@ function refreshTable() {
 
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
                   <el-dropdown-item v-for="(col, index) in cols" :key="index">
-                    <el-checkbox :key="col" :label="col">{{ col }}</el-checkbox>
+                    <el-checkbox :key="col.prop" :label="col.prop">{{ col.label }}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>

@@ -49,6 +49,7 @@ function getModelInfoByModelId(modelId: number) {
       modelInformation.modelImage = res.data.modelImage
       modelInformation.modelPaperLink = res.data.modelPaperLink
       modelInformation.modelCodeLink = res.data.modelCodeLink
+      
     } else {
       message(res.msg, { type: 'error' })
     }
@@ -62,6 +63,7 @@ function navigateToLink(link: string) {
 onMounted(() => {
   const modelId = route.query.modelId as any
   getModelInfoByModelId(modelId)
+  
 })
 
 watch(

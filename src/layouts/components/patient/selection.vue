@@ -7,7 +7,7 @@ import fold from '@iconify-icons/ep/fold'
 import refresh from '@iconify-icons/ep/refresh'
 import setUp from '@iconify-icons/ep/set-up'
 import rank from '@iconify-icons/ep/rank'
-import { chineseStandardTimeFormat,setAllPropertiesToNull } from '@/utils/commonUtils'
+import { chineseStandardTimeFormat, setAllPropertiesToNull,exportExcel } from '@/utils/commonUtils'
 import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
 import { usePatientStateStore } from '@/store/modules/patientState'
@@ -25,7 +25,6 @@ const patientStateStore = usePatientStateStore()
 
 const filterSelect = ref('patientName')
 const filterSearch = ref('')
-
 const visible = ref(false)
 
 const patientForm: Record<string, any> = reactive({
@@ -40,11 +39,25 @@ const patientForm: Record<string, any> = reactive({
 
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
-const checkedCols = ref(['姓名', '性别', '电话', '邮箱', '住址', '出生日期'])
-const cols = ['姓名', '性别', '电话', '邮箱', '住址', '体重', '身高', '身份证号', '出生日期']
+const checkedCols = ref([
+  'patientName',
+  'patientGender',
+  'phoneNumber',
+  'email',
+  'address',
+  'dateOfBirth'
+])
+const cols = [
+  { label: '姓名', prop: 'patientName' },
+  { label: '性别', prop: 'patientGender' },
+  { label: '电话', prop: 'phoneNumber' },
+  { label: '邮箱', prop: 'email' },
+  { label: '住址', prop: 'address' },
+  { label: '出生日期', prop: 'dateOfBirth' }
+]
 
 const handleCheckAllChange = (val: boolean) => {
-  checkedCols.value = val ? cols : []
+  checkedCols.value = val ? cols.map((item) => item.prop) : []
   isIndeterminate.value = false
   emits('changeTableCols', checkedCols.value)
 }
@@ -137,7 +150,7 @@ function conditionalFilter() {
         <el-button round :icon="applicationImport" @click="patientStateStore.getPatientListPage"
           >导入患者</el-button
         >
-        <el-button round :icon="applicationExport">导出患者</el-button>
+        <el-button round :icon="applicationExport" @click="exportExcel(JSON.parse(JSON.stringify(patientStateStore.patientListTableData)),cols,checkedCols,'患者列表.xlsx')">导出患者</el-button>
       </div>
       <div class="flex flex-wrap items-center w-auto h-auto gap-x-3">
         <el-tooltip content="刷新" placement="top" effect="light">
@@ -190,7 +203,7 @@ function conditionalFilter() {
 
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
                   <el-dropdown-item v-for="(col, index) in cols" :key="index">
-                    <el-checkbox :key="col" :label="col">{{ col }}</el-checkbox>
+                    <el-checkbox :key="col.prop" :label="col.prop">{{ col.label }}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>

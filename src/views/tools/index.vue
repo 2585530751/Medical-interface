@@ -105,7 +105,7 @@ const uploadAvatar = (options: UploadRequestOptions) => {
 function getExcelInformation(){
     getExcelApi().then((res: any) => {
     if (res.success) {
-      console.log(res.data)
+      
       tableData.value=res.data
     }
   })
@@ -118,9 +118,10 @@ onMounted(() => {
 import { useRouter } from "vue-router";
 const router = useRouter();
 const searchRow = (index: number) => {
-    console.log(tableData.value[index])
-    const toolId=tableData.value[index].toolId
-    router.push({path:"/tools/tools",query:{toolId}});   //将相应的Excel文件路径路径传递到下一个界面使用
+    
+    const toolRoute=tableData.value[index].toolRoute
+    
+    router.push({path:"/tools/tools",query:{toolRoute}});   //将相应的Excel文件路径路径传递到下一个界面使用
 }
 
 

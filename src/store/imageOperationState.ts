@@ -28,7 +28,7 @@ import type { Types } from '@cornerstonejs/core'
 import type { IStackViewport, IVolumeViewport } from '@cornerstonejs/core/src/types'
 import { formatDate } from '@/composables/image/utils'
 import type { SeriesInfoWindows } from '@/types/image'
-import { initDemo } from '@/utils/helpers/index.js'
+
 import createTools from '@/composables/toolsManage'
 import { utilities as csUtils } from '@cornerstonejs/core'
 import { type ViewportColorbar } from '@cornerstonejs/tools/src/utilities/voi/colorbar/ViewportColorbar'
@@ -36,9 +36,9 @@ import type { SeriesInfo, ImageInfo } from '@/types/series'
 
 const { Enums: csToolsEnums } = cornerstoneTools
 const { MouseBindings } = csToolsEnums
-await initDemo()
 
 export const useImageOperationStateStore = defineStore('imageOperationState', () => {
+ 
   const imageList = reactive<ImageInfo>({
     imageId: null,
     imageName: null,

@@ -128,7 +128,7 @@ function seriesOperation(seriesId: number) {
         </template>
       </el-table-column>
       <el-table-column
-        v-if="props.tableCols.includes('检查日期')"
+        v-if="props.tableCols.includes('studyDate')"
         label="检查日期"
         prop="studyDate"
         sortable
@@ -138,7 +138,7 @@ function seriesOperation(seriesId: number) {
         </template>
       </el-table-column>
       <el-table-column
-        v-if="props.tableCols.includes('检查时间')"
+        v-if="props.tableCols.includes('studyTime')"
         label="检查时间"
         prop="studyTime"
       >
@@ -150,23 +150,23 @@ function seriesOperation(seriesId: number) {
         </template>
       </el-table-column>
       <el-table-column
-        v-if="props.tableCols.includes('患者年龄')"
+        v-if="props.tableCols.includes('patientAge')"
         sortable
         label="患者年龄"
         prop="patientAge"
       />
       <el-table-column
-        v-if="props.tableCols.includes('检查次序')"
+        v-if="props.tableCols.includes('accessionNumber')"
         label="检查次序"
         prop="accessionNumber"
       />
       <el-table-column
-        v-if="props.tableCols.includes('检查部位')"
+        v-if="props.tableCols.includes('bodyPartExamined')"
         label="检查部位"
         prop="bodyPartExamined"
       />
       <el-table-column
-        v-if="props.tableCols.includes('检查描述')"
+        v-if="props.tableCols.includes('studyDescription')"
         label="检查描述"
         prop="studyDescription"
       />

@@ -3,11 +3,12 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --mode development",
+    "start": "vite --mode production",
     "build": "run-p type-check build-only",
-    "preview": "vite preview",
+    "preview": "vite preview --port 5173",
     "test:unit": "vitest",
-    "build-only": "vite build",
+    "build-only": "vite build --mode production",
     "type-check": "vue-tsc --noEmit -p tsconfig.vitest.json --composite false",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
     "format": "prettier --write src/"
@@ -42,7 +43,8 @@
     "vite-plugin-wasm": "^3.3.0",
     "vue-baidu-map-3x": "^1.0.37",
     "vue-echarts": "^6.6.9",
-    "vue-router": "^4.2.0"
+    "vue-router": "^4.2.0",
+    "xlsx": "^0.16.0"
   },
   "devDependencies": {
     "@iconify-icons/ep": "^1.2.12",
@@ -64,6 +66,7 @@
     "@vue/test-utils": "^2.3.2",
     "@vue/tsconfig": "^0.4.0",
     "autoprefixer": "^10.4.14",
+    "cross-env": "^7.0.3",
     "eslint": "^8.39.0",
     "eslint-plugin-vue": "^9.11.0",
     "jsdom": "^22.0.0",

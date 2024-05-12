@@ -6,7 +6,14 @@ import { useMyPatientStudyStateStore } from '@/store/modules/myPatientStudyState
 
 const myPatientStudyStateStore = useMyPatientStudyStateStore()
 const tableSize = ref('default')
-const tableCols = ref(['检查日期', '检查时间', '患者年龄', '检查次序', '检查部位', '检查描述'])
+const tableCols = ref([
+  'studyDate',
+  'studyTime',
+  'patientAge',
+  'accessionNumber',
+  'bodyPartExamined',
+  'studyDescription'
+])
 
 const handleSizeChange = (val: number) => {
   myPatientStudyStateStore.myPatientStudyPagination.pageSize = val
