@@ -7,11 +7,11 @@ import fold from '@iconify-icons/ep/fold'
 import refresh from '@iconify-icons/ep/refresh'
 import setUp from '@iconify-icons/ep/set-up'
 import rank from '@iconify-icons/ep/rank'
-import { setAllPropertiesToNull,exportExcel } from '@/utils/commonUtils'
+import { setAllPropertiesToNull, exportExcel } from '@/utils/commonUtils'
 import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
 import { useSeriesStateStore } from '@/store/modules/seriesState'
-
+import seriesUpload from '@/layouts/components/series/seriesUpload.vue'
 
 defineOptions({
   name: 'seriesSelection'
@@ -21,6 +21,8 @@ const emits = defineEmits<{
   changeTableSize: [size: string]
   changeTableCols: [cols: string[]]
 }>()
+
+const centerDialogVisible = ref(false)
 
 const seriesStateStore = useSeriesStateStore()
 
@@ -101,7 +103,6 @@ function refreshTable() {
   seriesStateStore.seriesPagination.currentPage = 1
   seriesStateStore.getSeriesListPage()
 }
-
 </script>
 
 <template>
@@ -144,14 +145,26 @@ function refreshTable() {
     </template>
     <div class="flex items-center justify-between">
       <div class="flex flex-wrap w-auto h-auto">
-        <el-button round>
+        <el-button round @click="centerDialogVisible = true">
           <template #icon>
             <IconifyIconOffline :icon="plus"></IconifyIconOffline>
           </template>
           新增序列</el-button
         >
         <el-button round :icon="applicationImport">导入序列</el-button>
-        <el-button round :icon="applicationExport" @click="exportExcel(JSON.parse(JSON.stringify(seriesStateStore.seriesListTableData)),cols,checkedCols,'序列列表.xlsx')">导出序列</el-button>
+        <el-button
+          round
+          :icon="applicationExport"
+          @click="
+            exportExcel(
+              JSON.parse(JSON.stringify(seriesStateStore.seriesListTableData)),
+              cols,
+              checkedCols,
+              '序列列表.xlsx'
+            )
+          "
+          >导出序列</el-button
+        >
       </div>
       <div class="flex flex-wrap items-center w-auto h-auto gap-x-3">
         <el-tooltip content="刷新" placement="top" effect="light">
@@ -257,6 +270,10 @@ function refreshTable() {
       </el-form-item>
     </el-form>
   </el-drawer>
+  <series-upload
+    :upload-window-open="centerDialogVisible"
+    @upload-window-close="centerDialogVisible = false"
+  ></series-upload>
 </template>
 
 <style lang="scss" scoped></style>

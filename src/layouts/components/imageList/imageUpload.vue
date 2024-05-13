@@ -1,7 +1,4 @@
 <script setup lang="ts">
-defineOptions({
-  name: ''
-})
 import { reactive, ref, watch } from 'vue'
 import { Delete, ZoomIn, Download } from '@element-plus/icons-vue'
 import { UploadFilled } from '@element-plus/icons-vue'
@@ -249,4 +246,3 @@ function handleDownload(file: UploadFile) {
   margin-right: 10px;
 }
 </style>
-@/store/imageOperationState

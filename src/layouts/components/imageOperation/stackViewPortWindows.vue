@@ -9,7 +9,13 @@ import { generateImageUrl } from '@/composables/image/utils'
 import { imageKeyValueStore } from '@/composables/image/imageKeyValueStore'
 import { createViewportColorbar } from '@/composables/image/imageOperate'
 // import {type ViewportColorbar} from '@cornerstonejs/tools/src/utilities/voi/colorbar/ViewportColorbar'
-import { Enums as csToolsEnums, segmentation, utilities as cstUtils,cancelActiveManipulations,annotation } from '@cornerstonejs/tools'
+import {
+  Enums as csToolsEnums,
+  segmentation,
+  utilities as cstUtils,
+  cancelActiveManipulations,
+  annotation
+} from '@cornerstonejs/tools'
 import { api } from 'dicomweb-client'
 import {
   RenderingEngine,
@@ -22,7 +28,7 @@ import {
 } from '@cornerstonejs/core'
 import { useImageOperationStateStore } from '@/store/imageOperationState'
 import { message } from '@/utils/message'
-import type { SeriesInfo,ImageInfo } from '@/types/series'
+import type { SeriesInfo, ImageInfo } from '@/types/series'
 
 defineOptions({
   name: 'stackViewPortWindows'
@@ -33,7 +39,7 @@ const props = defineProps<{
 }>()
 const imageIds: string[] = []
 const { ViewportType } = Enums
-const imageOperationStateStore =useImageOperationStateStore()
+const imageOperationStateStore = useImageOperationStateStore()
 let elementId = ref('cornerstone-element-' + props.index)
 const viewportId = 'stackViewPort' + props.index
 const renderingEngine = imageOperationStateStore.renderingEngine
@@ -95,9 +101,7 @@ function constructImagesId() {
     props.imagesInfoWindows.seriesInfo.imageList.forEach((item: ImageInfo) => {
       var temporaryimagePath
       if (item.modelType === 'model') {
-        temporaryimagePath = generateImageUrl(
-          item.singleImageModelData.modelResultPath
-        ) as string
+        temporaryimagePath = generateImageUrl(item.singleImageModelData.modelResultPath) as string
       } else {
         temporaryimagePath = generateImageUrl(item.imagePath) as string
       }
@@ -123,9 +127,13 @@ async function selectSeriesWindowsClick(event: Event) {
           )
         )
         console.log(
-          segmentation.activeSegmentation.getActiveSegmentation(imageOperationStateStore.toolGroup.id)
+          segmentation.activeSegmentation.getActiveSegmentation(
+            imageOperationStateStore.toolGroup.id
+          )
         )
-        console.log(segmentation.state.getSegmentationRepresentations(imageOperationStateStore.toolGroup.id))
+        console.log(
+          segmentation.state.getSegmentationRepresentations(imageOperationStateStore.toolGroup.id)
+        )
       } else {
         message('未添加Labelmap分割层，无需使用该分割工具。', { type: 'error' })
         event.preventDefault()
@@ -228,14 +236,22 @@ async function renderStackViewport() {
       element.addEventListener(csToolsEnums.Events.KEY_DOWN, (evt) => {
         cancelAndRemoveAnnotation(element)
       })
+
+      // element.addEventListener(MOUSE_WHEEL, ((evt: Types.EventTypes.ImageRenderedEvent) => {
+      //   console.log('IMAGE_RENDERED')
+      // }) as EventListener)
     }
     await viewport.setStack(imageIds, singleImageIndex)
     viewport.render()
     cstUtils.stackContextPrefetch.enable(viewport.element)
     imageOperationStateStore.viewports[props.index] = viewport
-    segmentationId = imageOperationStateStore.segmentationId + props.imagesInfoWindows.imageInfo.imageId
+    segmentationId =
+      imageOperationStateStore.segmentationId + props.imagesInfoWindows.imageInfo.imageId
   }
 }
+
+// const { MOUSE_WHEEL } = csToolsEnums.Events
+// const {} =Enums.Events  
 </script>
 
 <template>
@@ -269,4 +285,3 @@ async function renderStackViewport() {
   cursor: initial;
 }
 </style>
-@/store/imageOperationState

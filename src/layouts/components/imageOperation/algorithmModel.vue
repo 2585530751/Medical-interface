@@ -44,13 +44,13 @@ async function singleImageSegmentationOfThyroidNodules() {
           console.log(data.data)
           const singleImageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
           const seriesInfo:SeriesInfo = JSON.parse(JSON.stringify(seriesInfoWindows.seriesInfo))
-          const singleImage = Object.assign(
+          const image = Object.assign(
             {},
             seriesInfo.imageList.find((obj:any) => obj.imageId === params.imageId)
           )
-          singleImage!.singleImageModelData = singleImageModelData
-          singleImage!.modelType = 'model'
-          seriesInfo.imageList = [singleImage!]
+          image!.singleImageModelData = singleImageModelData
+          image!.modelType = 'model'
+          seriesInfo.imageList = [image!]
           pushseriesModelsListsSession(seriesInfo)
           imageOperationStateStore.pushSeriesModelsList(seriesInfo)
           message(data.msg, { type: 'success' })
@@ -76,7 +76,7 @@ async function imageSegmentationOfThyroidNodules() {
     
     await imageSegmentationOfThyroidNodulesApi(params)
       .then((data) => {
-        
+        console.log(data.data)
         if ((data.code = 200)) {
           const imageInfo = JSON.parse(JSON.stringify(seriesInfoWindows.imageInfo))
           for (var i = 0; i < data.data.length; i++) {

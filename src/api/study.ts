@@ -27,3 +27,16 @@ export const getUserPatientStudySeriesPage = (data?: object) => {
   )
 }
 
+
+export const uploadSeriesApi = (data?: object) => {
+  return http.request<any>(
+    'post',
+    baseUrlApi('study/uploadSeries'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+  )
+}
