@@ -14,12 +14,13 @@ import {
 } from '@/api/image'
 import { message } from '@/utils/message'
 import { pushseriesModelsListsSession } from '@/composables/image/utils'
-import { storageSession } from '@pureadmin/utils'
+
 
 import { reactive, ref } from 'vue'
 
 import pieChart from '@/components/ReChart/pieChart.vue'
 import type { SeriesInfo } from '@/types/series'
+import type { ImageModelResult } from '@/types/model.d.ts'
 
 const dialogVisible = ref(false)
 
@@ -41,14 +42,14 @@ async function singleImageSegmentationOfThyroidNodules() {
     await singleImageSegmentationOfThyroidNodulesApi(params)
       .then((data) => {
         if ((data.code = 200)) {
-          console.log(data.data)
-          const singleImageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
+          console.log(data)
+          const imageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
           const seriesInfo:SeriesInfo = JSON.parse(JSON.stringify(seriesInfoWindows.seriesInfo))
           const image = Object.assign(
             {},
             seriesInfo.imageList.find((obj:any) => obj.imageId === params.imageId)
           )
-          image!.singleImageModelData = singleImageModelData
+          image!.imageModelData = imageModelData
           image!.modelType = 'model'
           seriesInfo.imageList = [image!]
           pushseriesModelsListsSession(seriesInfo)
@@ -76,29 +77,27 @@ async function imageSegmentationOfThyroidNodules() {
     
     await imageSegmentationOfThyroidNodulesApi(params)
       .then((data) => {
-        console.log(data.data)
+        console.log(data)
         if ((data.code = 200)) {
-          const imageInfo = JSON.parse(JSON.stringify(seriesInfoWindows.imageInfo))
-          for (var i = 0; i < data.data.length; i++) {
-            const singleImageModelData = Object.assign(
-              {},
-              data.data[i],
-              JSON.parse(data.data[i].resData)
-            )
+          const dataResult:ImageModelResult[] = data.data as ImageModelResult[]
+          const seriesInfo:SeriesInfo = JSON.parse(JSON.stringify(seriesInfoWindows.seriesInfo))
+          const seriesFeature = []
+          for (var i = 0; i < dataResult.length; i++) {
+            seriesFeature.push(dataResult[i].imageFeature)
             let j = 0
-
-            while (j < imageInfo.singleImageList.length) {
-              if (imageInfo.singleImageList[j].imageId == data.data[i].imageId) {
-                
+            while (j < seriesInfo.imageList.length) {
+              if (seriesInfo.imageList[j].imageId == dataResult[i].imageId) {    
                 break
               }
               j++
             }
-            imageInfo.singleImageList[j].singleImageModelData = singleImageModelData
-            imageInfo.singleImageList[j].modelType = 'model'
+            seriesInfo.imageList[j].imageModelData = dataResult[i]
+            seriesInfo.imageList[j].modelType = 'model'
           }
-          pushseriesModelsListsSession(imageInfo)
-          imageOperationStateStore.pushSeriesModelsList(imageInfo)
+          seriesInfo.seriesModelType = 'segmentModel'
+          seriesInfo.seriesFeature = seriesFeature
+          pushseriesModelsListsSession(seriesInfo)
+          imageOperationStateStore.pushSeriesModelsList(seriesInfo)
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -187,13 +186,13 @@ async function singleImageDetectionOfPulmonaryNodules() {
     await singleImageDetectionOfPulmonaryNodulesApi(params)
       .then((data) => {
         if ((data.code = 200)) {
-          const singleImageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
+          const imageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
           const imageInfo = JSON.parse(JSON.stringify(seriesInfoWindows.imageInfo))
           const singleImage = Object.assign(
             {},
             imageInfo.singleImageList.find((obj:any) => obj.imageId === params.imageId)
           )
-          singleImage!.singleImageModelData = singleImageModelData
+          singleImage!.imageModelData = imageModelData
           singleImage!.modelType = 'model'
           imageInfo.singleImageList = [singleImage!]
           imageOperationStateStore.pushSeriesModelsList(imageInfo)
@@ -221,7 +220,7 @@ async function imageDetectionOfPulmonaryNodules() {
         if ((data.code = 200)) {
           const imageInfo = JSON.parse(JSON.stringify(seriesInfoWindows.imageInfo))
           for (var i = 0; i < data.data.length; i++) {
-            const singleImageModelData = Object.assign(
+            const imageModelData = Object.assign(
               {},
               data.data[i],
               JSON.parse(data.data[i].resData)
@@ -233,7 +232,7 @@ async function imageDetectionOfPulmonaryNodules() {
               }
               j++
             }
-            imageInfo.singleImageList[j].singleImageModelData = singleImageModelData
+            imageInfo.singleImageList[j].imageModelData = imageModelData
             imageInfo.singleImageList[j].modelType = 'model'
           }
           pushseriesModelsListsSession(imageInfo)
@@ -261,13 +260,13 @@ async function singleImageIntestinalPolypsSegmentation() {
     await singleImageIntestinalPolypsSegmentationApi(params)
       .then((data) => {
         if ((data.code = 200)) {
-          const singleImageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
+          const imageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
           const imageInfo = JSON.parse(JSON.stringify(seriesInfoWindows.imageInfo))
           const singleImage = Object.assign(
             {},
             imageInfo.singleImageList.find((obj:any) => obj.imageId === params.imageId)
           )
-          singleImage!.singleImageModelData = singleImageModelData
+          singleImage!.imageModelData = imageModelData
           singleImage!.modelType = 'model'
           imageInfo.singleImageList = [singleImage!]
           pushseriesModelsListsSession(imageInfo)
@@ -299,7 +298,7 @@ async function imageIntestinalPolypsSegmentation() {
         if ((data.code = 200)) {
           const imageInfo = JSON.parse(JSON.stringify(seriesInfoWindows.imageInfo))
           for (var i = 0; i < data.data.length; i++) {
-            const singleImageModelData = Object.assign(
+            const imageModelData = Object.assign(
               {},
               data.data[i],
               JSON.parse(data.data[i].resData)
@@ -313,7 +312,7 @@ async function imageIntestinalPolypsSegmentation() {
               }
               j++
             }
-            imageInfo.singleImageList[j].singleImageModelData = singleImageModelData
+            imageInfo.singleImageList[j].imageModelData = imageModelData
             imageInfo.singleImageList[j].modelType = 'model'
           }
           pushseriesModelsListsSession(imageInfo)
@@ -443,4 +442,3 @@ async function imageIntestinalPolypsSegmentation() {
 </template>
 
 <style lang="scss" scoped></style>
-@/store/imageOperationState

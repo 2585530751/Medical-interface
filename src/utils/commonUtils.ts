@@ -33,3 +33,9 @@ export function exportExcel(dataJson: Record<string, any>[], cols: Record<string
   XLSX.writeFile(wb, fileName)
 }
 
+export function exportJsonToExcel(dataJson: Record<string, any>[],fileName: string) {
+  const ws = XLSX.utils.json_to_sheet(dataJson)
+  const wb = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
+  XLSX.writeFile(wb, fileName)
+}

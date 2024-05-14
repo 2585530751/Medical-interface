@@ -325,3 +325,24 @@ export const departmentOptions = [
     label: '患者'
   }
 ]
+
+export const imageFeaturePropertyTranslations = {
+  original_firstorder_10Percentile: '10%特征值',
+  original_firstorder_90Percentile: '90%特征值',
+  original_firstorder_Energy: '能量',
+  original_firstorder_Entropy: '熵',
+  original_firstorder_InterquartileRange: '四分位距',
+  original_firstorder_Kurtosis: '峰度',
+  original_firstorder_Maximum: '最大值',
+  original_firstorder_Mean: '均值',
+  original_firstorder_MeanAbsoluteDeviation: '平均绝对偏差',
+  original_firstorder_Median: '中位数',
+  original_firstorder_Minimum: '最小值',
+  original_firstorder_Range: '范围',
+  original_firstorder_RobustMeanAbsoluteDeviation: '鲁棒平均绝对偏差',
+  original_firstorder_RootMeanSquared: '均方根',
+  original_firstorder_Skewness: '偏度',
+  original_firstorder_TotalEnergy: '总能量',
+  original_firstorder_Uniformity: '均匀性',
+  original_firstorder_Variance: '方差'
+}

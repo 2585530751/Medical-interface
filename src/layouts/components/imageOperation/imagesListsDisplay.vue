@@ -145,8 +145,8 @@ function deleteSelectedImagesModelsLists() {
     let existingElement = list.find((element) => {
       return (
         element.imageList.length === imagesModelsList.imageList.length &&
-        element.imageList[0].singleImageModelData.modelId ===
-          imagesModelsList.imageList[0].singleImageModelData.modelId
+        element.imageList[0].imageModelData.modelId ===
+          imagesModelsList.imageList[0].imageModelData.modelId
       )
     })
     console.log(existingElement)
@@ -216,7 +216,7 @@ function deleteAllImagesModelsLists() {
         :index="index"
       ></imagesListDisplay>
       <div
-        class="fixed bottom-0 left-0 flex items-center h-10 border-b-0 border-solid rounded-md dark:border-gray-500 w-60 justify-evenly backdrop-grayscale bg-stone-100 dark:bg-gray-700 border-slate-200 border-x-0"
+        class="fixed bottom-0 left-0 flex items-center h-10 border-b-0 border-solid rounded-md dark:border-t dark:border-gray-500 w-60 justify-evenly backdrop-grayscale bg-stone-100 dark:bg-gray-700 border-slate-200 border-x-0"
       >
         <el-button type="info" size="small" @click="deleteSelectedImagesLists()">删除</el-button>
         <el-button type="info" size="small" @click="deleteAllImagesLists()">清空</el-button>
@@ -264,7 +264,7 @@ function deleteAllImagesModelsLists() {
         :index="index"
       ></imagesModelsListDisplay>
       <div
-        class="fixed bottom-0 left-0 flex items-center h-10 border-b-0 border-solid rounded-md dark:border-gray-500 w-60 justify-evenly backdrop-grayscale bg-stone-100 dark:bg-gray-700 border-slate-200 border-x-0"
+        class="fixed bottom-0 left-0 flex items-center h-10 border-b-0 border-solid rounded-md dark:border-t dark:border-gray-500 w-60 justify-evenly backdrop-grayscale bg-stone-100 dark:bg-gray-700 border-slate-200 border-x-0"
       >
         <el-button type="info" size="small" @click="deleteSelectedImagesModelsLists()"
           >删除</el-button

@@ -1,4 +1,5 @@
-import type { SingleImageModelData } from '@/types/image'
+import type { ImageFeature } from './image';
+import type { ImageModelResult } from '@/types/model.d.ts'
 
 export interface ImageInfo {  
     imageId: number | null;  
@@ -42,7 +43,9 @@ export interface ImageInfo {
     imageNumber: string | null;  
     samplesPerPixel: string | null; // 或者使用number，如果需要  
     photometricInterpretation: string | null;  
-    singleImageModelData:SingleImageModelData|null;
+
+    imageModelData:ImageModelResult|null;
+    modelType:string|null;
 }
 
 export interface SeriesInfo {  
@@ -73,4 +76,7 @@ export interface SeriesInfo {
     mrAcquisitionType: string | null;  
     studyId: number;  
     imageList: ImageInfo[];
+
+    seriesFeature:ImageFeature[]|null;
+    seriesModelType:string|null;
 }

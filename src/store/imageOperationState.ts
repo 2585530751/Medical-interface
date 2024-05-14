@@ -81,7 +81,8 @@ export const useImageOperationStateStore = defineStore('imageOperationState', ()
     imageNumber: null,
     samplesPerPixel: null,
     photometricInterpretation: null,
-    singleImageModelData: null
+    imageModelData: null,
+    modelType: null
   })
   const seriesList = reactive<SeriesInfo>({
     seriesId: 0,
@@ -110,7 +111,9 @@ export const useImageOperationStateStore = defineStore('imageOperationState', ()
     spacingBetweenSlices: null,
     mrAcquisitionType: null,
     studyId: 0,
-    imageList: []
+    imageList: [],
+    seriesFeature: null,
+    seriesModelType: null
   })
   const seriesLists = reactive<SeriesInfo[]>(
     storageSession().getItem<SeriesInfo[]>(seriesListsSession)
@@ -200,8 +203,8 @@ export const useImageOperationStateStore = defineStore('imageOperationState', ()
     let existingElement = seriesModelsLists.find(
       (element) =>
         element.imageList.length === imagesListParameter.imageList.length &&
-        element.imageList[0].singleImageModelData!.modelId ===
-          imagesListParameter.imageList[0].singleImageModelData!.modelId
+        element.imageList[0].imageModelData!.modelId ===
+          imagesListParameter.imageList[0].imageModelData!.modelId
     )
     if (existingElement) {
       const index = seriesModelsLists.indexOf(existingElement)

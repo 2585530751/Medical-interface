@@ -2,6 +2,7 @@
 import biTextIndentLeft from '@/assets/svg/BiTextIndentLeft.svg?component'
 import commonTools from '@/layouts/components/imageOperation/commonTools.vue'
 import algorithmModel from '@/layouts/components/imageOperation/algorithmModel.vue'
+import imageFeatureOperate from '@/layouts/components/imageOperation/imageFeatureOperate.vue'
 import { ref, shallowRef } from 'vue'
 import arrowLeft from '@iconify-icons/ep/arrow-left'
 
@@ -28,7 +29,7 @@ function changeCurrentComp(comp: any): void {
         <el-button-group>
           <el-button text @click="changeCurrentComp(commonTools)"> 工具 </el-button>
           <el-button text @click="changeCurrentComp(algorithmModel)"> AI辅助 </el-button>
-
+          <el-button text @click="changeCurrentComp(imageFeatureOperate)"> 操作 </el-button>
         </el-button-group>
       </div>
     </div>

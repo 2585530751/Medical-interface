@@ -13,18 +13,18 @@ import {
 const { ViewportType } = Enums
 
 const props = defineProps<{
-  downloadWindowOpen?: boolean
+  saveCompletedImageWindowOpen?: boolean
 }>()
 
 const emits = defineEmits<{
-  downloadWindowClose: [] // 具名元组语法
+  saveCompletedImageWindowClose: [] // 具名元组语法
 }>()
 
-let centerDialogVisible = ref(props.downloadWindowOpen)
+let centerDialogVisible = ref(props.saveCompletedImageWindowOpen)
 
 watch(
   () => {
-    return props.downloadWindowOpen
+    return props.saveCompletedImageWindowOpen
   },
   (value, prevValue) => {
     centerDialogVisible.value = value
@@ -36,10 +36,11 @@ const imageInfo = reactive({
   imageHeight: 512,
   imageType: 'jpg',
   imageName: 'image',
-  imageAnnotation: true
+  imageAnnotation: true,
+  imageDescription: ''
 })
 
-const imageOperationStateStore =useImageOperationStateStore()
+const imageOperationStateStore = useImageOperationStateStore()
 
 var parentNode: HTMLElement | null = null
 var divElement: HTMLElement | null = null
@@ -61,16 +62,14 @@ function onClosed() {
   imageInfo.imageHeight = 512
   divForDownloadViewport!.style.width = '100%'
   divForDownloadViewport!.style.height = '100%'
-  parentNode!.insertBefore(divForDownloadViewport!,parentNode!.firstChild)
-  console.log(parentNode)
+  parentNode!.insertBefore(divForDownloadViewport!, parentNode!.firstChild)
 }
 
-function downloadCanvas() {
+function uploadSaveCompletedImage() {
   html2canvas(divForDownloadViewport as HTMLDivElement).then((canvas: HTMLCanvasElement) => {
-    const link = document.createElement('a')
-    link.download = imageInfo.imageName+'.'+imageInfo.imageType
-    link.href = canvas.toDataURL(imageInfo.imageType, 1.0)
-    link.click()
+    let formData = new FormData()
+    let imageData = canvas.toDataURL(imageInfo.imageType, 1.0)
+    formData.append('imageData', imageData)
   })
 }
 
@@ -80,7 +79,6 @@ const changeWidthHeight = () => {
 }
 
 function handleSwitchChange(newVal: Boolean) {
-  console.log(newVal)
   selectAllAnnotations(
     imageOperationStateStore.renderingEngine.id,
     imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
@@ -104,10 +102,10 @@ function handleSwitchChange(newVal: Boolean) {
     v-model="centerDialogVisible"
     class="overflow-auto"
     style="max-height: 50vh"
-    @close="$emit('downloadWindowClose')"
+    @close="$emit('saveCompletedImageWindowClose')"
     @opened="onOpened"
     @closed="onClosed"
-    title="下载图像"
+    title="保存图像"
     width="50%"
     :modal="false"
     :destroy-on-close="true"
@@ -117,18 +115,24 @@ function handleSwitchChange(newVal: Boolean) {
   >
     <div class="flex flex-col">
       <el-form ref="ruleFormRef" :model="imageInfo" label-position="top">
-        <el-form-item label="文件名">
-          <el-input v-model="imageInfo.imageName" />
+        <el-form-item label="图像描述" prop="imageDescription">
+          <el-input
+            v-model="imageInfo.imageDescription"
+            style="width: 100%"
+            :autosize="{ minRows: 5, maxRows: 10 }"
+            type="textarea"
+            placeholder="请输入图像描述"
+          />
         </el-form-item>
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="宽（px)">
-              <el-input v-model="imageInfo.imageWidth" @change="changeWidthHeight()" />
+              <el-input-number :max="1024" :min="32" v-model="imageInfo.imageWidth" @change="changeWidthHeight()" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="高（px)">
-              <el-input v-model="imageInfo.imageHeight" @change="changeWidthHeight()" />
+              <el-input-number :max="1024" :min="32" v-model="imageInfo.imageHeight" @change="changeWidthHeight()" />
             </el-form-item>
           </el-col>
         </el-row>
@@ -155,12 +159,10 @@ function handleSwitchChange(newVal: Boolean) {
         </el-row>
       </el-form>
     </div>
-    <template #footer>
-      <span class="dialog-footer">
-        <el-button @click="centerDialogVisible = false">取消</el-button>
-        <el-button type="primary" @click="downloadCanvas()"> 下载 </el-button>
-      </span>
-    </template>
+    <span class="flex justify-center mb-4">
+      <el-button @click="centerDialogVisible = false">取消</el-button>
+      <el-button type="primary" @click="uploadSaveCompletedImage()"> 保存图像 </el-button>
+    </span>
     <div id="previewCanvas" class="flex flex-col items-center justify-center">
       <el-text size="large">预览</el-text><br />
     </div>

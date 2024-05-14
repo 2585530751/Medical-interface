@@ -28,7 +28,7 @@ import {
 } from '@cornerstonejs/core'
 import type { Types } from '@cornerstonejs/core'
 import * as cornerstoneTools from '@cornerstonejs/tools'
-import type { ImageInfo, SeriesInfoWindows } from '@/types/image'
+import type {  SeriesInfoWindows } from '@/types/image'
 
 const centerDialogVisible = ref(false)
 
@@ -368,4 +368,3 @@ function removeStackSegmentation(segmentationId: string) {
 </template>
 
 <style lang="scss" scoped></style>
-@/store/imageOperationState

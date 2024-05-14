@@ -101,9 +101,9 @@ function constructImagesId() {
     props.imagesInfoWindows.seriesInfo.imageList.forEach((item: ImageInfo) => {
       var temporaryimagePath
       if (item.modelType === 'model') {
-        temporaryimagePath = generateImageUrl(item.singleImageModelData.modelResultPath) as string
+        temporaryimagePath = generateImageUrl(item.imageModelData!.resultPath) as string
       } else {
-        temporaryimagePath = generateImageUrl(item.imagePath) as string
+        temporaryimagePath = generateImageUrl(item.imagePath!) as string
       }
       imageKeyValueStore.set(temporaryimagePath, item)
       imageIds.push(temporaryimagePath)

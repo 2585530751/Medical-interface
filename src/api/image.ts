@@ -1,5 +1,7 @@
 import { http } from '@/utils/http'
 import { baseUrlApi } from './utils'
+import type { ResponseResuilt } from '@/types/global.d.ts'
+import type { ImageModelResult } from '@/types/model.d.ts'
 
 /**  */
 export const uploadImages = (data?: object) => {
@@ -37,7 +39,9 @@ export const deleteSingleImageById = (params?: object) => {
 }
 
 export const imageSegmentationOfThyroidNodulesApi = (params?: object) => {
-  return http.request<any>('get', baseUrlApi('modelApi/segment'), { params })
+  return http.request<ResponseResuilt<ImageModelResult[]>>('get', baseUrlApi('modelApi/segment'), {
+    params
+  })
 }
 
 export const singleImageSegmentationOfThyroidNodulesApi = (params?: object) => {

@@ -4,7 +4,7 @@ import timer from '@iconify-icons/ep/timer'
 import folder from '@iconify-icons/ep/folder'
 import { basicImageUrl } from '@/api/utils'
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick } from 'vue'
 import { useImageOperationStateStore } from '@/store/imageOperationState'
 import type { SeriesInfoWindows } from '@/types/image'
 import { changeSeriesListWindowsToSession } from '@/composables/image/utils'
@@ -29,7 +29,7 @@ const imageOperationStateStore =useImageOperationStateStore()
 let elementId = ref('cornerstone-element-imagesModelsList-' + props.imagesModelsList.seriesId)
 const viewportId = 'stackViewPort-imagesModelsList-' + props.imagesModelsList.seriesId
 const renderingEngine = imageOperationStateStore.renderingEngine
-const imagesModelsListUrl = generateImageUrl(props.imagesModelsList.imageList[0].singleImageModelData.modelResultPath)
+const imagesModelsListUrl = generateImageUrl(props.imagesModelsList.imageList[0].imageModelData!.resultPath)
 const imagesModelsListUrlCheck = ref(true)
 console.log(imagesModelsListUrl)
 function selectimagesModelsListToWindows() {
@@ -47,9 +47,11 @@ function selectimagesModelsListToWindows() {
   ]
   changeSeriesListWindowsToSession(seriesInfoWindows, imageOperationStateStore.selectSeriesWindows)
 }
-onMounted(() => {
+
+onMounted(async() => {
 
   if (imagesModelsListUrl && imagesModelsListUrl.endsWith('.dcm')) {
+    await nextTick()
     const element: HTMLDivElement = document.getElementById(elementId.value) as HTMLDivElement
     const viewportInput = {
       viewportId: viewportId,
@@ -96,7 +98,7 @@ onMounted(() => {
       <div class="border-2 border-solid rounded-lg border-slate-300">
         <el-image
           fit="cover"
-          :src="basicImageUrl + props.imagesModelsList.imageList[0].singleImageModelData.modelResultPath"
+          :src="basicImageUrl + props.imagesModelsList.imageList[0].imageModelData?.resultPath"
           :crossorigin="'anonymous'"
           v-show="!imagesModelsListUrlCheck"
         />
