@@ -88,7 +88,7 @@ watch(
         ><el-icon><DocumentCopy /></el-icon>序列特征</el-button
       >
     </div>
-    <div>
+    <div  v-show="checkWindowsType">
       <el-descriptions direction="vertical" :column="1" size="default" border>
         <el-descriptions-item
           v-for="(value, key) in imageFeature"

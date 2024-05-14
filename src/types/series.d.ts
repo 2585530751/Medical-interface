@@ -83,6 +83,8 @@ export interface SeriesInfo {
 
     readerView:string|null;
     doctorView:string|null;
+    markSeriesPreviewPath:string|null;
+    markSeriesName:string|null;
 
     seriesFeature:ImageFeature[]|null;
     seriesModelType:string|null;

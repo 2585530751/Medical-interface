@@ -1,5 +1,7 @@
 import { http } from '@/utils/http'
 import { baseUrlApi } from './utils'
+import type { ResponseResuilt } from '@/types/global'
+import type { SeriesInfo } from '@/types/series'
 
 export const getSeriesImagePageApi = (data?: object) => {
     return http.request<any>(
@@ -23,7 +25,7 @@ export const getSeriesImageByIdApi = (params?: object) => {
   }
 
   export const viewReadermApi = (data?: object) => {
-    return http.request<ResponseResuilt<ImageInfo>>(
+    return http.request<ResponseResuilt<SeriesInfo>>(
       'post',
       baseUrlApi('view/reader'),
       { data },

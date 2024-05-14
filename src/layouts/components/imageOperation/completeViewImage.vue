@@ -9,7 +9,7 @@ import {
   showAllAnnotations,
   selectAllAnnotations
 } from '@/composables/image/imageOperate'
-import { uploadMarkImageFormApi } from '@/api/image'
+import { viewReadermApi } from '@/api/series'
 import { imageKeyValueStore } from '@/composables/image/imageKeyValueStore'
 import type { ImageFeature } from '@/types/image'
 import type { ImageInfo } from '@/types/series'
@@ -101,70 +101,49 @@ function uploadSaveCompletedImage() {
     formData.append('file', file)
     formData.append('info', JSON.stringify(markImageObject))
     console.log(formData)
-    uploadMarkImageFormApi(formData).then((res) => {
+    viewReadermApi(formData).then((res) => {
       if (res.code === 200) {
-        const imageInfo: ImageInfo = res.data as ImageInfo
+        const seriesInfo: SeriesInfo = res.data as SeriesInfo
         const seriesListWindows = imageOperationStateStore.seriesListWindows
         const seriesLists = imageOperationStateStore.seriesLists
         const seriesModelsLists = imageOperationStateStore.seriesModelsLists
+
         for (var i = 0; i < seriesListWindows.length; i++) {
           if (seriesListWindows[i] != 0) {
             const seriesListWindow: SeriesInfoWindows = seriesListWindows[i] as SeriesInfoWindows
-            var check = false
-            if (seriesListWindow.seriesInfo.seriesId == imageInfo.seriesId) {
-              const imageList = seriesListWindow.seriesInfo.imageList
-              for (var j = 0; j < imageList.length; j++) {
-                if (imageList[j].imageId == imageInfo.imageId) {
-                  imageList[i].markImageName = imageInfo.markImageDesc
-                  imageList[i].markImagePath = imageInfo.markImagePath
-                  imageList[i].imageStatus = imageInfo.imageStatus
-                  check = true
-                  break
-                }
-              }
-            }
-            if (check == true) {
+            if (seriesListWindow.seriesInfo.seriesId == seriesInfo.seriesId) {
+              seriesListWindow.seriesInfo.markSeriesPreviewPath = seriesInfo.markSeriesPreviewPath
+              seriesListWindow.seriesInfo.markSeriesName = seriesInfo.markSeriesName
+              seriesListWindow.seriesInfo.readerView = seriesInfo.readerView
+              seriesListWindow.seriesInfo.seriesPreviewPath = seriesInfo.seriesPreviewPath
+              seriesListWindow.seriesInfo.seriesStatus = seriesInfo.seriesStatus
               changeSeriesListWindowsToSession(seriesListWindow, i)
+              break
             }
           }
         }
 
         for (var i = 0; i < seriesLists.length; i++) {
-          const seriesInfo: SeriesInfo = seriesLists[i] as SeriesInfo
-          var check = false
-          if (seriesInfo.seriesId == imageInfo.seriesId) {
-            const imageList = seriesInfo.imageList
-            for (var j = 0; j < imageList.length; j++) {
-              if (imageList[j].imageId == imageInfo.imageId) {
-                imageList[i].markImageName = imageInfo.markImageDesc
-                imageList[i].markImagePath = imageInfo.markImagePath
-                imageList[i].imageStatus = imageInfo.imageStatus
-                check = true
-                break
-              }
-            }
-          }
-          if (check == true) {
-            pushSeriesToSession(seriesInfo)
+          const seriesInfomation: SeriesInfo = seriesLists[i] as SeriesInfo
+          if (seriesInfo.seriesId == seriesInfo.seriesId) {
+            seriesInfomation.markSeriesPreviewPath = seriesInfo.markSeriesPreviewPath
+            seriesInfomation.markSeriesName = seriesInfo.markSeriesName
+            seriesInfomation.readerView = seriesInfo.readerView
+            seriesInfomation.seriesPreviewPath = seriesInfo.seriesPreviewPath
+            seriesInfomation.seriesStatus = seriesInfo.seriesStatus
+            pushSeriesToSession(seriesInfomation)
+            break
           }
         }
 
         for (var i = 0; i < seriesModelsLists.length; i++) {
           const seriesModelsList: SeriesInfo = seriesModelsLists[i] as SeriesInfo
-          var check = false
-          if (seriesModelsList.seriesId == imageInfo.seriesId) {
-            const imageList = seriesModelsList.imageList
-            for (var j = 0; j < imageList.length; j++) {
-              if (imageList[j].imageId == imageInfo.imageId) {
-                imageList[i].markImageName = imageInfo.markImageDesc
-                imageList[i].markImagePath = imageInfo.markImagePath
-                imageList[i].imageStatus = imageInfo.imageStatus
-                check = true
-                break
-              }
-            }
-          }
-          if (check == true) {
+          if (seriesModelsList.seriesId == seriesInfo.seriesId) {
+            seriesModelsList.markSeriesPreviewPath = seriesInfo.markSeriesPreviewPath
+            seriesModelsList.markSeriesName = seriesInfo.markSeriesName
+            seriesModelsList.readerView = seriesInfo.readerView
+            seriesModelsList.seriesPreviewPath = seriesInfo.seriesPreviewPath
+            seriesModelsList.seriesStatus = seriesInfo.seriesStatus
             pushseriesModelsListsSession(seriesModelsList)
           }
         }
