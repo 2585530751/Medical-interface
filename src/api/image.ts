@@ -2,6 +2,7 @@ import { http } from '@/utils/http'
 import { baseUrlApi } from './utils'
 import type { ResponseResuilt } from '@/types/global.d.ts'
 import type { ImageModelResult } from '@/types/model.d.ts'
+import type { ImageInfo } from '@/types/series'
 
 /**  */
 export const uploadImages = (data?: object) => {
@@ -18,7 +19,7 @@ export const uploadImages = (data?: object) => {
 }
 
 export const uploadMarkImageFormApi = (data?: object) => {
-  return http.request<ResponseResuilt<string>>(
+  return http.request<ResponseResuilt<ImageInfo>>(
     'post',
     baseUrlApi('markImage/uploadMarkImageForm'),
     { data },

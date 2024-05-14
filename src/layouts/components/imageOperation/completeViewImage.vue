@@ -26,18 +26,18 @@ import { message } from '@/utils/message'
 const { ViewportType } = Enums
 
 const props = defineProps<{
-  saveCompletedImageWindowOpen?: boolean
+  completeViewImageWindowOpen?: boolean
 }>()
 
 const emits = defineEmits<{
-  saveCompletedImageWindowClose: [] // 具名元组语法
+  completeViewImageWindowClose: [] // 具名元组语法
 }>()
 
-let centerDialogVisible = ref(props.saveCompletedImageWindowOpen)
+let centerDialogVisible = ref(props.completeViewImageWindowOpen)
 
 watch(
   () => {
-    return props.saveCompletedImageWindowOpen
+    return props.completeViewImageWindowOpen
   },
   (value, prevValue) => {
     centerDialogVisible.value = value
@@ -169,7 +169,7 @@ function uploadSaveCompletedImage() {
           }
         }
         message(res.msg, { type: 'success' })
-        emits('saveCompletedImageWindowClose')
+        emits('completeViewImageWindowClose')
       }
     })
   })
@@ -219,7 +219,7 @@ function handleSwitchChange(newVal: Boolean) {
     v-model="centerDialogVisible"
     class="overflow-auto"
     style="max-height: 50vh"
-    @close="$emit('saveCompletedImageWindowClose')"
+    @close="$emit('completeViewImageWindowClose')"
     @opened="onOpened"
     @closed="onClosed"
     title="保存图像"
@@ -291,7 +291,7 @@ function handleSwitchChange(newVal: Boolean) {
     </div>
     <span class="flex justify-center mb-4">
       <el-button @click="centerDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="uploadSaveCompletedImage()"> 保存图像 </el-button>
+      <el-button type="primary" @click="uploadSaveCompletedImage()"> 完成阅片 </el-button>
     </span>
     <div id="previewCanvas" class="flex flex-col items-center justify-center">
       <el-text size="large">预览</el-text><br />

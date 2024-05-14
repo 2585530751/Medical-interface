@@ -60,8 +60,8 @@ export function pushseriesModelsListsSession(seriesInfo: SeriesInfo) {
     let existingElement = list.find((element) => {
       return (
         element.imageList.length === seriesInfo.imageList.length &&
-        element.imageList[0].imageModelData.modelId ===
-        seriesInfo.imageList[0].imageModelData.modelId
+        element.imageList[0].imageModelData!.modelId ===
+        seriesInfo.imageList[0].imageModelData!.modelId
       )
     })
     if (existingElement) {

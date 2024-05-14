@@ -44,6 +44,10 @@ export interface ImageInfo {
     samplesPerPixel: string | null; // 或者使用number，如果需要  
     photometricInterpretation: string | null;  
 
+    markImageName:string|null;
+    markImagePath:string|null;
+    markImageDesc:string|null;
+
     imageModelData:ImageModelResult|null;
     modelType:string|null;
 }
@@ -76,6 +80,9 @@ export interface SeriesInfo {
     mrAcquisitionType: string | null;  
     studyId: number;  
     imageList: ImageInfo[];
+
+    readerView:string|null;
+    doctorView:string|null;
 
     seriesFeature:ImageFeature[]|null;
     seriesModelType:string|null;

@@ -20,7 +20,6 @@ import { useImageOperationStateStore } from '@/store/imageOperationState'
 import { generateImageUrl } from '@/composables/image/utils'
 import { imageKeyValueStore } from '@/composables/image/imageKeyValueStore'
 import stackViewPortWindows from '@/layouts/components/imageOperation/stackViewPortWindows.vue'
-import image from '@/router/modules/image'
 
 const imageOperationStateStore =useImageOperationStateStore()
 

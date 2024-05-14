@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import seriesFeatureTable from '@/layouts/components/imageOperation/seriesFeatureTable.vue'
 import { useImageOperationStateStore } from '@/store/imageOperationState'
 import type { SeriesInfoWindows } from '@/types/image'
@@ -10,6 +10,8 @@ import { Reading, DocumentCopy, DocumentAdd, Check } from '@element-plus/icons-v
 import type { ImageFeature } from '@/types/image'
 import { imageFeaturePropertyTranslations } from '@/utils/commonVariables'
 import saveCompletedImage from '@/layouts/components/imageOperation/saveCompletedImage.vue'
+import completeViewImage from '@/layouts/components/imageOperation/completeViewImage.vue'
+import { tr } from 'element-plus/es/locale'
 
 defineOptions({
   name: ''
@@ -18,9 +20,12 @@ const imageOperationStateStore = useImageOperationStateStore()
 
 const centerDialogVisible = ref(false)
 const saveCompletedImageVisible = ref(false)
+const completeViewImageVisible = ref(false)
 const drawerVisible = ref()
 const seriesFeature = ref()
 const imageFeature = ref<ImageFeature>()
+
+const checkWindowsType = ref(true)
 
 function seriesFeatureTableVisible() {
   const seriesInfoWindows = imageOperationStateStore.seriesListWindows[
@@ -43,20 +48,39 @@ function imageFeatureTableVisible() {
   delete imageFeature.value?.modelResId
   delete imageFeature.value?.file_name
 }
+
+watch(
+  () => imageOperationStateStore.selectSeriesWindows,
+  () => {
+    const selectSeriesWindow =
+      imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+    if (
+      selectSeriesWindow != 0 &&
+      selectSeriesWindow.seriesInfo.seriesModelType == 'segmentModel'
+    ) {
+      checkWindowsType.value = true
+    } else {
+      checkWindowsType.value = false
+    }
+  },
+  {
+    deep: true
+  }
+)
 </script>
 
 <template>
   <div class="divide-x-0 divide-y-2 divide-slate-400/50 divide-solid">
     <div class="flex flex-wrap justify-evenly bg-stone-50 dark:border-gray-700 dark:bg-gray-800">
-      <el-button class="my-1" size="default" round @click="saveCompletedImageVisible=true"
+      <el-button class="my-1" size="default" round @click="saveCompletedImageVisible = true"
         ><el-icon><DocumentAdd /></el-icon> 保存图像</el-button
       >
 
-      <el-button class="my-1" size="default" round @click="seriesFeatureTableVisible()"
+      <el-button class="my-1" size="default" round @click="completeViewImageVisible = true"
         ><el-icon><Check /></el-icon>完成阅片</el-button
       >
     </div>
-    <div class="flex flex-wrap justify-evenly bg-stone-50 dark:border-gray-700 dark:bg-gray-800">
+    <div v-show="checkWindowsType" class="flex flex-wrap justify-evenly bg-stone-50 dark:border-gray-700 dark:bg-gray-800">
       <el-button class="my-1" size="default" @click="imageFeatureTableVisible()"
         ><el-icon><Reading /></el-icon> 图像特征</el-button
       >
@@ -89,6 +113,11 @@ function imageFeatureTableVisible() {
       :save-completed-image-window-open="saveCompletedImageVisible"
       @save-completed-image-window-close="saveCompletedImageVisible = false"
     ></saveCompletedImage>
+    <completeViewImage
+      :complete-view-image-window-open="completeViewImageVisible"
+      @complete-view-image-window-close="completeViewImageVisible = false"
+    >
+    </completeViewImage>
   </div>
 </template>
 

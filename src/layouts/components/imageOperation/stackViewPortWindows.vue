@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { SeriesInfoWindows, SingleImage } from '@/types/image'
+import type { SeriesInfoWindows } from '@/types/image'
 import { initDemo } from '@/utils/helpers/index.js'
 import registerWebImageLoader from '@/utils/helpers/registerWebImageLoader'
 import hardcodedMetaDataProvider from '@/utils/helpers//hardcodedMetaDataProvider'
@@ -16,7 +16,6 @@ import {
   cancelActiveManipulations,
   annotation
 } from '@cornerstonejs/tools'
-import { api } from 'dicomweb-client'
 import {
   RenderingEngine,
   Enums,
