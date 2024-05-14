@@ -11,7 +11,7 @@ export interface ImageInfo {
     operateId: number | null;  
     operateName: string | null;  
     operateTime: Date | null; // 注意这里假设了日期格式，你可能需要自定义日期解析  
-    status: string | null;  
+    imageStatus: number | null;  
     imageEquipment: string | null;  
     imageFormat: string | null;  
     imageDesc: string | null;  

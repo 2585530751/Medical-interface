@@ -28,3 +28,4 @@ export interface ImageFeature {
   original_firstorder_Uniformity: number | null
   original_firstorder_Variance: number | null
 }
+

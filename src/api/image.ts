@@ -17,6 +17,19 @@ export const uploadImages = (data?: object) => {
   )
 }
 
+export const uploadMarkImageFormApi = (data?: object) => {
+  return http.request<ResponseResuilt<string>>(
+    'post',
+    baseUrlApi('markImage/uploadMarkImageForm'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+  )
+}
+
 export const getImagePageByDoctorId = (data?: object) => {
   return http.request<any>(
     'post',
@@ -73,3 +86,4 @@ export const singleImageIntestinalPolypsSegmentationApi = (params?: object) => {
 export const imageIntestinalPolypsSegmentationApi = (params?: object) => {
   return http.request<any>('get', baseUrlApi('modelApi/intestinalPolypsSegmentation'), { params })
 }
+

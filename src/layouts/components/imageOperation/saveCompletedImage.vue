@@ -9,6 +9,11 @@ import {
   showAllAnnotations,
   selectAllAnnotations
 } from '@/composables/image/imageOperate'
+import { uploadMarkImageFormApi } from '@/api/image'
+import { imageKeyValueStore } from '@/composables/image/imageKeyValueStore'
+import type { ImageFeature } from '@/types/image'
+import type { ImageInfo } from '@/types/series'
+import type { ImageModelResult } from '@/types/model'
 
 const { ViewportType } = Enums
 
@@ -31,7 +36,7 @@ watch(
   }
 )
 
-const imageInfo = reactive({
+const imageFileInfo = reactive({
   imageWidth: 512,
   imageHeight: 512,
   imageType: 'jpg',
@@ -53,13 +58,13 @@ function onOpened() {
   parentNode = divForDownloadViewport.parentNode as HTMLDivElement
   divElement = document.getElementById('previewCanvas') as HTMLDivElement
   divElement.appendChild(divForDownloadViewport)
-  divForDownloadViewport!.style.width = imageInfo.imageWidth + 'px'
-  divForDownloadViewport!.style.height = imageInfo.imageHeight + 'px'
+  divForDownloadViewport!.style.width = imageFileInfo.imageWidth + 'px'
+  divForDownloadViewport!.style.height = imageFileInfo.imageHeight + 'px'
 }
 
 function onClosed() {
-  imageInfo.imageWidth = 512
-  imageInfo.imageHeight = 512
+  imageFileInfo.imageWidth = 512
+  imageFileInfo.imageHeight = 512
   divForDownloadViewport!.style.width = '100%'
   divForDownloadViewport!.style.height = '100%'
   parentNode!.insertBefore(divForDownloadViewport!, parentNode!.firstChild)
@@ -68,14 +73,54 @@ function onClosed() {
 function uploadSaveCompletedImage() {
   html2canvas(divForDownloadViewport as HTMLDivElement).then((canvas: HTMLCanvasElement) => {
     let formData = new FormData()
-    let imageData = canvas.toDataURL(imageInfo.imageType, 1.0)
-    formData.append('imageData', imageData)
+    let imageData = canvas.toDataURL(imageFileInfo.imageType, 1.0)
+    let blob = dataURLtoBlob(imageData)
+    let file = new File([blob], imageFileInfo.imageName, { type: imageFileInfo.imageType })
+
+    const imageInfo: ImageInfo = imageKeyValueStore.get(
+      imageOperationStateStore.viewports[
+        imageOperationStateStore.selectSeriesWindows
+      ].getCurrentImageId()
+    )
+    const imageModelData: ImageModelResult = JSON.parse(JSON.stringify(imageInfo.imageModelData))
+    const markImageObject = {
+      seriesId: imageModelData.seriesId,
+      imageId: imageModelData.imageId,
+      modelId: imageModelData.modelId,
+      markImageName: imageFileInfo.imageName,
+      markImageDesc: imageFileInfo.imageDescription
+    }
+    formData.append('file', file)
+    formData.append('info', JSON.stringify(markImageObject))
+    console.log(formData)
+    uploadMarkImageFormApi(formData).then((res) => {
+      if(res.code === 200) {
+        
+        imageInfo.imageStatus = 1
+
+      }
+    })
   })
 }
 
+function dataURLtoBlob(dataurl: string) {
+  // 转换函数（这里简化处理，不处理可能的错误）
+  const parts = dataurl.split(';base64,')
+  const contentType = parts[0].split(':')[1]
+  const raw = window.atob(parts[1])
+  const rawLength = raw.length
+  const uInt8Array = new Uint8Array(rawLength)
+
+  for (let i = 0; i < rawLength; ++i) {
+    uInt8Array[i] = raw.charCodeAt(i)
+  }
+
+  return new Blob([uInt8Array], { type: contentType })
+}
+
 const changeWidthHeight = () => {
-  divForDownloadViewport!.style.width = imageInfo.imageWidth + 'px'
-  divForDownloadViewport!.style.height = imageInfo.imageHeight + 'px'
+  divForDownloadViewport!.style.width = imageFileInfo.imageWidth + 'px'
+  divForDownloadViewport!.style.height = imageFileInfo.imageHeight + 'px'
 }
 
 function handleSwitchChange(newVal: Boolean) {
@@ -114,32 +159,45 @@ function handleSwitchChange(newVal: Boolean) {
     center
   >
     <div class="flex flex-col">
-      <el-form ref="ruleFormRef" :model="imageInfo" label-position="top">
+      <el-form ref="ruleFormRef" :model="imageFileInfo" label-position="top">
         <el-form-item label="图像描述" prop="imageDescription">
           <el-input
-            v-model="imageInfo.imageDescription"
+            v-model="imageFileInfo.imageDescription"
             style="width: 100%"
             :autosize="{ minRows: 5, maxRows: 10 }"
             type="textarea"
             placeholder="请输入图像描述"
           />
         </el-form-item>
+        <el-form-item label="文件名">
+          <el-input v-model="imageFileInfo.imageName" />
+        </el-form-item>
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="宽（px)">
-              <el-input-number :max="1024" :min="32" v-model="imageInfo.imageWidth" @change="changeWidthHeight()" />
+              <el-input-number
+                :max="1024"
+                :min="32"
+                v-model="imageFileInfo.imageWidth"
+                @change="changeWidthHeight()"
+              />
             </el-form-item>
           </el-col>
           <el-col :span="12">
             <el-form-item label="高（px)">
-              <el-input-number :max="1024" :min="32" v-model="imageInfo.imageHeight" @change="changeWidthHeight()" />
+              <el-input-number
+                :max="1024"
+                :min="32"
+                v-model="imageFileInfo.imageHeight"
+                @change="changeWidthHeight()"
+              />
             </el-form-item>
           </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
             <el-form-item label="图片类型" prop="patientWeight">
-              <el-radio-group v-model="imageInfo.imageType" class="ml-4">
+              <el-radio-group v-model="imageFileInfo.imageType" class="ml-4">
                 <el-radio label="png" size="large">png</el-radio>
                 <el-radio label="jpg" size="large">jpg</el-radio>
               </el-radio-group>
@@ -148,7 +206,7 @@ function handleSwitchChange(newVal: Boolean) {
           <el-col :span="12">
             <el-form-item label="显示注释" prop="patientAge">
               <el-switch
-                v-model="imageInfo.imageAnnotation"
+                v-model="imageFileInfo.imageAnnotation"
                 @change="handleSwitchChange"
                 size="large"
                 active-text="显示"

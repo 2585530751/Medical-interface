@@ -196,7 +196,7 @@ const searchRow = (index: number) => {
                                 <el-table-column prop="toolName" label="项目名称" width="150" />
                                 <el-table-column prop="toolBackground" label="项目背景" width="150" />
                                 <el-table-column prop="toolAbstract" label="项目概要" width="250" />
-                                <el-table-column prop="toolRoute" label="项目路径" width="600" />
+                                <el-table-column prop="toolRoute" label="项目路径" width="450" />
                                 <el-table-column fixed="right" label="Operations" width="220">
                                     <template #default="scope">
                                         <div style="display: flex;">
