@@ -90,10 +90,10 @@ function viewReader() {
         imageOperationStateStore.selectSeriesWindows
       ].getCurrentImageId()
     )
-    const imageModelData: ImageModelResult = JSON.parse(JSON.stringify(imageInfo.imageModelData))
+    // const imageModelData: ImageModelResult = JSON.parse(JSON.stringify(imageInfo.imageModelData))
     const markImageObject = {
-      seriesId: imageModelData.seriesId,
-      imageId: imageModelData.imageId,
+      seriesId: imageInfo.seriesId,
+      imageId: imageInfo.imageId,
       readerView: imageFileInfo.imageDescription
     }
     formData.append('file', file)

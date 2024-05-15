@@ -142,7 +142,7 @@ function imageDelete(seriesId: number) {
               </el-table-column>
               <el-table-column label="图像ID" prop="imageId" />
               <el-table-column label="图像名称" prop="singleImageName" />
-              <el-table-column fixed="right" label="操作" width="200">
+              <el-table-column fixed="right" label="操作" >
                 <template #default="scope">
                   <el-button
                     link
@@ -183,7 +183,7 @@ function imageDelete(seriesId: number) {
       <el-table-column label="序列数量" prop="imageCount" />
       <el-table-column label="上传医生" prop="creatorName" />
       <el-table-column label="上传时间" prop="createTime" />
-      <el-table-column fixed="right" label="操作" width="200">
+      <el-table-column fixed="right" label="操作" >
         <template #default="scope">
           <el-button link type="primary" size="small" @click="imagesOperation(scope.row)"
             ><template #icon>

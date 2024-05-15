@@ -117,7 +117,7 @@ function imageOperation(imageInfo: ImageInfo, seriesInfo: SeriesInfo) {
                 <el-table-column label="分配位数" prop="bitsAllocated" />
                 <el-table-column label="位数存储" prop="bitsStored" />
                 <el-table-column label="影像描述" prop="imageDesc" />
-                <el-table-column fixed="right" label="操作" width="200">
+                <el-table-column fixed="right" label="操作" >
                   <template #default="scope">
                     <el-button
                       link
@@ -185,7 +185,7 @@ function imageOperation(imageInfo: ImageInfo, seriesInfo: SeriesInfo) {
         label="序列描述"
         prop="seriesDesc"
       />
-      <el-table-column fixed="right" label="操作" width="200">
+      <el-table-column fixed="right" label="操作" >
         <template #default="scope">
           <el-button link type="primary" size="default" @click="seriesOperation(scope.row)"
             ><template #icon>

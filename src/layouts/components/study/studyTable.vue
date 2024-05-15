@@ -19,7 +19,8 @@ import { getSeriesImageByIdApi } from '@/api/series'
 import { message } from '@/utils/message'
 import rolePermission from '@/components/rolePermission.vue'
 import { basicImageUrl } from '@/api/utils'
-import imageDicom from '@/components/ReImage/imageDicom.vue'
+import seriesDicom from '@/components/ReImage/seriesDicom.vue'
+import seriesDiagnosticResult from '@/layouts/components/series/seriesDiagnosticResult.vue'
 
 const props = defineProps<{
   tableSize: string
@@ -30,6 +31,8 @@ const studyStateStore = useStudyStateStore()
 const seriesStateStore = useSeriesStateStore()
 const imageOperationStateStore = useImageOperationStateStore()
 const tableRef = ref<TableInstance>()
+const seriesDiagnosticResultVisible = ref(false)
+const seriesInfoDiagnosticResult = ref({} as SeriesInfo)
 
 onMounted(() => {
   studyStateStore.getStudyListPage()
@@ -77,6 +80,11 @@ function seriesOperation(seriesId: number) {
     router.push('/imageOperation')
   })
 }
+
+function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
+  seriesInfoDiagnosticResult.value = seriesInfo
+  seriesDiagnosticResultVisible.value = true
+}
 </script>
 
 <template>
@@ -119,8 +127,11 @@ function seriesOperation(seriesId: number) {
                           scope.row.seriesPreviewPath.endsWith('.jpeg')
                         "
                       />
-                      <imageDicom
-                        :image-info="scope.row"
+                      <seriesDicom
+                        class="w-16 h-16"
+                        key-value="SeriesPreview"
+                        :series-info="scope.row"
+                        :series-path="scope.row.seriesPreviewPath"
                         v-show="scope.row.seriesPreviewPath.endsWith('.dcm')"
                       />
                     </div>
@@ -143,8 +154,11 @@ function seriesOperation(seriesId: number) {
                           scope.row.markSeriesPreviewPath.endsWith('.jpeg')
                         "
                       />
-                      <imageDicom
-                        :image-info="scope.row"
+                      <seriesDicom
+                        class="w-16 h-16"
+                        key-value="MarkSeriesPreview"
+                        :series-info="scope.row"
+                        :series-path="scope.row.markSeriesPreviewPath"
                         v-show="scope.row.markSeriesPreviewPath.endsWith('.dcm')"
                       />
                     </div>
@@ -158,9 +172,7 @@ function seriesOperation(seriesId: number) {
                 <el-table-column label="序列描述" prop="seriesDesc" />
                 <el-table-column label="序列状态">
                   <template #default="scope">
-                    <el-tag type="success" v-if="scope.row.seriesStatus == '0'"
-                      >阅片员未阅片</el-tag
-                    >
+                    <el-tag type="success" v-if="scope.row.seriesStatus == '0'">阅片员未阅</el-tag>
                     <el-tag type="info" v-if="scope.row.seriesStatus == '1'">医生未诊断</el-tag>
                     <el-tag type="warning" v-if="scope.row.seriesStatus == '2'">医生已诊断</el-tag>
                   </template>
@@ -174,7 +186,7 @@ function seriesOperation(seriesId: number) {
                           link
                           type="primary"
                           size="small"
-                          @click="seriesOperation(scope.row.seriesId)"
+                          @click="diagnosticResultWindowOpen(scope.row)"
                           ><template #icon>
                             <IconifyIconOffline :icon="view"></IconifyIconOffline>
                           </template>
@@ -204,7 +216,6 @@ function seriesOperation(seriesId: number) {
                     <role-permission :value="['radiologist']">
                       <div class="flex items-center gap-1">
                         <el-button
-                          v-if="scope.row.seriesStatus == '1'"
                           link
                           type="primary"
                           size="small"
@@ -274,7 +285,7 @@ function seriesOperation(seriesId: number) {
         label="检查描述"
         prop="studyDescription"
       />
-      <el-table-column fixed="right" label="操作" width="200">
+      <el-table-column fixed="right" label="操作">
         <template #default="scope">
           <el-button
             link
@@ -290,6 +301,10 @@ function seriesOperation(seriesId: number) {
       </el-table-column>
     </el-table>
   </el-card>
+  <seriesDiagnosticResult
+    :diagnostic-result-window-open="seriesDiagnosticResultVisible"
+    :series-info="seriesInfoDiagnosticResult"
+  ></seriesDiagnosticResult>
 </template>
 
 <style lang="scss" scoped></style>

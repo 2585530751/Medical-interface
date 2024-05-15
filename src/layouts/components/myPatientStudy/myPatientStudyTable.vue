@@ -98,7 +98,7 @@ function seriesOperation(seriesId: number) {
                 <el-table-column label="序列类型" prop="modality" />
                 <el-table-column label="上传时间" prop="createTime" />
                 <el-table-column label="序列描述" prop="seriesDesc" />
-                <el-table-column fixed="right" label="操作" width="200">
+                <el-table-column fixed="right" label="操作" >
                   <template #default="scope">
                     <el-button
                       link
@@ -162,7 +162,7 @@ function seriesOperation(seriesId: number) {
         label="检查描述"
         prop="studyDescription"
       />
-      <el-table-column fixed="right" label="操作" width="200">
+      <el-table-column fixed="right" label="操作" >
         <template #default>
           <el-button
             link

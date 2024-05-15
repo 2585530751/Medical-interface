@@ -83,7 +83,7 @@ function viewSerieslistByStudyId(studyId: number) {
                 <el-table-column label="检查次序" prop="accessionNumber" />
                 <el-table-column label="检查部位" prop="bodyPartExamined" />
                 <el-table-column label="检查描述" prop="studyDescription" />
-                <el-table-column fixed="right" label="操作" width="200">
+                <el-table-column fixed="right" label="操作" >
                   <template #default="scope">
                     <el-button link type="primary" size="small" @click="viewSerieslistByStudyId(scope.row.studyId)"
                       ><template #icon>
@@ -126,7 +126,7 @@ function viewSerieslistByStudyId(studyId: number) {
         label="出生日期"
         prop="dateOfBirth"
       />
-      <el-table-column fixed="right" label="操作" width="200">
+      <el-table-column fixed="right" label="操作" >
         <template #default="scope">
           <el-button link type="primary" size="default" @click="viewChecklist(scope.row.patientId)"
             ><template #icon>

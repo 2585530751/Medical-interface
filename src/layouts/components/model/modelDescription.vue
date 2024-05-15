@@ -86,7 +86,7 @@ watch(
         <defs>
           <pattern
             id="e813992c-7d03-4cc4-a2bd-151760b470a0"
-            width="200"
+            
             height="200"
             x="50%"
             y="-1"
