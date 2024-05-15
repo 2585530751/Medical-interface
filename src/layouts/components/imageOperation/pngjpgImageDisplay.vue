@@ -20,14 +20,31 @@ import { useImageOperationStateStore } from '@/store/imageOperationState'
 import { generateImageUrl } from '@/composables/image/utils'
 import { imageKeyValueStore } from '@/composables/image/imageKeyValueStore'
 import stackViewPortWindows from '@/layouts/components/imageOperation/stackViewPortWindows.vue'
+import {
+  Enums as csToolsEnums,
+  segmentation,
+  utilities as cstUtils,
+  cancelActiveManipulations,
+  annotation
+} from '@cornerstonejs/tools'
 
-const imageOperationStateStore =useImageOperationStateStore()
-
-
+const imageOperationStateStore = useImageOperationStateStore()
 
 onMounted(() => {
   const element: HTMLDivElement = document.getElementById('imageOperationView') as HTMLDivElement
+  element.addEventListener(csToolsEnums.Events.KEY_DOWN, (evt) => {
+    cancelAndRemoveAnnotation(element)
+  })
+
   element.oncontextmenu = (e) => e.preventDefault()
+  // 创建一个新的 ResizeObserver 实例
+  let ro = new ResizeObserver((entries) => {
+    setTimeout(() => {
+      // viewport.resize()
+      imageOperationStateStore.renderingEngine.resize(true, true)
+    }, 100) // 延迟1000毫秒后调用
+  })
+  ro.observe(element)
 })
 
 createTools()
@@ -39,12 +56,20 @@ const gridStyle = computed(() => ({
   gap: '8px' // 格子间隔
 }))
 const totalCells = computed(() => {
-  return imageOperationStateStore.windowRowsColumns.rows * imageOperationStateStore.windowRowsColumns.columns
+  return (
+    imageOperationStateStore.windowRowsColumns.rows *
+    imageOperationStateStore.windowRowsColumns.columns
+  )
 })
 
 const imagesInfoWindows = computed(() => {
   return imageOperationStateStore.seriesListWindows
 })
+
+function cancelAndRemoveAnnotation(temElement: HTMLDivElement) {
+  const annotationUID = cancelActiveManipulations(temElement)
+  annotation.state.removeAnnotation(annotationUID as string)
+}
 </script>
 
 <template>

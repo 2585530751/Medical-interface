@@ -49,7 +49,7 @@ export const useImageOperationStateStore = defineStore('imageOperationState', ()
     operateId: null,
     operateName: null,
     operateTime: null,
-    status: null,
+    imageStatus: null,
     imageEquipment: null,
     imageFormat: null,
     imageDesc: null,
@@ -82,7 +82,10 @@ export const useImageOperationStateStore = defineStore('imageOperationState', ()
     samplesPerPixel: null,
     photometricInterpretation: null,
     imageModelData: null,
-    modelType: null
+    modelType: null,
+    markImageName: null,
+    markImagePath: null,
+    markImageDesc: null
   })
   const seriesList = reactive<SeriesInfo>({
     seriesId: 0,
@@ -113,7 +116,11 @@ export const useImageOperationStateStore = defineStore('imageOperationState', ()
     studyId: 0,
     imageList: [],
     seriesFeature: null,
-    seriesModelType: null
+    seriesModelType: null,
+    readerView: null,
+    doctorView: null,
+    markSeriesPreviewPath: null,
+    markSeriesName: null
   })
   const seriesLists = reactive<SeriesInfo[]>(
     storageSession().getItem<SeriesInfo[]>(seriesListsSession)

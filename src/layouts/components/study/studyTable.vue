@@ -11,12 +11,15 @@ import { useSeriesStateStore } from '@/store/modules/seriesState'
 import { useImageOperationStateStore } from '@/store/imageOperationState'
 import { setAllPropertiesToNull } from '@/utils/commonUtils'
 import router from '@/router'
-import { Timer } from '@element-plus/icons-vue'
+import { Timer, ArrowDown } from '@element-plus/icons-vue'
 import type { SeriesInfo } from '@/types/series'
 import { changeSeriesListWindowsToSession, pushSeriesToSession } from '@/composables/image/utils'
 import type { SeriesInfoWindows } from '@/types/image'
 import { getSeriesImageByIdApi } from '@/api/series'
 import { message } from '@/utils/message'
+import rolePermission from '@/components/rolePermission.vue'
+import { basicImageUrl } from '@/api/utils'
+import imageDicom from '@/components/ReImage/imageDicom.vue'
 
 const props = defineProps<{
   tableSize: string
@@ -100,26 +103,127 @@ function seriesOperation(seriesId: number) {
                 resizable
                 class="dark:bg-neutral-900"
               >
+                <el-table-column label="序列预览">
+                  <template #default="scope">
+                    <div
+                      v-if="
+                        scope.row.seriesPreviewPath != null && scope.row.seriesPreviewPath != ''
+                      "
+                    >
+                      <el-image
+                        :src="basicImageUrl + scope.row.seriesPreviewPath"
+                        :crossorigin="'anonymous'"
+                        v-show="
+                          scope.row.seriesPreviewPath.endsWith('.png') ||
+                          scope.row.seriesPreviewPath.endsWith('.jpg') ||
+                          scope.row.seriesPreviewPath.endsWith('.jpeg')
+                        "
+                      />
+                      <imageDicom
+                        :image-info="scope.row"
+                        v-show="scope.row.seriesPreviewPath.endsWith('.dcm')"
+                      />
+                    </div>
+                  </template>
+                </el-table-column>
+                <el-table-column label="标注预览">
+                  <template #default="scope">
+                    <div
+                      v-if="
+                        scope.row.markSeriesPreviewPath != null &&
+                        scope.row.markSeriesPreviewPath != ''
+                      "
+                    >
+                      <el-image
+                        :src="basicImageUrl + scope.row.markSeriesPreviewPath"
+                        :crossorigin="'anonymous'"
+                        v-show="
+                          scope.row.markSeriesPreviewPath.endsWith('.png') ||
+                          scope.row.markSeriesPreviewPath.endsWith('.jpg') ||
+                          scope.row.markSeriesPreviewPath.endsWith('.jpeg')
+                        "
+                      />
+                      <imageDicom
+                        :image-info="scope.row"
+                        v-show="scope.row.markSeriesPreviewPath.endsWith('.dcm')"
+                      />
+                    </div>
+                  </template>
+                </el-table-column>
                 <el-table-column label="序列日期" prop="seriesDate" />
                 <el-table-column label="序列时间" prop="seriesTime" />
                 <el-table-column label="序列数量" prop="seriesNumber" />
                 <el-table-column label="序列类型" prop="modality" />
                 <el-table-column label="上传时间" prop="createTime" />
                 <el-table-column label="序列描述" prop="seriesDesc" />
-                <el-table-column fixed="right" label="操作" width="200">
+                <el-table-column label="序列状态">
                   <template #default="scope">
-                    <el-button
-                      link
-                      type="primary"
-                      size="small"
-                      @click="seriesOperation(scope.row.seriesId)"
-                      ><template #icon>
-                        <IconifyIconOffline :icon="view"></IconifyIconOffline>
-                      </template>
-                      阅片</el-button
+                    <el-tag type="success" v-if="scope.row.seriesStatus == '0'"
+                      >阅片员未阅片</el-tag
                     >
-
-                    <el-button :icon="IonEllipsisHorizontal" link type="primary" />
+                    <el-tag type="info" v-if="scope.row.seriesStatus == '1'">医生未诊断</el-tag>
+                    <el-tag type="warning" v-if="scope.row.seriesStatus == '2'">医生已诊断</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column fixed="right" label="操作">
+                  <template #default="scope">
+                    <role-permission :value="['doctor']">
+                      <div class="flex items-center gap-1">
+                        <el-button
+                          v-if="scope.row.seriesStatus == '1'"
+                          link
+                          type="primary"
+                          size="small"
+                          @click="seriesOperation(scope.row.seriesId)"
+                          ><template #icon>
+                            <IconifyIconOffline :icon="view"></IconifyIconOffline>
+                          </template>
+                          诊断</el-button
+                        >
+                        <el-dropdown class="">
+                          <el-button :icon="IonEllipsisHorizontal" link type="primary"></el-button>
+                          <template #dropdown>
+                            <el-dropdown-menu>
+                              <el-dropdown-item
+                                ><el-button
+                                  link
+                                  type="primary"
+                                  size="small"
+                                  @click="seriesOperation(scope.row.seriesId)"
+                                  ><template #icon>
+                                    <IconifyIconOffline :icon="view"></IconifyIconOffline>
+                                  </template>
+                                  阅片</el-button
+                                ></el-dropdown-item
+                              >
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </div>
+                    </role-permission>
+                    <role-permission :value="['radiologist']">
+                      <div class="flex items-center gap-1">
+                        <el-button
+                          v-if="scope.row.seriesStatus == '1'"
+                          link
+                          type="primary"
+                          size="small"
+                          @click="seriesOperation(scope.row.seriesId)"
+                          ><template #icon>
+                            <IconifyIconOffline :icon="view"></IconifyIconOffline>
+                          </template>
+                          阅片</el-button
+                        >
+                        <el-dropdown class="">
+                          <el-button :icon="IonEllipsisHorizontal" link type="primary"></el-button>
+                          <template #dropdown>
+                            <el-dropdown-menu>
+                              <el-dropdown-item></el-dropdown-item>
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </div>
+                    </role-permission>
                   </template>
                 </el-table-column>
               </el-table>

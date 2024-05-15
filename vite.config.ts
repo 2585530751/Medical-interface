@@ -22,15 +22,15 @@ export default defineConfig((ConfigEnv) => {
             '@cornerstonejs/dicom-image-loader/dist/dynamic-import/cornerstoneDICOMImageLoader.min.js',
           '@cornerstone-nifti-image-loader':
             '@cornerstonejs/nifti-image-loader/dist/cornerstoneNIFTIImageLoader.min.js',
-          // '/src/index.worker.64c896c4316fcd506666.worker.js': path.resolve(
-          //   __dirname,
-          //   'node_modules',
-          //   '@cornerstonejs',
-          //   'dicom-image-loader',
-          //   'dist',
-          //   'dynamic-import',
-          //   'index.worker.64c896c4316fcd506666.worker.js'
-          // )
+          '/src/index.worker.64c896c4316fcd506666.worker.js': path.resolve(
+            __dirname,
+            'node_modules',
+            '@cornerstonejs',
+            'dicom-image-loader',
+            'dist',
+            'dynamic-import',
+            'index.worker.64c896c4316fcd506666.worker.js'
+          )
         }
       },
       server: {

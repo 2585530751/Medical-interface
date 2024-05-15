@@ -24,7 +24,7 @@ export const getSeriesImageByIdApi = (params?: object) => {
     )
   }
 
-  export const viewReadermApi = (data?: object) => {
+  export const viewReaderApi = (data?: object) => {
     return http.request<ResponseResuilt<SeriesInfo>>(
       'post',
       baseUrlApi('view/reader'),

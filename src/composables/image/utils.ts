@@ -81,19 +81,20 @@ export function pushseriesModelsListsSession(seriesInfo: SeriesInfo) {
 }
 
 export function changeSeriesListWindowsToSession(
-  seriesInfoWindows: SeriesInfoWindows,
+  seriesInfoWindow: SeriesInfoWindows,
   index: number
 ) {
   const session = storageSession()
   if (session.getItem(seriesListWindowsSession)) {
     const list: (SeriesInfoWindows | 0)[] = session.getItem(seriesListWindowsSession)
-    if (JSON.stringify(list[index]) != JSON.stringify(seriesInfoWindows)) {
-      list[index] = seriesInfoWindows
+    if (JSON.stringify(list[index]) != JSON.stringify(seriesInfoWindow)) {
+      console.log(seriesInfoWindow)
+      list[index] = seriesInfoWindow
       session.setItem(seriesListWindowsSession, list)
     }
   } else {
     const list: (SeriesInfoWindows | 0)[] = [0, 0, 0, 0, 0, 0, 0, 0, 0]
-    list[index] = seriesInfoWindows
+    list[index] = seriesInfoWindow
     session.setItem(seriesListWindowsSession, list)
   }
 }

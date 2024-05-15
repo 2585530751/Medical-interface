@@ -1,3 +1,5 @@
+import type { RouteConfigsTable } from "@/types/global";
+
 export default {
     path: "/study",
     redirect: "/study/index",

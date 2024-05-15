@@ -4,7 +4,7 @@ import timer from '@iconify-icons/ep/timer'
 import folder from '@iconify-icons/ep/folder'
 import { basicImageUrl } from '@/api/utils'
 
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, nextTick, onUnmounted } from 'vue'
 import { useImageOperationStateStore } from '@/store/imageOperationState'
 import type { SeriesInfoWindows } from '@/types/image'
 import { changeSeriesListWindowsToSession } from '@/composables/image/utils'
@@ -50,32 +50,32 @@ function selectImagesListToWindows() {
       imageOperationStateStore.selectSeriesWindows + 1
     )
   ]
-  changeSeriesListWindowsToSession(
-    seriesInfoWindows,
-    imageOperationStateStore.selectSeriesWindows
-  )
+  changeSeriesListWindowsToSession(seriesInfoWindows, imageOperationStateStore.selectSeriesWindows)
 }
 
 function checkInputCheckbox() {
   emit('addSelectImagesLists', props.seriesList, checked.value)
 }
 
-onMounted(() => {
+onUnmounted(() => {
+  renderingEngine.disableElement(viewportId)
+})
+
+onMounted(async () => {
+  await nextTick()
   if (imagesListUrl && imagesListUrl.endsWith('.dcm')) {
-    setTimeout(() => {
-      const element: HTMLDivElement = document.getElementById(elementId.value) as HTMLDivElement
-      const viewportInput = {
-        viewportId: viewportId,
-        type: ViewportType.STACK,
-        element: element as HTMLDivElement
-      }
-      renderingEngine.enableElement(viewportInput)
-      const viewport = renderingEngine.getViewport(viewportId) as IStackViewport
-      imageIds[0] = imagesListUrl
-      viewport.setStack(imageIds).then(() => {
-        viewport.render()
-      })
-    }, 500)
+    const element: HTMLDivElement = document.getElementById(elementId.value) as HTMLDivElement
+    const viewportInput = {
+      viewportId: viewportId,
+      type: ViewportType.STACK,
+      element: element as HTMLDivElement
+    }
+    renderingEngine.enableElement(viewportInput)
+    const viewport = renderingEngine.getViewport(viewportId) as IStackViewport
+    imageIds[0] = imagesListUrl
+    viewport.setStack(imageIds).then(() => {
+      viewport.render()
+    })
   } else {
     imagesListUrlCheck.value = false
   }
@@ -89,7 +89,9 @@ onMounted(() => {
     </div>
     <div
       class="flex flex-col justify-center w-4/6 gap-1"
-      :class="{ highlighted: imageOperationStateStore.selectSeriesList === props.seriesList.seriesId }"
+      :class="{
+        highlighted: imageOperationStateStore.selectSeriesList === props.seriesList.seriesId
+      }"
       @click="selectImagesListToWindows()"
     >
       <div class="flex items-center justify-between">

@@ -177,7 +177,7 @@ function deleteAllImagesModelsLists() {
       </el-button-group>
     </div>
     <div
-      v-show="mainShow"
+      v-if="mainShow"
       class="flex flex-col px-4 py-2 bg-stone-50 dark:border-gray-700 dark:bg-gray-800"
     >
       <div class="flex items-center justify-between">
@@ -204,7 +204,7 @@ function deleteAllImagesModelsLists() {
       </div>
     </div>
     <div
-      v-show="mainShow"
+      v-if="mainShow"
       class="flex flex-col justify-center gap-8 py-2 bg-stone-50 dark:border-gray-700 dark:bg-gray-800"
     >
       <!-- <imagesListDisplay :imagesList="imagesList"></imagesListDisplay> -->
@@ -224,7 +224,7 @@ function deleteAllImagesModelsLists() {
     </div>
 
     <div
-      v-show="!mainShow"
+      v-if="!mainShow"
       class="flex flex-col px-4 py-2 bg-stone-50 dark:border-gray-700 dark:bg-gray-800"
     >
       <div class="flex items-center justify-between">
@@ -252,7 +252,7 @@ function deleteAllImagesModelsLists() {
     </div>
 
     <div
-      v-show="!mainShow"
+      v-if="!mainShow"
       class="flex flex-col justify-center gap-8 py-2 bg-stone-50 dark:border-gray-700 dark:bg-gray-800"
     >
       <!-- <imagesListDisplay :imagesList="imagesList"></imagesListDisplay> -->

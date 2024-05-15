@@ -9,7 +9,7 @@ import {
   showAllAnnotations,
   selectAllAnnotations
 } from '@/composables/image/imageOperate'
-import { viewReadermApi } from '@/api/series'
+import { viewReaderApi } from '@/api/series'
 import { imageKeyValueStore } from '@/composables/image/imageKeyValueStore'
 import type { ImageFeature } from '@/types/image'
 import type { ImageInfo } from '@/types/series'
@@ -78,7 +78,7 @@ function onClosed() {
   parentNode!.insertBefore(divForDownloadViewport!, parentNode!.firstChild)
 }
 
-function uploadSaveCompletedImage() {
+function viewReader() {
   html2canvas(divForDownloadViewport as HTMLDivElement).then((canvas: HTMLCanvasElement) => {
     let formData = new FormData()
     let imageData = canvas.toDataURL(imageFileInfo.imageType, 1.0)
@@ -94,15 +94,14 @@ function uploadSaveCompletedImage() {
     const markImageObject = {
       seriesId: imageModelData.seriesId,
       imageId: imageModelData.imageId,
-      modelId: imageModelData.modelId,
-      markImageName: imageFileInfo.imageName,
-      markImageDesc: imageFileInfo.imageDescription
+      readerView: imageFileInfo.imageDescription
     }
     formData.append('file', file)
     formData.append('info', JSON.stringify(markImageObject))
     console.log(formData)
-    viewReadermApi(formData).then((res) => {
+    viewReaderApi(formData).then((res) => {
       if (res.code === 200) {
+        console.log(res.data)
         const seriesInfo: SeriesInfo = res.data as SeriesInfo
         const seriesListWindows = imageOperationStateStore.seriesListWindows
         const seriesLists = imageOperationStateStore.seriesLists
@@ -118,7 +117,6 @@ function uploadSaveCompletedImage() {
               seriesListWindow.seriesInfo.seriesPreviewPath = seriesInfo.seriesPreviewPath
               seriesListWindow.seriesInfo.seriesStatus = seriesInfo.seriesStatus
               changeSeriesListWindowsToSession(seriesListWindow, i)
-              break
             }
           }
         }
@@ -201,7 +199,7 @@ function handleSwitchChange(newVal: Boolean) {
     @close="$emit('completeViewImageWindowClose')"
     @opened="onOpened"
     @closed="onClosed"
-    title="保存图像"
+    title="完成阅片"
     width="50%"
     :modal="false"
     :destroy-on-close="true"
@@ -211,13 +209,13 @@ function handleSwitchChange(newVal: Boolean) {
   >
     <div class="flex flex-col">
       <el-form ref="ruleFormRef" :model="imageFileInfo" label-position="top">
-        <el-form-item label="图像描述" prop="imageDescription">
+        <el-form-item label="序列描述" prop="imageDescription">
           <el-input
             v-model="imageFileInfo.imageDescription"
             style="width: 100%"
             :autosize="{ minRows: 5, maxRows: 10 }"
             type="textarea"
-            placeholder="请输入图像描述"
+            placeholder="请输入对于序列的描述"
           />
         </el-form-item>
         <el-form-item label="文件名">
@@ -270,7 +268,7 @@ function handleSwitchChange(newVal: Boolean) {
     </div>
     <span class="flex justify-center mb-4">
       <el-button @click="centerDialogVisible = false">取消</el-button>
-      <el-button type="primary" @click="uploadSaveCompletedImage()"> 完成阅片 </el-button>
+      <el-button type="primary" @click="viewReader()"> 完成阅片 </el-button>
     </span>
     <div id="previewCanvas" class="flex flex-col items-center justify-center">
       <el-text size="large">预览</el-text><br />

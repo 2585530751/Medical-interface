@@ -64,6 +64,7 @@ const checkContourSegmentationToolName = [
 ]
 
 onMounted(async () => {
+  
   await renderStackViewport()
 })
 
@@ -190,10 +191,7 @@ function handleMouseLeave() {
   })
 }
 
-function cancelAndRemoveAnnotation(temElement: HTMLDivElement) {
-  const annotationUID = cancelActiveManipulations(temElement)
-  annotation.state.removeAnnotation(annotationUID as string)
-}
+
 
 async function renderStackViewport() {
   if (props.imagesInfoWindows != 0) {
@@ -223,18 +221,6 @@ async function renderStackViewport() {
       )
       imageOperationStateStore.viewportColorbar[props.index] = colorbar
       imageOperationStateStore.toolGroup.addViewport(viewportId, renderingEngine.id)
-      // 创建一个新的 ResizeObserver 实例
-      let ro = new ResizeObserver((entries) => {
-        setTimeout(() => {
-          viewport.resize()
-          renderingEngine.resize(true, true)
-        }, 100) // 延迟1000毫秒后调用
-      })
-      ro.observe(element)
-
-      element.addEventListener(csToolsEnums.Events.KEY_DOWN, (evt) => {
-        cancelAndRemoveAnnotation(element)
-      })
 
       // element.addEventListener(MOUSE_WHEEL, ((evt: Types.EventTypes.ImageRenderedEvent) => {
       //   console.log('IMAGE_RENDERED')

@@ -4,7 +4,7 @@ import timer from '@iconify-icons/ep/timer'
 import folder from '@iconify-icons/ep/folder'
 import { basicImageUrl } from '@/api/utils'
 
-import { ref, onMounted, nextTick } from 'vue'
+import { ref, onMounted, nextTick, onUnmounted } from 'vue'
 import { useImageOperationStateStore } from '@/store/imageOperationState'
 import type { SeriesInfoWindows } from '@/types/image'
 import { changeSeriesListWindowsToSession } from '@/composables/image/utils'
@@ -69,6 +69,10 @@ onMounted(async() => {
     console.log("viewport")
     imagesModelsListUrlCheck.value = false
   }
+})
+
+onUnmounted(() => {
+  renderingEngine.disableElement(viewportId)
 })
 </script>
 

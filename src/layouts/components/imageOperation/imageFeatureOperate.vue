@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import seriesFeatureTable from '@/layouts/components/imageOperation/seriesFeatureTable.vue'
 import { useImageOperationStateStore } from '@/store/imageOperationState'
 import type { SeriesInfoWindows } from '@/types/image'
@@ -26,6 +26,7 @@ const seriesFeature = ref()
 const imageFeature = ref<ImageFeature>()
 
 const checkWindowsType = ref(true)
+const checkSeriesStatus = ref(true)
 
 function seriesFeatureTableVisible() {
   const seriesInfoWindows = imageOperationStateStore.seriesListWindows[
@@ -49,18 +50,39 @@ function imageFeatureTableVisible() {
   delete imageFeature.value?.file_name
 }
 
+onMounted(() => {
+  const selectSeriesWindow =
+    imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+  if (selectSeriesWindow != 0) {
+    if (selectSeriesWindow.seriesInfo.seriesModelType == 'segmentModel') {
+      checkWindowsType.value = true
+    } else {
+      checkWindowsType.value = false
+    }
+    if (selectSeriesWindow.seriesInfo.seriesStatus == '0') {
+      checkSeriesStatus.value = true
+    } else {
+      checkSeriesStatus.value = false
+    }
+  }
+})
+
 watch(
   () => imageOperationStateStore.selectSeriesWindows,
   () => {
     const selectSeriesWindow =
       imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
-    if (
-      selectSeriesWindow != 0 &&
-      selectSeriesWindow.seriesInfo.seriesModelType == 'segmentModel'
-    ) {
-      checkWindowsType.value = true
-    } else {
-      checkWindowsType.value = false
+    if (selectSeriesWindow != 0) {
+      if (selectSeriesWindow.seriesInfo.seriesModelType == 'segmentModel') {
+        checkWindowsType.value = true
+      } else {
+        checkWindowsType.value = false
+      }
+      if (selectSeriesWindow.seriesInfo.seriesStatus == '0') {
+        checkSeriesStatus.value = true
+      } else {
+        checkSeriesStatus.value = false
+      }
     }
   },
   {
@@ -76,11 +98,14 @@ watch(
         ><el-icon><DocumentAdd /></el-icon> 保存图像</el-button
       >
 
-      <el-button class="my-1" size="default" round @click="completeViewImageVisible = true"
+      <el-button v-show="checkSeriesStatus" class="my-1" size="default" round @click="completeViewImageVisible = true"
         ><el-icon><Check /></el-icon>完成阅片</el-button
       >
     </div>
-    <div v-show="checkWindowsType" class="flex flex-wrap justify-evenly bg-stone-50 dark:border-gray-700 dark:bg-gray-800">
+    <div
+      v-show="checkWindowsType"
+      class="flex flex-wrap justify-evenly bg-stone-50 dark:border-gray-700 dark:bg-gray-800"
+    >
       <el-button class="my-1" size="default" @click="imageFeatureTableVisible()"
         ><el-icon><Reading /></el-icon> 图像特征</el-button
       >
@@ -88,7 +113,7 @@ watch(
         ><el-icon><DocumentCopy /></el-icon>序列特征</el-button
       >
     </div>
-    <div  v-show="checkWindowsType">
+    <div v-show="checkWindowsType">
       <el-descriptions direction="vertical" :column="1" size="default" border>
         <el-descriptions-item
           v-for="(value, key) in imageFeature"

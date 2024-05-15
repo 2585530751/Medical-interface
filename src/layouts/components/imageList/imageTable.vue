@@ -9,7 +9,7 @@ import router from '@/router'
 import { basicImageUrl } from '@/api/utils'
 import { useImageOperationStateStore } from '@/store/imageOperationState'
 import { changeSeriesListWindowsToSession, pushSeriesToSession } from '@/composables/image/utils'
-import type { ImageInfo, SeriesInfoWindows } from '@/types/image'
+import type {  SeriesInfoWindows } from '@/types/image'
 import imageDicom from '@/components/ReImage/imageDicom.vue'
 import { message } from '@/utils/message'
 
