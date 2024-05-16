@@ -136,7 +136,7 @@ function seriesOperation(seriesId: number) {
       >
         <template v-slot:default="scope">
           <div style="display: flex; align-items: center">
-            <el-icon><timer /></el-icon>
+            <el-icon v-show="scope.row.studyTime"><timer /></el-icon>
             <span style="margin-left: 5px"> {{ scope.row.studyTime }}</span>
           </div>
         </template>

@@ -90,11 +90,10 @@ function uploadSaveCompletedImage() {
         imageOperationStateStore.selectSeriesWindows
       ].getCurrentImageId()
     )
-    const imageModelData: ImageModelResult = JSON.parse(JSON.stringify(imageInfo.imageModelData))
+    // const imageModelData: ImageModelResult = JSON.parse(JSON.stringify(imageInfo.imageModelData))
     const markImageObject = {
-      seriesId: imageModelData.seriesId,
-      imageId: imageModelData.imageId,
-      modelId: imageModelData.modelId,
+      seriesId: imageInfo.seriesId,
+      imageId: imageInfo.imageId,
       markImageName: imageFileInfo.imageName,
       markImageDesc: imageFileInfo.imageDescription
     }

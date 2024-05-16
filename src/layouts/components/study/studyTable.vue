@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { TableInstance } from 'element-plus'
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import editPen from '@iconify-icons/ep/edit-pen'
 import deleteUser from '@iconify-icons/ep/delete'
 import zoomIn from '@iconify-icons/ep/zoom-in'
+import pictrueIcon from '@iconify-icons/ep/picture'
 import view from '@iconify-icons/ep/view'
 import IonEllipsisHorizontal from '@/assets/svg/IonEllipsisHorizontal.svg?component'
 import { useStudyStateStore } from '@/store/modules/studyState'
@@ -31,8 +32,9 @@ const studyStateStore = useStudyStateStore()
 const seriesStateStore = useSeriesStateStore()
 const imageOperationStateStore = useImageOperationStateStore()
 const tableRef = ref<TableInstance>()
+
 const seriesDiagnosticResultVisible = ref(false)
-const seriesInfoDiagnosticResult = ref({} as SeriesInfo)
+var seriesInfoDiagnosticResult = reactive({} as SeriesInfo)
 
 onMounted(() => {
   studyStateStore.getStudyListPage()
@@ -82,8 +84,13 @@ function seriesOperation(seriesId: number) {
 }
 
 function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
-  seriesInfoDiagnosticResult.value = seriesInfo
+  seriesInfoDiagnosticResult = seriesInfo
+  console.log('seriesInfoDiagnosticResult', seriesInfoDiagnosticResult)
   seriesDiagnosticResultVisible.value = true
+}
+
+function updateModifiedSeriesInfo() {
+  studyStateStore.getStudyListPage()
 }
 </script>
 
@@ -119,6 +126,7 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
                       "
                     >
                       <el-image
+                        class="flex items-center size-24"
                         :src="basicImageUrl + scope.row.seriesPreviewPath"
                         :crossorigin="'anonymous'"
                         v-show="
@@ -128,7 +136,7 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
                         "
                       />
                       <seriesDicom
-                        class="w-16 h-16"
+                        class="size-24 "
                         key-value="SeriesPreview"
                         :series-info="scope.row"
                         :series-path="scope.row.seriesPreviewPath"
@@ -137,7 +145,7 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
                     </div>
                   </template>
                 </el-table-column>
-                <el-table-column label="标注预览">
+                <el-table-column label="已阅预览">
                   <template #default="scope">
                     <div
                       v-if="
@@ -146,6 +154,7 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
                       "
                     >
                       <el-image
+                        class="flex items-center size-24"
                         :src="basicImageUrl + scope.row.markSeriesPreviewPath"
                         :crossorigin="'anonymous'"
                         v-show="
@@ -155,7 +164,7 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
                         "
                       />
                       <seriesDicom
-                        class="w-16 h-16"
+                        class="size-24"
                         key-value="MarkSeriesPreview"
                         :series-info="scope.row"
                         :series-path="scope.row.markSeriesPreviewPath"
@@ -259,7 +268,7 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
       >
         <template v-slot:default="scope">
           <div style="display: flex; align-items: center">
-            <el-icon><timer /></el-icon>
+            <el-icon v-show="scope.row.studyTime"><timer /></el-icon>
             <span style="margin-left: 5px"> {{ scope.row.studyTime }}</span>
           </div>
         </template>
@@ -293,7 +302,7 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
             size="default"
             @click="viewSerieslistByStudyId(scope.row.studyId)"
             ><template #icon>
-              <IconifyIconOffline :icon="zoomIn"></IconifyIconOffline>
+              <IconifyIconOffline :icon="pictrueIcon"></IconifyIconOffline>
             </template>
             序列</el-button
           >
@@ -303,6 +312,8 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
   </el-card>
   <seriesDiagnosticResult
     :diagnostic-result-window-open="seriesDiagnosticResultVisible"
+    @diagnostic-result-window-close="seriesDiagnosticResultVisible = false"
+    @modified-series-info="updateModifiedSeriesInfo"
     :series-info="seriesInfoDiagnosticResult"
   ></seriesDiagnosticResult>
 </template>

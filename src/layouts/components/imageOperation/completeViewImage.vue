@@ -83,7 +83,7 @@ function viewReader() {
     let formData = new FormData()
     let imageData = canvas.toDataURL(imageFileInfo.imageType, 1.0)
     let blob = dataURLtoBlob(imageData)
-    let file = new File([blob], imageFileInfo.imageName, { type: imageFileInfo.imageType })
+    let file = new File([blob], imageFileInfo.imageName+'.'+imageFileInfo.imageType, { type: imageFileInfo.imageType })
 
     const imageInfo: ImageInfo = imageKeyValueStore.get(
       imageOperationStateStore.viewports[

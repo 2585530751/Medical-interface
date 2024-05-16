@@ -8,12 +8,13 @@ import type { SeriesInfo, ImageInfo } from '@/types/series'
 
 const props = defineProps<{
   imageInfo: ImageInfo
+  keyValue: string
 }>()
 const imageIds: string[] = []
 const { ViewportType } = Enums
-const imageOperationStateStore =useImageOperationStateStore()
-let elementId = ref('cornerstone-element-imageDicom-' + props.imageInfo.imageId)
-const viewportId = 'stackViewPort-imageDicom-' + props.imageInfo.imageId
+const imageOperationStateStore = useImageOperationStateStore()
+let elementId = ref('cornerstone-element-imageDicom-' + props.keyValue + props.imageInfo.imageId)
+const viewportId = 'stackViewPort-imageDicom-' + props.keyValue + props.imageInfo.imageId
 const renderingEngine = imageOperationStateStore.renderingEngine
 const imagesListUrl = generateImageUrl(props.imageInfo.imagePath as string)
 

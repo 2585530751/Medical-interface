@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableInstance } from 'element-plus'
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import view from '@iconify-icons/ep/view'
 import deleteUser from '@iconify-icons/ep/delete'
 import IonEllipsisHorizontal from '@/assets/svg/IonEllipsisHorizontal.svg?component'
@@ -13,6 +13,9 @@ import type { SeriesInfo, ImageInfo } from '@/types/series'
 import type { SeriesInfoWindows } from '@/types/image'
 import { changeSeriesListWindowsToSession, pushSeriesToSession } from '@/composables/image/utils'
 import router from '@/router'
+import seriesDiagnosticResult from '@/layouts/components/series/seriesDiagnosticResult.vue'
+import rolePermission from '@/components/rolePermission.vue'
+import seriesDicom from '@/components/ReImage/seriesDicom.vue'
 
 const props = defineProps<{
   tableSize: string
@@ -21,6 +24,9 @@ const props = defineProps<{
 
 const seriesStateStore = useSeriesStateStore()
 const imageOperationStateStore = useImageOperationStateStore()
+
+const seriesDiagnosticResultVisible = ref(false)
+var seriesInfoDiagnosticResult = reactive({} as SeriesInfo)
 
 const tableRef = ref<TableInstance>()
 
@@ -38,10 +44,7 @@ function seriesOperation(seriesInfo: SeriesInfo) {
   }
   imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows] =
     seriesInfoWindows
-  changeSeriesListWindowsToSession(
-    seriesInfoWindows,
-    imageOperationStateStore.selectSeriesWindows
-  )
+  changeSeriesListWindowsToSession(seriesInfoWindows, imageOperationStateStore.selectSeriesWindows)
   pushSeriesToSession(seriesInfo)
   router.push('/imageOperation')
 }
@@ -56,12 +59,17 @@ function imageOperation(imageInfo: ImageInfo, seriesInfo: SeriesInfo) {
   }
   imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows] =
     seriesInfoWindows
-  changeSeriesListWindowsToSession(
-    seriesInfoWindows,
-    imageOperationStateStore.selectSeriesWindows
-  )
+  changeSeriesListWindowsToSession(seriesInfoWindows, imageOperationStateStore.selectSeriesWindows)
   pushSeriesToSession(seriesInfo)
   router.push('/imageOperation')
+}
+
+function updateModifiedSeriesInfo() {
+  seriesStateStore.getSeriesListPage()
+}
+function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
+  seriesInfoDiagnosticResult = seriesInfo
+  seriesDiagnosticResultVisible.value = true
 }
 </script>
 
@@ -89,7 +97,7 @@ function imageOperation(imageInfo: ImageInfo, seriesInfo: SeriesInfo) {
                 :border="true"
                 class="dark:bg-neutral-900"
               >
-                <el-table-column label="图片">
+                <el-table-column label="初始图像">
                   <template #default="scope">
                     <el-image
                       :src="basicImageUrl + scope.row.imagePath"
@@ -101,8 +109,27 @@ function imageOperation(imageInfo: ImageInfo, seriesInfo: SeriesInfo) {
                       "
                     />
                     <imageDicom
+                      key-value="ImagePath"
                       :image-info="scope.row"
                       v-show="scope.row.imagePath.endsWith('.dcm')"
+                    />
+                  </template>
+                </el-table-column>
+                <el-table-column label="已阅图像">
+                  <template #default="scope">
+                    <el-image
+                      :src="basicImageUrl + scope.row.markImagePath"
+                      :crossorigin="'anonymous'"
+                      v-show="
+                        scope.row.markImagePath.endsWith('.png') ||
+                        scope.row.markImagePath.endsWith('.jpg') ||
+                        scope.row.markImagePath.endsWith('.jpeg')
+                      "
+                    />
+                    <imageDicom
+                      key-value="MarkImagePath"
+                      :image-info="scope.row"
+                      v-show="scope.row.markImagePath.endsWith('.dcm')"
                     />
                   </template>
                 </el-table-column>
@@ -117,24 +144,111 @@ function imageOperation(imageInfo: ImageInfo, seriesInfo: SeriesInfo) {
                 <el-table-column label="分配位数" prop="bitsAllocated" />
                 <el-table-column label="位数存储" prop="bitsStored" />
                 <el-table-column label="影像描述" prop="imageDesc" />
-                <el-table-column fixed="right" label="操作" >
+                <el-table-column label="图像状态">
                   <template #default="scope">
-                    <el-button
-                      link
-                      type="primary"
-                      size="small"
-                      @click="imageOperation(scope.row, props.row)"
-                      ><template #icon>
-                        <IconifyIconOffline :icon="view"></IconifyIconOffline>
-                      </template>
-                      阅片</el-button
-                    >
-
-                    <el-button :icon="IonEllipsisHorizontal" link type="primary" />
+                    <el-tag type="success" v-if="scope.row.imageStatus == '0'">未阅</el-tag>
+                    <el-tag type="info" v-if="scope.row.imageStatus == '1'">已阅</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column fixed="right" label="操作">
+                  <template #default="scope">
+                    <role-permission :value="['doctor']">
+                      <div class="flex items-center gap-1">
+                        <el-dropdown class="">
+                          <el-button :icon="IonEllipsisHorizontal" link type="primary"></el-button>
+                          <template #dropdown>
+                            <el-dropdown-menu>
+                              <el-dropdown-item
+                                ><el-button
+                                  link
+                                  type="primary"
+                                  size="small"
+                                  @click="imageOperation(scope.row, props.row)"
+                                  ><template #icon>
+                                    <IconifyIconOffline :icon="view"></IconifyIconOffline>
+                                  </template>
+                                  阅片</el-button
+                                ></el-dropdown-item
+                              >
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </div>
+                    </role-permission>
+                    <role-permission :value="['radiologist']">
+                      <div class="flex items-center gap-1">
+                        <el-button
+                          link
+                          type="primary"
+                          size="small"
+                          @click="imageOperation(scope.row, props.row)"
+                          ><template #icon>
+                            <IconifyIconOffline :icon="view"></IconifyIconOffline>
+                          </template>
+                          阅片</el-button
+                        >
+                        <el-dropdown>
+                          <el-button :icon="IonEllipsisHorizontal" link type="primary"></el-button>
+                          <template #dropdown>
+                            <el-dropdown-menu>
+                              <el-dropdown-item></el-dropdown-item>
+                            </el-dropdown-menu>
+                          </template>
+                        </el-dropdown>
+                      </div>
+                    </role-permission>
                   </template>
                 </el-table-column>
               </el-table>
             </div>
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="序列预览">
+        <template #default="scope">
+          <div v-if="scope.row.seriesPreviewPath != null && scope.row.seriesPreviewPath != ''">
+            <el-image
+              class="flex items-center size-20"
+              :src="basicImageUrl + scope.row.seriesPreviewPath"
+              :crossorigin="'anonymous'"
+              v-show="
+                scope.row.seriesPreviewPath.endsWith('.png') ||
+                scope.row.seriesPreviewPath.endsWith('.jpg') ||
+                scope.row.seriesPreviewPath.endsWith('.jpeg')
+              "
+            />
+            <seriesDicom
+              class="size-20"
+              key-value="SeriesPreview"
+              :series-info="scope.row"
+              :series-path="scope.row.seriesPreviewPath"
+              v-show="scope.row.seriesPreviewPath.endsWith('.dcm')"
+            />
+          </div>
+        </template>
+      </el-table-column>
+      <el-table-column label="已阅预览">
+        <template #default="scope">
+          <div
+            v-if="scope.row.markSeriesPreviewPath != null && scope.row.markSeriesPreviewPath != ''"
+          >
+            <el-image
+              class="flex items-center size-20"
+              :src="basicImageUrl + scope.row.markSeriesPreviewPath"
+              :crossorigin="'anonymous'"
+              v-show="
+                scope.row.markSeriesPreviewPath.endsWith('.png') ||
+                scope.row.markSeriesPreviewPath.endsWith('.jpg') ||
+                scope.row.markSeriesPreviewPath.endsWith('.jpeg')
+              "
+            />
+            <seriesDicom
+              class="size-20"
+              key-value="MarkSeriesPreview"
+              :series-info="scope.row"
+              :series-path="scope.row.markSeriesPreviewPath"
+              v-show="scope.row.markSeriesPreviewPath.endsWith('.dcm')"
+            />
           </div>
         </template>
       </el-table-column>
@@ -155,7 +269,7 @@ function imageOperation(imageInfo: ImageInfo, seriesInfo: SeriesInfo) {
       >
         <template v-slot:default="scope">
           <div style="display: flex; align-items: center">
-            <el-icon><timer /></el-icon>
+            <el-icon v-show="scope.row.seriesTime"><timer /></el-icon>
             <span style="margin-left: 5px"> {{ scope.row.seriesTime }}</span>
           </div>
         </template>
@@ -185,19 +299,81 @@ function imageOperation(imageInfo: ImageInfo, seriesInfo: SeriesInfo) {
         label="序列描述"
         prop="seriesDesc"
       />
-      <el-table-column fixed="right" label="操作" >
+      <el-table-column label="序列状态">
         <template #default="scope">
-          <el-button link type="primary" size="default" @click="seriesOperation(scope.row)"
-            ><template #icon>
-              <IconifyIconOffline :icon="view"></IconifyIconOffline>
-            </template>
-            阅片</el-button
-          >
-          <el-button :icon="IonEllipsisHorizontal" link type="primary" />
+          <el-tag type="success" v-if="scope.row.seriesStatus == '0'">阅片员未阅</el-tag>
+          <el-tag type="info" v-if="scope.row.seriesStatus == '1'">医生未诊断</el-tag>
+          <el-tag type="warning" v-if="scope.row.seriesStatus == '2'">医生已诊断</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" label="操作">
+        <template #default="scope">
+          <role-permission :value="['doctor']">
+            <div class="flex items-center gap-1">
+              <el-button
+                v-if="scope.row.seriesStatus == '1'"
+                link
+                type="primary"
+                size="small"
+                @click="diagnosticResultWindowOpen(scope.row)"
+                ><template #icon>
+                  <IconifyIconOffline :icon="view"></IconifyIconOffline>
+                </template>
+                诊断</el-button
+              >
+              <el-dropdown class="">
+                <el-button :icon="IonEllipsisHorizontal" link type="primary"></el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item
+                      ><el-button
+                        link
+                        type="primary"
+                        size="small"
+                        @click="seriesOperation(scope.row.seriesId)"
+                        ><template #icon>
+                          <IconifyIconOffline :icon="view"></IconifyIconOffline>
+                        </template>
+                        阅片</el-button
+                      ></el-dropdown-item
+                    >
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
+          </role-permission>
+          <role-permission :value="['radiologist']">
+            <div class="flex items-center gap-1">
+              <el-button
+                link
+                type="primary"
+                size="small"
+                @click="seriesOperation(scope.row.seriesId)"
+                ><template #icon>
+                  <IconifyIconOffline :icon="view"></IconifyIconOffline>
+                </template>
+                阅片</el-button
+              >
+              <el-dropdown>
+                <el-button :icon="IonEllipsisHorizontal" link type="primary"></el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item></el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
+          </role-permission>
         </template>
       </el-table-column>
     </el-table>
   </el-card>
+  <seriesDiagnosticResult
+    :diagnostic-result-window-open="seriesDiagnosticResultVisible"
+    @diagnostic-result-window-close="seriesDiagnosticResultVisible = false"
+    @modified-series-info="updateModifiedSeriesInfo"
+    :series-info="seriesInfoDiagnosticResult"
+  ></seriesDiagnosticResult>
 </template>
 
 <style lang="scss" scoped></style>

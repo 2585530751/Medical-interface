@@ -4,22 +4,26 @@ import type { SeriesInfo } from '@/types/series'
 import seriesDicom from '@/components/ReImage/seriesDicom.vue'
 import { basicImageUrl } from '@/api/utils'
 import { DArrowRight } from '@element-plus/icons-vue'
+import { viewDoctorApi } from '@/api/series'
+import { message } from '@/utils/message'
 
 const props = defineProps<{
   diagnosticResultWindowOpen?: boolean
   seriesInfo: SeriesInfo
 }>()
 
-console.log('props.seriesInfo', props.seriesInfo)
+const emits = defineEmits<{
+  diagnosticResultWindowClose: [] // 具名元组语法
+  modifiedSeriesInfo: [seriesInfo: SeriesInfo]
+}>()
+
 
 const diagnosticResult = reactive({
   seriesId: props.seriesInfo.seriesId,
   doctorView: ''
 })
 
-const emits = defineEmits<{
-  diagnosticResultWindowClose: [] // 具名元组语法
-}>()
+
 
 let centerDialogVisible = ref(props.diagnosticResultWindowOpen)
 
@@ -31,6 +35,23 @@ watch(
     centerDialogVisible.value = value
   }
 )
+
+function viewDoctor() {
+  diagnosticResult.seriesId = props.seriesInfo.seriesId
+  viewDoctorApi(diagnosticResult)
+    .then((res) => {
+      if (res.code === 200) {
+        emits('modifiedSeriesInfo', res.data as SeriesInfo)
+        emits('diagnosticResultWindowClose')
+        message(res.msg,{type:'success'})
+      } else {
+        message(res.msg,{type:'error'})
+      }
+    })
+    .catch((err) => {
+      message(err,{type:'error'})
+    })
+}
 </script>
 
 <template>
@@ -41,14 +62,14 @@ watch(
     width="60%"
     center
   >
-    <div class="flex items-center justify-between w-full">
+    <div class="flex items-center justify-between w-full mb-6">
       <div
         class="flex flex-col items-center justify-center w-full gap-2"
         v-if="
           props.seriesInfo.seriesPreviewPath != null && props.seriesInfo.seriesPreviewPath != ''
         "
       >
-        <el-text>初始序列预览</el-text>
+        <el-text size="large">初始序列预览</el-text>
         <el-image
           :src="basicImageUrl + props.seriesInfo.seriesPreviewPath"
           :crossorigin="'anonymous'"
@@ -84,7 +105,7 @@ watch(
           props.seriesInfo.markSeriesPreviewPath != ''
         "
       >
-        <el-text>已阅序列预览</el-text>
+        <el-text size="large">已阅序列预览</el-text>
         <el-image
           :src="basicImageUrl + props.seriesInfo.markSeriesPreviewPath"
           :crossorigin="'anonymous'"
@@ -103,13 +124,19 @@ watch(
         />
       </div>
     </div>
-
+    <div class="mb-6">
+      <p>阅片描述:</p>
+      <el-text type="info">
+        {{ props.seriesInfo.readerView || '暂无描述' }}
+      </el-text>
+    </div>
     <el-form ref="ruleFormRef" :model="diagnosticResult" label-position="top">
-      <el-form-item label="医生建议" prop="doctorView">
+      <el-form-item label="医生诊断：" prop="doctorView">
         <el-input
+          :autosize="{ minRows: 4, maxRows: 20 }"
           v-model="diagnosticResult.doctorView"
           type="textarea"
-          placeholder="请输入成像描述"
+          placeholder="请输入您的诊断！"
         />
       </el-form-item>
     </el-form>
@@ -117,7 +144,7 @@ watch(
       <div>
         <span class="dialog-footer">
           <el-button @click="centerDialogVisible = false">取消</el-button>
-          <el-button type="primary"> 下一步 </el-button>
+          <el-button type="primary" @click="viewDoctor()"> 完成诊断！ </el-button>
         </span>
       </div>
     </template>

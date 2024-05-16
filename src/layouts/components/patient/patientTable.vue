@@ -2,6 +2,8 @@
 import type { TableInstance } from 'element-plus'
 import { onMounted, ref, watch } from 'vue'
 import zoomIn from '@iconify-icons/ep/zoom-in'
+import pictrueIcon from '@iconify-icons/ep/picture'
+import filmIcon from '@iconify-icons/ep/film'
 import IonEllipsisHorizontal from '@/assets/svg/IonEllipsisHorizontal.svg?component'
 import { usePatientStateStore } from '@/store/modules/patientState'
 import { useStudyStateStore } from '@/store/modules/studyState'
@@ -87,7 +89,7 @@ function viewSerieslistByStudyId(studyId: number) {
                   <template #default="scope">
                     <el-button link type="primary" size="small" @click="viewSerieslistByStudyId(scope.row.studyId)"
                       ><template #icon>
-                        <IconifyIconOffline :icon="zoomIn"></IconifyIconOffline>
+                        <IconifyIconOffline :icon="pictrueIcon"></IconifyIconOffline>
                       </template>
                       序列</el-button
                     >
@@ -130,13 +132,13 @@ function viewSerieslistByStudyId(studyId: number) {
         <template #default="scope">
           <el-button link type="primary" size="default" @click="viewChecklist(scope.row.patientId)"
             ><template #icon>
-              <IconifyIconOffline :icon="zoomIn"></IconifyIconOffline>
+              <IconifyIconOffline :icon="filmIcon"></IconifyIconOffline>
             </template>
             检查</el-button
           >
           <el-button link type="primary" size="default" @click="viewSerieslistByPaitentId(scope.row.patientId)"
             ><template #icon>
-              <IconifyIconOffline :icon="zoomIn"></IconifyIconOffline>
+              <IconifyIconOffline :icon="pictrueIcon"></IconifyIconOffline>
             </template>
             序列</el-button
           >
