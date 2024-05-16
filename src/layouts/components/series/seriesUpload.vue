@@ -33,7 +33,7 @@ const disabled = ref(false)
 
 const imageList = ref<UploadUserFile[]>([])
 const imagesInfo = reactive({
-  departmentNameList: ''
+  departmentNameList: []
 })
 
 const handleRemove = (file: UploadFile) => {
@@ -71,8 +71,11 @@ function submitFileForm() {
   imageList.value.forEach((file) => {
     formData.append('files', file.raw!)
   })
+  const params = {
+    departmentNameList: [imagesInfo.departmentNameList[imagesInfo.departmentNameList.length - 1]]
+  }
   // 文件名
-  formData.append('seriesInfo', JSON.stringify(imagesInfo))
+  formData.append('seriesInfo', JSON.stringify(params))
   uploadSeriesApi(formData)
     .then((res) => {
       if (res.success) {
