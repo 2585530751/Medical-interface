@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted, onBeforeMount } from 'vue'
 import type { IconifyIconOffline } from '@/components/ReIcon'
 import plus from '@iconify-icons/ep/circle-plus'
 import search from '@iconify-icons/ep/search'
@@ -7,7 +7,7 @@ import fold from '@iconify-icons/ep/fold'
 import refresh from '@iconify-icons/ep/refresh'
 import setUp from '@iconify-icons/ep/set-up'
 import rank from '@iconify-icons/ep/rank'
-import { chineseStandardTimeFormat, setAllPropertiesToNull,exportExcel } from '@/utils/commonUtils'
+import { chineseStandardTimeFormat, setAllPropertiesToNull, exportExcel } from '@/utils/commonUtils'
 import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
 import { usePatientStateStore } from '@/store/modules/patientState'
@@ -40,6 +40,7 @@ const patientForm: Record<string, any> = reactive({
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
 const checkedCols = ref([
+  'createTime',
   'patientName',
   'patientGender',
   'phoneNumber',
@@ -48,6 +49,7 @@ const checkedCols = ref([
   'dateOfBirth'
 ])
 const cols = [
+  { label: '创建时间', prop: 'createTime' },
   { label: '姓名', prop: 'patientName' },
   { label: '性别', prop: 'patientGender' },
   { label: '电话', prop: 'phoneNumber' },
@@ -99,6 +101,10 @@ function conditionalFilter() {
   patientStateStore.patientPagination.currentPage = 1
   patientStateStore.getPatientListPage()
 }
+
+onBeforeMount(() => {
+  emits('changeTableCols', checkedCols.value)
+})
 </script>
 
 <template>
@@ -150,7 +156,19 @@ function conditionalFilter() {
         <el-button round :icon="applicationImport" @click="patientStateStore.getPatientListPage"
           >导入患者</el-button
         >
-        <el-button round :icon="applicationExport" @click="exportExcel(JSON.parse(JSON.stringify(patientStateStore.patientListTableData)),cols,checkedCols,'患者列表.xlsx')">导出患者</el-button>
+        <el-button
+          round
+          :icon="applicationExport"
+          @click="
+            exportExcel(
+              JSON.parse(JSON.stringify(patientStateStore.patientListTableData)),
+              cols,
+              checkedCols,
+              '患者列表.xlsx'
+            )
+          "
+          >导出患者</el-button
+        >
       </div>
       <div class="flex flex-wrap items-center w-auto h-auto gap-x-3">
         <el-tooltip content="刷新" placement="top" effect="light">

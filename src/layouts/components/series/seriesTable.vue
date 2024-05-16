@@ -275,6 +275,12 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
         </template>
       </el-table-column>
       <el-table-column
+        label="创建时间"
+        sortable
+        v-if="props.tableCols.includes('createTime')"
+        prop="createTime"
+      />
+      <el-table-column
         v-if="props.tableCols.includes('seriesName')"
         label="序列名称"
         prop="seriesName"

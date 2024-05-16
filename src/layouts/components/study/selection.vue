@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onBeforeMount } from 'vue'
 import type { IconifyIconOffline } from '@/components/ReIcon'
 import plus from '@iconify-icons/ep/circle-plus'
 import search from '@iconify-icons/ep/search'
@@ -51,7 +51,13 @@ const checkedCols = ref([
   'bodyPartExamined',
   'studyDescription'
 ])
+
+onBeforeMount(() => {
+  emits('changeTableCols', checkedCols.value)
+})
+
 const cols = [
+  { label: '创建时间', prop: 'createTime' },
   { label: '检查日期', prop: 'studyDate' },
   { label: '检查时间', prop: 'studyTime' },
   { label: '患者年龄', prop: 'patientAge' },

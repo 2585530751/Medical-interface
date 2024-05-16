@@ -1,20 +1,12 @@
 <script setup lang="ts">
 import seriesTable from '@/layouts/components/series/seriesTable.vue'
 import seriesSelection from '@/layouts/components/series/selection.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,type Ref  } from 'vue'
 import { useSeriesStateStore } from '@/store/modules/seriesState'
 
 const seriesStateStore = useSeriesStateStore()
 const tableSize = ref('default')
-const tableCols = ref([
-  'seriesName',
-  'seriesFormat',
-  'seriesCount',
-  'patientName',
-  'seriesDate',
-  'seriesTime',
-  'seriesDesc'
-])
+const tableCols: Ref<string[]> = ref([])
 
 const handleSizeChange = (val: number) => {
   seriesStateStore.seriesPagination.pageSize = val

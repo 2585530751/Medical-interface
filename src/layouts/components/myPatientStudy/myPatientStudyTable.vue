@@ -32,7 +32,6 @@ onMounted(() => {
   myPatientStudyStateStore.getMyPatientStudyListPage()
 })
 
-
 function seriesOperation(seriesId: number) {
   console.log('seriesId', seriesId)
   const params = {
@@ -48,7 +47,7 @@ function seriesOperation(seriesId: number) {
     if (seriesInfo.imageList[0] == null) {
       message('序列无图像', { type: 'error' })
       return
-    } 
+    }
     imageOperationStateStore.bindSeriesList(seriesInfo)
     imageOperationStateStore.bindImageList(seriesInfo.imageList[0])
     imageOperationStateStore.pushSeriesList(seriesInfo)
@@ -98,7 +97,7 @@ function seriesOperation(seriesId: number) {
                 <el-table-column label="序列类型" prop="modality" />
                 <el-table-column label="上传时间" prop="createTime" />
                 <el-table-column label="序列描述" prop="seriesDesc" />
-                <el-table-column fixed="right" label="操作" >
+                <el-table-column fixed="right" label="操作">
                   <template #default="scope">
                     <el-button
                       link
@@ -142,6 +141,12 @@ function seriesOperation(seriesId: number) {
         </template>
       </el-table-column>
       <el-table-column
+        label="创建时间"
+        sortable
+        v-if="props.tableCols.includes('createTime')"
+        prop="createTime"
+      />
+      <el-table-column
         v-if="props.tableCols.includes('patientAge')"
         sortable
         label="患者年龄"
@@ -162,13 +167,9 @@ function seriesOperation(seriesId: number) {
         label="检查描述"
         prop="studyDescription"
       />
-      <el-table-column fixed="right" label="操作" >
+      <el-table-column fixed="right" label="操作">
         <template #default>
-          <el-button
-            link
-            type="primary"
-            size="default"
-            
+          <el-button link type="primary" size="default"
             ><template #icon>
               <IconifyIconOffline :icon="zoomIn"></IconifyIconOffline>
             </template>

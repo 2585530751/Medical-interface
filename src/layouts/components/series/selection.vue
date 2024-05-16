@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onBeforeMount } from 'vue'
 import type { IconifyIconOffline } from '@/components/ReIcon'
 import plus from '@iconify-icons/ep/circle-plus'
 import search from '@iconify-icons/ep/search'
@@ -54,7 +54,13 @@ const checkedCols = ref([
   'seriesTime',
   'seriesDesc'
 ])
+
+onBeforeMount(() => {
+  emits('changeTableCols', checkedCols.value)
+})
+
 const cols = [
+{ label: '创建时间', prop: 'createTime' },
   { label: '序列名称', prop: 'seriesName' },
   { label: '序列格式', prop: 'seriesFormat' },
   { label: '图像数量', prop: 'seriesCount' },

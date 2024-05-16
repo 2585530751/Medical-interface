@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onBeforeMount } from 'vue'
 import type { IconifyIconOffline } from '@/components/ReIcon'
 import plus from '@iconify-icons/ep/circle-plus'
 import search from '@iconify-icons/ep/search'
@@ -7,7 +7,7 @@ import fold from '@iconify-icons/ep/fold'
 import refresh from '@iconify-icons/ep/refresh'
 import setUp from '@iconify-icons/ep/set-up'
 import rank from '@iconify-icons/ep/rank'
-import { setAllPropertiesToNull,exportExcel } from '@/utils/commonUtils'
+import { setAllPropertiesToNull, exportExcel } from '@/utils/commonUtils'
 import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
 import { useMyPatientStudyStateStore } from '@/store/modules/myPatientStudyState'
@@ -44,6 +44,7 @@ const myPatientStudyForm: Record<string, any> = reactive({
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
 const cols = [
+  { label: '创建时间', prop: 'createTime' },
   { label: '检查日期', prop: 'studyDate' },
   { label: '检查时间', prop: 'studyTime' },
   { label: '患者年龄', prop: 'patientAge' },
@@ -52,6 +53,7 @@ const cols = [
   { label: '检查描述', prop: 'studyDescription' }
 ]
 const checkedCols = ref([
+  
   'studyDate',
   'studyTime',
   'patientAge',
@@ -59,6 +61,10 @@ const checkedCols = ref([
   'bodyPartExamined',
   'studyDescription'
 ])
+
+onBeforeMount(() => {
+  emits('changeTableCols', checkedCols.value)
+})
 
 const handleCheckAllChange = (val: boolean) => {
   checkedCols.value = val ? cols.map((item) => item.prop) : []
@@ -144,7 +150,19 @@ function refreshTable() {
           新增检查</el-button
         >
         <el-button round :icon="applicationImport">导入检查</el-button>
-        <el-button round :icon="applicationExport" @click="exportExcel(JSON.parse(JSON.stringify(myPatientStudyStateStore.myPatientStudyListTableData)),cols,checkedCols,'检查列表.xlsx')">导出检查</el-button>
+        <el-button
+          round
+          :icon="applicationExport"
+          @click="
+            exportExcel(
+              JSON.parse(JSON.stringify(myPatientStudyStateStore.myPatientStudyListTableData)),
+              cols,
+              checkedCols,
+              '检查列表.xlsx'
+            )
+          "
+          >导出检查</el-button
+        >
       </div>
       <div class="flex flex-wrap items-center w-auto h-auto gap-x-3">
         <el-tooltip content="刷新" placement="top" effect="light">

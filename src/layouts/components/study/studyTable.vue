@@ -274,6 +274,12 @@ function updateModifiedSeriesInfo() {
         </template>
       </el-table-column>
       <el-table-column
+        label="创建时间"
+        sortable
+        v-if="props.tableCols.includes('createTime')"
+        prop="createTime"
+      />
+      <el-table-column
         v-if="props.tableCols.includes('patientAge')"
         sortable
         label="患者年龄"

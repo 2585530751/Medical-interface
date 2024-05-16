@@ -1,19 +1,12 @@
 <script setup lang="ts">
 import patientTable from '@/layouts/components/patient/patientTable.vue'
 import patientSelection from '@/layouts/components/patient/selection.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,type Ref } from 'vue'
 import { usePatientStateStore } from '@/store/modules/patientState'
 
 const patientStateStore = usePatientStateStore()
 const tableSize = ref('default')
-const tableCols = ref([
-  'patientName',
-  'patientGender',
-  'phoneNumber',
-  'email',
-  'address',
-  'dateOfBirth'
-])
+const tableCols: Ref<string[]> = ref([])
 
 const handleSizeChange = (val: number) => {
   patientStateStore.patientPagination.pageSize = val

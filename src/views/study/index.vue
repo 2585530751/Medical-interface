@@ -1,19 +1,12 @@
 <script setup lang="ts">
 import studyTable from '@/layouts/components/study/studyTable.vue'
 import studySelection from '@/layouts/components/study/selection.vue'
-import { ref, onMounted } from 'vue'
+import { ref, onMounted,type Ref  } from 'vue'
 import { useStudyStateStore } from '@/store/modules/studyState'
 
 const studyStateStore = useStudyStateStore()
 const tableSize = ref('default')
-const tableCols = ref([
-  'studyDate',
-  'studyTime',
-  'patientAge',
-  'accessionNumber',
-  'bodyPartExamined',
-  'studyDescription'
-])
+const tableCols: Ref<string[]> = ref([])
 
 const handleSizeChange = (val: number) => {
   studyStateStore.studyPagination.pageSize = val
