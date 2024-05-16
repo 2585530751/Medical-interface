@@ -202,3 +202,16 @@ export const getExcelApi = (params?: object) => {
 export const getExcelByToolIdApi = (params?: object) => {
   return http.request<any>('get', baseUrlApi('tool/getToolInfoByToolId'), { params })
 }
+
+export const updateExcelApi = (data?: object) => {
+  return http.request<any>(
+    'post',
+    baseUrlApi('tool/updateTool'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+  )
+}

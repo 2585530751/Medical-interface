@@ -27,4 +27,3 @@ export interface ImageModelResult {
   imageFeature: ImageFeature;  
 }  
 
-  

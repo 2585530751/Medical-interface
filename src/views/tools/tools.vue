@@ -52,11 +52,16 @@ const loadAll = () => {
 }
 onMounted(() => {
   restaurants.value = loadAll()
-  
 })
 //下面使用上一个界面传来的文件路径参数
 import { useRoute } from 'vue-router';
+//toolId,toolDate,toolName,toolBackground,toolAbstract,toolRoute
 const param = useRoute();  
+const toolId=param.query.toolId
+const toolDate=param.query.toolDate
+const toolName=param.query.toolName
+const toolBackground=param.query.toolBackground
+const toolAbstract=param.query.toolAbstract
 const toolRoute = param.query.toolRoute;         //routeValue就是上一个界面的值
 
 //实现router-link局部切换

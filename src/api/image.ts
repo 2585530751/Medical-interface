@@ -78,13 +78,13 @@ export const imageDetectionOfPulmonaryNodulesApi = (params?: object) => {
   return http.request<any>('get', baseUrlApi('modelApi/lungDetect'), { params })
 }
 
-export const singleImageIntestinalPolypsSegmentationApi = (params?: object) => {
+export const imageIntestinalPolypsSegmentationApi = (params?: object) => {
   return http.request<any>('get', baseUrlApi('modelApi/intestinalPolypsSingleSegmentation'), {
     params
   })
 }
 
-export const imageIntestinalPolypsSegmentationApi = (params?: object) => {
+export const seriesIntestinalPolypsSegmentationApi = (params?: object) => {
   return http.request<any>('get', baseUrlApi('modelApi/intestinalPolypsSegmentation'), { params })
 }
 

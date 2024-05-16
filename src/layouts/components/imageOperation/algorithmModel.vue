@@ -9,8 +9,8 @@ import {
   imageSegmentationOfThyroidNodulesApi,
   imageDetectionOfPulmonaryNodulesApi,
   imageClassifyOfThyroidNodulesApi,
-  singleImageIntestinalPolypsSegmentationApi,
-  imageIntestinalPolypsSegmentationApi
+  imageIntestinalPolypsSegmentationApi,
+  seriesIntestinalPolypsSegmentationApi
 } from '@/api/image'
 import { message } from '@/utils/message'
 import { pushseriesModelsListsSession } from '@/composables/image/utils'
@@ -248,7 +248,7 @@ async function imageDetectionOfPulmonaryNodules() {
   }
 }
 
-async function singleImageIntestinalPolypsSegmentation() {
+async function imageIntestinalPolypsSegmentation() {
   const seriesInfoWindows =
     imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
   if (seriesInfoWindows != 0) {
@@ -257,7 +257,7 @@ async function singleImageIntestinalPolypsSegmentation() {
         imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].getCurrentImageId()
       ).imageId
     }
-    await singleImageIntestinalPolypsSegmentationApi(params)
+    await imageIntestinalPolypsSegmentationApi(params)
       .then((data) => {
         if ((data.code = 200)) {
           const imageModelData = Object.assign({}, data.data, JSON.parse(data.data.resData))
@@ -271,7 +271,6 @@ async function singleImageIntestinalPolypsSegmentation() {
           imageInfo.singleImageList = [singleImage!]
           pushseriesModelsListsSession(imageInfo)
           imageOperationStateStore.pushSeriesModelsList(imageInfo)
-
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -283,7 +282,7 @@ async function singleImageIntestinalPolypsSegmentation() {
   }
 }
 
-async function imageIntestinalPolypsSegmentation() {
+async function seriesIntestinalPolypsSegmentation() {
   const seriesInfoWindows =
     imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
   if (seriesInfoWindows != 0) {
@@ -293,7 +292,7 @@ async function imageIntestinalPolypsSegmentation() {
       ).seriesId
     }
    
-    await imageIntestinalPolypsSegmentationApi(params)
+    await seriesIntestinalPolypsSegmentationApi(params)
       .then((data) => {
         if ((data.code = 200)) {
           const imageInfo = JSON.parse(JSON.stringify(seriesInfoWindows.imageInfo))
@@ -419,10 +418,10 @@ async function imageIntestinalPolypsSegmentation() {
 
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="singleImageIntestinalPolypsSegmentation"
+              <el-dropdown-item @click="imageIntestinalPolypsSegmentation"
                 >图像分类</el-dropdown-item
               >
-              <el-dropdown-item @click="imageIntestinalPolypsSegmentation">序列分类</el-dropdown-item>
+              <el-dropdown-item @click="seriesIntestinalPolypsSegmentation">序列分类</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>

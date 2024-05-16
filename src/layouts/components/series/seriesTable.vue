@@ -330,7 +330,7 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
                         link
                         type="primary"
                         size="small"
-                        @click="seriesOperation(scope.row.seriesId)"
+                        @click="seriesOperation(scope.row)"
                         ><template #icon>
                           <IconifyIconOffline :icon="view"></IconifyIconOffline>
                         </template>
@@ -348,7 +348,7 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
                 link
                 type="primary"
                 size="small"
-                @click="seriesOperation(scope.row.seriesId)"
+                @click="seriesOperation(scope.row)"
                 ><template #icon>
                   <IconifyIconOffline :icon="view"></IconifyIconOffline>
                 </template>

@@ -113,18 +113,21 @@ function getExcelInformation(){
 
 onMounted(() => {
   getExcelInformation()
+ 
 })
 //跳转到下一个页面
 import { useRouter } from "vue-router";
 const router = useRouter();
 const searchRow = (index: number) => {
-    
+   
+    const toolId=tableData.value[index].toolId
+    const toolDate=tableData.value[index].toolDate
+    const toolName=tableData.value[index].toolName
+    const toolBackground=tableData.value[index].toolBackground
+    const toolAbstract=tableData.value[index].toolAbstract
     const toolRoute=tableData.value[index].toolRoute
-    
-    router.push({path:"/tools/tools",query:{toolRoute}});   //将相应的Excel文件路径路径传递到下一个界面使用
+    router.push({path:"/tools/tools",query:{toolId,toolDate,toolName,toolBackground,toolAbstract,toolRoute}});   //将相应的Excel文件路径路径传递到下一个界面使用
 }
-
-
 </script>
 
 <template>
