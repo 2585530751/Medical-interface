@@ -26,8 +26,8 @@ const checked = ref(false)
 const imageIds: string[] = []
 const { ViewportType } = Enums
 const imageOperationStateStore =useImageOperationStateStore()
-let elementId = ref('cornerstone-element-imagesModelsList-' + props.imagesModelsList.seriesId)
-const viewportId = 'stackViewPort-imagesModelsList-' + props.imagesModelsList.seriesId
+let elementId = ref('cornerstone-element-imagesModelsList-' + props.index)
+const viewportId = 'stackViewPort-imagesModelsList-' + props.index
 const renderingEngine = imageOperationStateStore.renderingEngine
 const imagesModelsListUrl = generateImageUrl(props.imagesModelsList.imageList[0].imageModelData!.resultPath)
 const imagesModelsListUrlCheck = ref(true)
@@ -137,4 +137,3 @@ onUnmounted(() => {
   padding: 4px; /* 内边距 */
 }
 </style>
-@/store/imageOperationState

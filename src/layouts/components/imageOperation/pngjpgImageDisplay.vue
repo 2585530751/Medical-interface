@@ -32,13 +32,12 @@ const imageOperationStateStore = useImageOperationStateStore()
 
 onMounted(() => {
   const element: HTMLDivElement = document.getElementById('imageOperationView') as HTMLDivElement
-  element.addEventListener(csToolsEnums.Events.KEY_DOWN, (evt) => {
-    cancelAndRemoveAnnotation(element)
-  })
+ 
 
   element.oncontextmenu = (e) => e.preventDefault()
   // 创建一个新的 ResizeObserver 实例
   let ro = new ResizeObserver((entries) => {
+    console.log('ResizeObserver')
     setTimeout(() => {
       // viewport.resize()
       imageOperationStateStore.renderingEngine.resize(true, true)
@@ -66,10 +65,7 @@ const imagesInfoWindows = computed(() => {
   return imageOperationStateStore.seriesListWindows
 })
 
-function cancelAndRemoveAnnotation(temElement: HTMLDivElement) {
-  const annotationUID = cancelActiveManipulations(temElement)
-  annotation.state.removeAnnotation(annotationUID as string)
-}
+
 </script>
 
 <template>

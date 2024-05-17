@@ -64,7 +64,6 @@ const checkContourSegmentationToolName = [
 ]
 
 onMounted(async () => {
-  
   await renderStackViewport()
 })
 
@@ -191,8 +190,6 @@ function handleMouseLeave() {
   })
 }
 
-
-
 async function renderStackViewport() {
   if (props.imagesInfoWindows != 0) {
     const element: HTMLDivElement = document.getElementById(elementId.value) as HTMLDivElement
@@ -221,7 +218,9 @@ async function renderStackViewport() {
       )
       imageOperationStateStore.viewportColorbar[props.index] = colorbar
       imageOperationStateStore.toolGroup.addViewport(viewportId, renderingEngine.id)
-
+      element.addEventListener(csToolsEnums.Events.KEY_DOWN, (evt) => {
+        cancelAndRemoveAnnotation(element)
+      })
       // element.addEventListener(MOUSE_WHEEL, ((evt: Types.EventTypes.ImageRenderedEvent) => {
       //   console.log('IMAGE_RENDERED')
       // }) as EventListener)
@@ -235,8 +234,12 @@ async function renderStackViewport() {
   }
 }
 
+function cancelAndRemoveAnnotation(temElement: HTMLDivElement) {
+  const annotationUID = cancelActiveManipulations(temElement)
+  annotation.state.removeAnnotation(annotationUID as string)
+}
 // const { MOUSE_WHEEL } = csToolsEnums.Events
-// const {} =Enums.Events  
+// const {} =Enums.Events
 </script>
 
 <template>

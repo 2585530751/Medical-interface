@@ -91,6 +91,7 @@ import {
 import type { ContourConfig } from '@cornerstonejs/tools/src/types/ContourTypes'
 import { reactive, ref, watch } from 'vue'
 import vtkColormaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps'
+import { image } from 'html2canvas/dist/types/css/types/image'
 
 const {
   Synchronizer,
@@ -146,11 +147,11 @@ const {
   Enums: csToolsEnums
 } = cornerstoneTools
 
-const imageOperationStateStore =useImageOperationStateStore()
+const imageOperationStateStore = useImageOperationStateStore()
 const segmentationTools = ref(true)
 const operateTools = ref(true)
 const annotationTools = ref(true)
-const otherTools=ref(true)
+const otherTools = ref(true)
 
 const Splines = {
   CardinalSplineSegmentation: {
@@ -213,6 +214,9 @@ const layouts = [
 const setLayout = (r: number, c: number) => {
   imageOperationStateStore.windowRowsColumns.rows = r
   imageOperationStateStore.windowRowsColumns.columns = c
+  setTimeout(() => {
+    imageOperationStateStore.renderingEngine.resize(true, true)
+  }, 1000)
 }
 
 const windowLevelPresetValues = [
@@ -296,7 +300,10 @@ const segmentationToolsConfiguration = reactive({
 })
 
 function changeBrushSizeForToolGroup(radius: number) {
-  csToolsUtilities.segmentation.setBrushSizeForToolGroup(imageOperationStateStore.toolGroup.id, radius)
+  csToolsUtilities.segmentation.setBrushSizeForToolGroup(
+    imageOperationStateStore.toolGroup.id,
+    radius
+  )
 }
 
 function changeBrushThresholdForToolGroup() {
@@ -390,9 +397,9 @@ function deleteSeriesListWindowsToSession(
     const list: (SeriesInfoWindows | 0)[] = session.getItem(seriesListWindowsSession)
     list[index] = 0
     session.setItem(seriesListWindowsSession, list)
-    imageOperationStateStore.viewports[index]=0 as any
+    imageOperationStateStore.viewports[index] = 0 as any
     imageOperationStateStore.viewportColorbar[index].destroy()
-    imageOperationStateStore.viewportColorbar[index]=0 as any
+    imageOperationStateStore.viewportColorbar[index] = 0 as any
     imageOperationStateStore.seriesListWindows[index] = 0
     renderingEngine!.disableElement(viewportId)
   }
@@ -455,7 +462,8 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
                 @click="
                   resetToDefaultViewportProperties(
                     imageOperationStateStore.renderingEngine.id,
-                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]
+                      .id
                   )
                 "
                 >重置视口默认属性</el-dropdown-item
@@ -464,7 +472,8 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
                 @click="
                   removeCurrentImageIdProperties(
                     imageOperationStateStore.renderingEngine.id,
-                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]
+                      .id
                   )
                 "
                 >去除视口已有属性</el-dropdown-item
@@ -474,8 +483,11 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
                   setViewportColorbar(
                     'Grayscale',
                     imageOperationStateStore.renderingEngine.id,
-                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id,
-                    imageOperationStateStore.viewportColorbar[imageOperationStateStore.selectSeriesWindows]
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]
+                      .id,
+                    imageOperationStateStore.viewportColorbar[
+                      imageOperationStateStore.selectSeriesWindows
+                    ]
                   )
                 "
                 >重置视口默认彩条</el-dropdown-item
@@ -484,13 +496,18 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
                 @click="
                   resetToDefaultViewportProperties(
                     imageOperationStateStore.renderingEngine.id,
-                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]
+                      .id
                   ),
                     setViewportColorbar(
                       'Grayscale',
                       imageOperationStateStore.renderingEngine.id,
-                      imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id,
-                      imageOperationStateStore.viewportColorbar[imageOperationStateStore.selectSeriesWindows]
+                      imageOperationStateStore.viewports[
+                        imageOperationStateStore.selectSeriesWindows
+                      ].id,
+                      imageOperationStateStore.viewportColorbar[
+                        imageOperationStateStore.selectSeriesWindows
+                      ]
                     )
                 "
                 >恢复视口初始状态</el-dropdown-item
@@ -522,7 +539,8 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
                     windowLevelPresetValue.window,
                     windowLevelPresetValue.level,
                     imageOperationStateStore.renderingEngine.id,
-                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]
+                      .id
                   )
                 "
               >
@@ -552,8 +570,11 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
                   setViewportColorbar(
                     colormap.Name,
                     imageOperationStateStore.renderingEngine.id,
-                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id,
-                    imageOperationStateStore.viewportColorbar[imageOperationStateStore.selectSeriesWindows]
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]
+                      .id,
+                    imageOperationStateStore.viewportColorbar[
+                      imageOperationStateStore.selectSeriesWindows
+                    ]
                   )
                 "
                 >{{ colormap.ColorSpace }} {{ colormap.Name }}</el-dropdown-item
@@ -594,7 +615,10 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
         >
           <darkThemeFilled style="height: 30px; width: 30px"></darkThemeFilled>
         </imageOperation>
-        <imageOperation operation="移动" @click="imageOperationStateStore.bindLeftMouse(PanTool.toolName)">
+        <imageOperation
+          operation="移动"
+          @click="imageOperationStateStore.bindLeftMouse(PanTool.toolName)"
+        >
           <dragOutlined style="height: 30px; width: 30px"></dragOutlined>
         </imageOperation>
         <div class="flex items-center h-16 bg-gray-100 rounded-lg w-14 dark:bg-gray-700">
@@ -615,7 +639,8 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
                 @click="
                   changeZoom(
                     imageOperationStateStore.renderingEngine.id,
-                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id,
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]
+                      .id,
                     1.05
                   )
                 "
@@ -631,7 +656,8 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
                 @click="
                   changeZoom(
                     imageOperationStateStore.renderingEngine.id,
-                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id,
+                    imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]
+                      .id,
                     0.95
                   )
                 "
@@ -696,7 +722,9 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
                     @click="
                       resetPan(
                         imageOperationStateStore.renderingEngine.id,
-                        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
+                        imageOperationStateStore.viewports[
+                          imageOperationStateStore.selectSeriesWindows
+                        ].id
                       )
                     "
                     >重置移动</el-dropdown-item
@@ -705,7 +733,9 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
                     @click="
                       resetZoom(
                         imageOperationStateStore.renderingEngine.id,
-                        imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
+                        imageOperationStateStore.viewports[
+                          imageOperationStateStore.selectSeriesWindows
+                        ].id
                       )
                     "
                     >重置大小</el-dropdown-item
@@ -727,7 +757,8 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
               @click="
                 changePreviousImage(
                   imageOperationStateStore.renderingEngine.id,
-                  imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
+                  imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]
+                    .id
                 )
               "
             ></playerStart
@@ -751,7 +782,8 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
               @click="
                 changeNextImage(
                   imageOperationStateStore.renderingEngine.id,
-                  imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
+                  imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]
+                    .id
                 )
               "
             ></playerEnd
@@ -933,7 +965,8 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
                 selectAnnotationsByToolName(
                   imageOperationStateStore.leftMouseActive,
                   imageOperationStateStore.renderingEngine.id,
-                  imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
+                  imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows]
+                    .id
                 )
               "
             >
@@ -958,7 +991,9 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
                         selectAnnotationsByToolName(
                           annotationTools.toolName,
                           imageOperationStateStore.renderingEngine.id,
-                          imageOperationStateStore.viewports[imageOperationStateStore.selectSeriesWindows].id
+                          imageOperationStateStore.viewports[
+                            imageOperationStateStore.selectSeriesWindows
+                          ].id
                         )
                       "
                       :key="annotationTools.label"
@@ -1259,7 +1294,9 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
 
           <imageOperation
             operation="实时轮廓"
-            @click="imageOperationStateStore.bindLeftMouse(LivewireContourSegmentationTool.toolName)"
+            @click="
+              imageOperationStateStore.bindLeftMouse(LivewireContourSegmentationTool.toolName)
+            "
           >
             <livewireSegmentation
               style="height: 30px; width: 30px; fill: currentColor"
@@ -1301,14 +1338,19 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
           </div>
           <imageOperation
             operation="手绘轮廓"
-            @click="imageOperationStateStore.bindLeftMouse(PlanarFreehandContourSegmentationTool.toolName)"
+            @click="
+              imageOperationStateStore.bindLeftMouse(PlanarFreehandContourSegmentationTool.toolName)
+            "
           >
             <planarFreehandSegmentation
               style="height: 30px; width: 30px; fill: currentColor"
             ></planarFreehandSegmentation>
           </imageOperation>
         </div>
-        <div class="px-2 pt-1 pb-1" v-show="imageOperationStateStore.leftMouseActive == 'CircularBrush'">
+        <div
+          class="px-2 pt-1 pb-1"
+          v-show="imageOperationStateStore.leftMouseActive == 'CircularBrush'"
+        >
           <div class="flex justify-between">
             <el-text>毛刷半径(mm)</el-text
             ><el-input-number
@@ -1331,7 +1373,10 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
             />
           </div>
         </div>
-        <div class="px-2 pt-1 pb-1" v-show="imageOperationStateStore.leftMouseActive == 'CircularEraser'">
+        <div
+          class="px-2 pt-1 pb-1"
+          v-show="imageOperationStateStore.leftMouseActive == 'CircularEraser'"
+        >
           <div class="flex justify-between">
             <el-text>橡皮半径(mm)</el-text
             ><el-input-number
@@ -1354,7 +1399,10 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
             />
           </div>
         </div>
-        <div class="px-2 pt-1 pb-1" v-show="imageOperationStateStore.leftMouseActive == 'ThresholdCircle'">
+        <div
+          class="px-2 pt-1 pb-1"
+          v-show="imageOperationStateStore.leftMouseActive == 'ThresholdCircle'"
+        >
           <div class="flex justify-between">
             <el-text>阈值半径(mm)</el-text
             ><el-input-number
@@ -1432,7 +1480,8 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
           class="px-2 pt-1 pb-1"
           v-show="
             imageOperationStateStore.leftMouseActive == LivewireContourSegmentationTool.toolName ||
-            imageOperationStateStore.leftMouseActive == PlanarFreehandContourSegmentationTool.toolName ||
+            imageOperationStateStore.leftMouseActive ==
+              PlanarFreehandContourSegmentationTool.toolName ||
             splineToolsNames.includes(imageOperationStateStore.leftMouseActive)
           "
         >
@@ -1618,7 +1667,6 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
         >
           <removals style="height: 30px; width: 30px; fill: currentColor"></removals>
         </imageOperation>
-        
       </div>
     </div>
   </div>

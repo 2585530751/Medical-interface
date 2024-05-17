@@ -38,7 +38,6 @@ const { Enums: csToolsEnums } = cornerstoneTools
 const { MouseBindings } = csToolsEnums
 
 export const useImageOperationStateStore = defineStore('imageOperationState', () => {
- 
   const imageList = reactive<ImageInfo>({
     imageId: null,
     imageName: null,
@@ -85,7 +84,9 @@ export const useImageOperationStateStore = defineStore('imageOperationState', ()
     modelType: null,
     markImageName: null,
     markImagePath: null,
-    markImageDesc: null
+    markImageDesc: null,
+    createTime: null,
+    creatorId: null
   })
   const seriesList = reactive<SeriesInfo>({
     seriesId: 0,
@@ -207,19 +208,42 @@ export const useImageOperationStateStore = defineStore('imageOperationState', ()
   }
 
   function pushSeriesModelsList(imagesListParameter: SeriesInfo) {
-    let existingElement = seriesModelsLists.find(
-      (element) =>
-        element.imageList.length === imagesListParameter.imageList.length &&
-        element.imageList[0].imageModelData!.modelId ===
-          imagesListParameter.imageList[0].imageModelData!.modelId
-    )
-    if (existingElement) {
-      const index = seriesModelsLists.indexOf(existingElement)
-      seriesModelsLists.splice(index, 1)
+    if (seriesModelsLists.length == 0) {
       seriesModelsLists.push(imagesListParameter)
-    } else {
-      seriesModelsLists.push(imagesListParameter)
+      return
     }
+    for (var i = 0; i < seriesModelsLists.length; i++) {
+      if (
+        seriesModelsLists[i].seriesId === imagesListParameter.seriesId &&
+        seriesModelsLists[i].imageList[0].imageModelData!.modelId ===
+          imagesListParameter.imageList[0].imageModelData!.modelId
+      ) {
+        if (seriesModelsLists[i].imageList.length < imagesListParameter.imageList.length) {
+          for (var j = 0; j < imagesListParameter.imageList.length; j++) {
+            if (
+              seriesModelsLists[i].imageList[0].imageId == imagesListParameter.imageList[j].imageId
+            ) {
+              seriesModelsLists[i].imageList[0] = imagesListParameter.imageList[j]
+            }
+          }
+        } else if (seriesModelsLists[i].imageList.length > imagesListParameter.imageList.length) {
+          for (var j = 0; j < seriesModelsLists[i].imageList.length; j++) {
+            if (
+              seriesModelsLists[i].imageList[j].imageId == imagesListParameter.imageList[0].imageId
+            ) {
+              seriesModelsLists[i].imageList[j] = imagesListParameter.imageList[0]
+            }
+          }
+        } else if (seriesModelsLists[i].imageList.length == imagesListParameter.imageList.length) {
+          if (
+            seriesModelsLists[i].imageList[0].imageId == imagesListParameter.imageList[0].imageId
+          ) {
+            seriesModelsLists.splice(i, 1)
+          }
+        }
+      } 
+    }
+    seriesModelsLists.push(imagesListParameter)
   }
 
   async function getImagesListData() {
