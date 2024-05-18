@@ -49,7 +49,7 @@ watch(
       imagesListsInfo.imagesSetNumber += 1
     }
     // 提取所有不同的 imageType 并存储到 Set 中以去除重复项
-    const uniqueImageTypes = new Set(imagesLists.map((image) => image.seriesEquipment))
+    const uniqueImageTypes = new Set(imagesLists.map((image) => image.seriesModality))
     // 将 Set 转换回数组，并使用 join 方法将 imageType 串联成一个字符串
     const imageTypesString = Array.from(uniqueImageTypes).join('/')
     imagesListsInfo.imagesEquipment = imageTypesString
@@ -69,7 +69,7 @@ watch(
       imagesModelsListsInfo.imagesModelsSetNumber += 1
     }
     // 提取所有不同的 imageType 并存储到 Set 中以去除重复项
-    const uniqueImageTypes = new Set(imagesModelsLists.map((image) => image.seriesEquipment))
+    const uniqueImageTypes = new Set(imagesModelsLists.map((image) => image.seriesModality))
     // 将 Set 转换回数组，并使用 join 方法将 imageType 串联成一个字符串
     const imageTypesString = Array.from(uniqueImageTypes).join('/')
     imagesModelsListsInfo.imagesEquipment = imageTypesString
@@ -87,12 +87,12 @@ onMounted(() => {
     imagesModelsListsInfo.imagesModelsSetNumber += 1
   }
   // 提取所有不同的 imageType 并存储到 Set 中以去除重复项
-  const uniqueImageTypes = new Set(imagesModelsLists.map((image) => image.seriesEquipment))
+  const uniqueImageTypes = new Set(imagesModelsLists.map((image) => image.seriesModality))
   // 将 Set 转换回数组，并使用 join 方法将 imageType 串联成一个字符串
   const imageTypesString = Array.from(uniqueImageTypes).join('/')
   imagesModelsListsInfo.imagesEquipment = imageTypesString
   // 提取所有不同的 imageType 并存储到 Set 中以去除重复项
-  const uniqueImageTypes1 = new Set(imagesLists.map((image) => image.seriesEquipment))
+  const uniqueImageTypes1 = new Set(imagesLists.map((image) => image.seriesModality))
   // 将 Set 转换回数组，并使用 join 方法将 imageType 串联成一个字符串
   const imageTypesString1 = Array.from(uniqueImageTypes).join('/')
   imagesListsInfo.imagesEquipment = imageTypesString1

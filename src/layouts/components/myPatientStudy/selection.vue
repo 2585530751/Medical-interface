@@ -143,12 +143,7 @@ function refreshTable() {
     </template>
     <div class="flex items-center justify-between">
       <div class="flex flex-wrap w-auto h-auto">
-        <el-button round>
-          <template #icon>
-            <IconifyIconOffline :icon="plus"></IconifyIconOffline>
-          </template>
-          新增检查</el-button
-        >
+        
         <el-button round :icon="applicationImport">导入检查</el-button>
         <el-button
           round

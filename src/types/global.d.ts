@@ -35,7 +35,7 @@ interface RouteConfigsTable {
 }
 
 
-export interface ResponseResuilt<T = any> {  
+export interface ResponseResult<T = any> {  
   code: number;  
   msg: string;  
   data: T | null | undefined | ''; // 允许data为空字符串、null、undefined或任何类型T 

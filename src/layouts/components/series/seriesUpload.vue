@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive, ref, watch } from 'vue'
+import { reactive, type Ref, ref, watch, onMounted } from 'vue'
 import { Delete, ZoomIn, Download } from '@element-plus/icons-vue'
 import { UploadFilled } from '@element-plus/icons-vue'
 import { type UploadFile } from 'element-plus'
@@ -8,7 +8,9 @@ import type { UploadUserFile } from 'element-plus'
 import type { UploadInstance } from 'element-plus'
 import { uploadSeriesApi } from '@/api/study'
 import { useSeriesStateStore } from '@/store/modules/seriesState'
-import { departmentOptions } from '@/utils/commonVariables'
+import { getPermissionByCurrentUserIdApi } from '@/api/user'
+import type { PermissionEntity } from '@/types/user'
+import { Warning } from '@element-plus/icons-vue'
 
 const props = defineProps<{
   uploadWindowOpen?: boolean
@@ -18,12 +20,7 @@ const emits = defineEmits<{
   uploadWindowClose: [] // 具名元组语法
 }>()
 
-const filteredObjects = departmentOptions.filter((obj) => obj.value === 'doctor')
-
-var options: any[] = []
-filteredObjects.forEach((obj) => {
-    options= obj.children!
-})
+var options: Ref<PermissionEntity[]> = ref([])
 
 const seriesStateStore = useSeriesStateStore()
 
@@ -43,7 +40,7 @@ const handleRemove = (file: UploadFile) => {
 }
 
 const headers: Record<string, any> = {
-  'Content-Type':'multipart/form-data'
+  'Content-Type': 'multipart/form-data'
 }
 
 const handlePictureCardPreview = (file: UploadFile) => {
@@ -72,7 +69,7 @@ function submitFileForm() {
     formData.append('files', file.raw!)
   })
   const params = {
-    departmentNameList: [imagesInfo.departmentNameList[imagesInfo.departmentNameList.length - 1]]
+    departmentNameList: imagesInfo.departmentNameList
   }
   // 文件名
   formData.append('seriesInfo', JSON.stringify(params))
@@ -99,6 +96,24 @@ function handleDownload(file: UploadFile) {
   link.click() //模拟在按钮上实现一次鼠标点击
   window.URL.revokeObjectURL(link.href)
 }
+
+function obtainDepartmentList() {
+  getPermissionByCurrentUserIdApi()
+    .then((res) => {
+      if (res.success) {
+        options.value = res.data as PermissionEntity[]
+      } else {
+        message(res.msg, { type: 'error' })
+      }
+    })
+    .catch((error) => {
+      message(error, { type: 'error' })
+    })
+}
+
+onMounted(() => {
+  obtainDepartmentList()
+})
 </script>
 
 <template>
@@ -109,12 +124,34 @@ function handleDownload(file: UploadFile) {
     width="60%"
     center
   >
-    <el-form-item label="科室">
-      <el-cascader
-        :options="options"
-        :show-all-levels="false"
+    <el-form-item label="科室" >
+      <el-select
         v-model="imagesInfo.departmentNameList"
-      />
+        multiple
+        collapse-tags
+        collapse-tags-tooltip
+        :max-collapse-tags="3"
+        placeholder="选择科室"
+        class="w-1/3"
+      >
+        <el-option
+          v-for="item in options"
+          :key="item.permissionId"
+          :label="item.description"
+          :value="item.permissionName"
+        >
+          <span style="float: left">{{ item.description }}</span>
+          <span
+            class="pl-6"
+            style="float: right; color: var(--el-text-color-secondary); font-size: 13px"
+          >
+            {{ item.permissionName }}
+          </span>
+        </el-option>
+      </el-select>
+      <el-tooltip  content="选择的科室都有权限查看此内容！" placement="bottom">
+        <el-icon class="pl-2" color="red" size="16"><Warning /></el-icon>
+      </el-tooltip>
     </el-form-item>
     <el-upload
       list-type="picture-card"

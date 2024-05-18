@@ -1,6 +1,6 @@
 import { http } from '@/utils/http'
 import { baseUrlApi } from './utils'
-import type { ResponseResuilt } from '@/types/global.d.ts'
+import type { ResponseResult } from '@/types/global.d.ts'
 import type { ImageModelResult } from '@/types/model.d.ts'
 import type { ImageInfo } from '@/types/series'
 
@@ -19,7 +19,7 @@ export const uploadImages = (data?: object) => {
 }
 
 export const uploadMarkImageFormApi = (data?: object) => {
-  return http.request<ResponseResuilt<ImageInfo>>(
+  return http.request<ResponseResult<ImageInfo>>(
     'post',
     baseUrlApi('markImage/uploadMarkImageForm'),
     { data },
@@ -53,13 +53,13 @@ export const deleteSingleImageById = (params?: object) => {
 }
 
 export const seriesSegmentationOfThyroidNodulesApi = (params?: object) => {
-  return http.request<ResponseResuilt<ImageModelResult[]>>('get', baseUrlApi('modelApi/seriesSegment'), {
+  return http.request<ResponseResult<ImageModelResult[]>>('get', baseUrlApi('modelApi/seriesSegment'), {
     params
   })
 }
 
 export const imageSegmentationOfThyroidNodulesApi = (params?: object) => {
-  return http.request<ResponseResuilt<ImageModelResult>>('get', baseUrlApi('modelApi/imageSegment'), { params })
+  return http.request<ResponseResult<ImageModelResult>>('get', baseUrlApi('modelApi/imageSegment'), { params })
 }
 
 export const imageClassifyOfThyroidNodulesApi = (params?: object) => {
@@ -79,12 +79,12 @@ export const seriesDetectionOfPulmonaryNodulesApi = (params?: object) => {
 }
 
 export const imageIntestinalPolypsSegmentationApi = (params?: object) => {
-  return http.request<ResponseResuilt<ImageModelResult>>('get', baseUrlApi('modelApi/intestinalPolypsImageSegmentation'), {
+  return http.request<ResponseResult<ImageModelResult>>('get', baseUrlApi('modelApi/intestinalPolypsImageSegmentation'), {
     params
   })
 }
 
 export const seriesIntestinalPolypsSegmentationApi = (params?: object) => {
-  return http.request<ResponseResuilt<ImageModelResult[]>>('get', baseUrlApi('modelApi/intestinalPolypsSeriesSegmentation'), { params })
+  return http.request<ResponseResult<ImageModelResult[]>>('get', baseUrlApi('modelApi/intestinalPolypsSeriesSegmentation'), { params })
 }
 

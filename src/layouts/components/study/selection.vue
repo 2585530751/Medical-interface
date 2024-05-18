@@ -7,7 +7,7 @@ import fold from '@iconify-icons/ep/fold'
 import refresh from '@iconify-icons/ep/refresh'
 import setUp from '@iconify-icons/ep/set-up'
 import rank from '@iconify-icons/ep/rank'
-import { setAllPropertiesToNull,exportExcel } from '@/utils/commonUtils'
+import { setAllPropertiesToNull, exportExcel } from '@/utils/commonUtils'
 import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
 import { useStudyStateStore } from '@/store/modules/studyState'
@@ -145,14 +145,20 @@ function refreshTable() {
     </template>
     <div class="flex items-center justify-between">
       <div class="flex flex-wrap w-auto h-auto">
-        <el-button round>
-          <template #icon>
-            <IconifyIconOffline :icon="plus"></IconifyIconOffline>
-          </template>
-          新增检查</el-button
-        >
         <el-button round :icon="applicationImport">导入检查</el-button>
-        <el-button round :icon="applicationExport" @click="exportExcel(JSON.parse(JSON.stringify(studyStateStore.studyListTableData)),cols,checkedCols,'检查列表.xlsx')">导出检查</el-button>
+        <el-button
+          round
+          :icon="applicationExport"
+          @click="
+            exportExcel(
+              JSON.parse(JSON.stringify(studyStateStore.studyListTableData)),
+              cols,
+              checkedCols,
+              '检查列表.xlsx'
+            )
+          "
+          >导出检查</el-button
+        >
       </div>
       <div class="flex flex-wrap items-center w-auto h-auto gap-x-3">
         <el-tooltip content="刷新" placement="top" effect="light">

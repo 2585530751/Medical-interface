@@ -16,6 +16,7 @@ import router from '@/router'
 import seriesDiagnosticResult from '@/layouts/components/series/seriesDiagnosticResult.vue'
 import rolePermission from '@/components/rolePermission.vue'
 import seriesDicom from '@/components/ReImage/seriesDicom.vue'
+import plus from '@iconify-icons/ep/plus'
 
 const props = defineProps<{
   tableSize: string
@@ -90,7 +91,17 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
           >
             <p m="t-0 b-2">序列UID: {{ props.row.seriesInstanceUid }}</p>
             <div class="w-11/12">
-              <h3>影像详情</h3>
+              <div class="flex items-center justify-between">
+                <h3 class="inline-block">图像详情</h3>
+                <role-permission :value="['doctor']"
+                  ><el-button round class="font-semibold">
+                    <template #icon>
+                      <IconifyIconOffline :icon="plus"></IconifyIconOffline>
+                    </template>
+                    新增图像</el-button
+                  ></role-permission
+                >
+              </div>
               <el-table
                 :data="props.row.imageList"
                 resizable
@@ -350,11 +361,7 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
           </role-permission>
           <role-permission :value="['radiologist']">
             <div class="flex items-center gap-1">
-              <el-button
-                link
-                type="primary"
-                size="small"
-                @click="seriesOperation(scope.row)"
+              <el-button link type="primary" size="small" @click="seriesOperation(scope.row)"
                 ><template #icon>
                   <IconifyIconOffline :icon="view"></IconifyIconOffline>
                 </template>

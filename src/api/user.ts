@@ -1,38 +1,7 @@
 import { http } from '@/utils/http'
 import { baseUrlApi } from './utils'
-
-export type UserResult = {
-  success: boolean
-  code: number
-  msg: string
-  data: {
-    /** 用户名 */
-    username: string
-    /** 当前登陆用户的角色 */
-    roles: Array<string>
-    /** `token` */
-    accessToken: string
-
-    /** 用于调用刷新`accessToken`的接口时所需的`token` */
-    refreshToken: string
-    /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
-    expires: number
-  }
-}
-
-export type RefreshTokenResult = {
-  success: boolean
-  code: number
-  msg: string
-  data: {
-    /** `token` */
-    accessToken: string
-    /** 用于调用刷新`accessToken`的接口时所需的`token` */
-    refreshToken: string
-    /** `accessToken`的过期时间（格式'xxxx/xx/xx xx:xx:xx'） */
-    expires: number
-  }
-}
+import type { UserResult, RefreshTokenResult,PermissionEntity } from '@/types/user'
+import type { ResponseResult } from '@/types/global'
 
 /** 登录 */
 export const getLogin = (data?: object) => {
@@ -117,10 +86,6 @@ export const updateUserAddressApi = (data?: object) => {
   })
 }
 
-// export const postUserInformationApi =(params?: object) =>{
-//   return http.request<any>("post",baseUrlApi("user/updateUserInfo"),{params})
-// }
-
 
 export const postUserInformationApi = (params?: object) => {
   return http.request<any>(
@@ -180,6 +145,10 @@ export const getPatientStudyPageApi = (data?: object) => {
       }
     }
   )
+}
+
+export const getPermissionByCurrentUserIdApi = () => {
+  return http.request<ResponseResult<PermissionEntity[]>>('get', baseUrlApi('permission/getPermissionByCurrentUserId'))
 }
 
 export const setExcelApi = (data?: object) => {

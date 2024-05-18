@@ -15,12 +15,13 @@ import {
 import { message } from '@/utils/message'
 import { pushseriesModelsListsSession } from '@/composables/image/utils'
 
-import { reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, watch } from 'vue'
 
 import pieChart from '@/components/ReChart/pieChart.vue'
 import type { ImageInfo, SeriesInfo } from '@/types/series'
 import type { ImageModelResult } from '@/types/model.d.ts'
-import { nextTick } from 'process'
+import { changeSeriesListWindowsToSession } from '@/composables/image/utils'
+import type { SeriesInfoWindows } from '@/types/image'
 
 const dialogVisible = ref(false)
 
@@ -57,6 +58,8 @@ async function imageSegmentationOfThyroidNodules() {
           seriesInfo.seriesFeature = [dataResult.imageFeature]
           pushseriesModelsListsSession(seriesInfo)
           imageOperationStateStore.pushSeriesModelsList(seriesInfo)
+
+          changeSeriesListWindowsToSessionAndSeriesInfoWindows(seriesInfo, 'segmentModel')
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -80,35 +83,38 @@ async function seriesSegmentationOfThyroidNodules() {
       ).seriesId
     }
 
-    await seriesSegmentationOfThyroidNodulesApi(params).then((data) => {
-      if ((data.code = 200)) {
-        const dataResult: ImageModelResult[] = data.data as ImageModelResult[]
-        const seriesInfo: SeriesInfo = JSON.parse(JSON.stringify(seriesInfoWindows.seriesInfo))
-        const seriesFeature = []
-        for (var i = 0; i < dataResult.length; i++) {
-          seriesFeature.push(dataResult[i].imageFeature)
-          let j = 0
-          while (j < seriesInfo.imageList.length) {
-            if (seriesInfo.imageList[j].imageId == dataResult[i].imageId) {
-              break
+    await seriesSegmentationOfThyroidNodulesApi(params)
+      .then((data) => {
+        if ((data.code = 200)) {
+          const dataResult: ImageModelResult[] = data.data as ImageModelResult[]
+          const seriesInfo: SeriesInfo = JSON.parse(JSON.stringify(seriesInfoWindows.seriesInfo))
+          const seriesFeature = []
+          for (var i = 0; i < dataResult.length; i++) {
+            seriesFeature.push(dataResult[i].imageFeature)
+            let j = 0
+            while (j < seriesInfo.imageList.length) {
+              if (seriesInfo.imageList[j].imageId == dataResult[i].imageId) {
+                break
+              }
+              j++
             }
-            j++
+            seriesInfo.imageList[j].imageModelData = dataResult[i]
+            seriesInfo.imageList[j].modelType = 'model'
           }
-          seriesInfo.imageList[j].imageModelData = dataResult[i]
-          seriesInfo.imageList[j].modelType = 'model'
+          seriesInfo.seriesModelType = 'segmentModel'
+          seriesInfo.seriesFeature = seriesFeature
+          pushseriesModelsListsSession(seriesInfo)
+          imageOperationStateStore.pushSeriesModelsList(seriesInfo)
+
+          changeSeriesListWindowsToSessionAndSeriesInfoWindows(seriesInfo, 'segmentModel')
+          message(data.msg, { type: 'success' })
+        } else {
+          message(data.msg, { type: 'error' })
         }
-        seriesInfo.seriesModelType = 'segmentModel'
-        seriesInfo.seriesFeature = seriesFeature
-        pushseriesModelsListsSession(seriesInfo)
-        imageOperationStateStore.pushSeriesModelsList(seriesInfo)
-        message(data.msg, { type: 'success' })
-      } else {
-        message(data.msg, { type: 'error' })
-      }
-    })
-    // .catch((error) => {
-    //   message(error, { type: 'error' })
-    // })
+      })
+      .catch((error) => {
+        message(error, { type: 'error' })
+      })
   }
 }
 
@@ -182,7 +188,7 @@ async function seriesClassifyOfThyroidNodules() {
             malignantNumPercentage +
             '%的概率为恶性。'
           dialogVisible.value = true
-   
+
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -220,6 +226,8 @@ async function imageDetectionOfPulmonaryNodules() {
           seriesInfo.seriesModelType = 'detectModel'
           pushseriesModelsListsSession(seriesInfo)
           imageOperationStateStore.pushSeriesModelsList(seriesInfo)
+
+          changeSeriesListWindowsToSessionAndSeriesInfoWindows(seriesInfo, 'detectModel')
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -261,6 +269,8 @@ async function seriesDetectionOfPulmonaryNodules() {
           seriesInfo.seriesModelType = 'detectModel'
           pushseriesModelsListsSession(seriesInfo)
           imageOperationStateStore.pushSeriesModelsList(seriesInfo)
+
+          changeSeriesListWindowsToSessionAndSeriesInfoWindows(seriesInfo, 'detectModel')
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -299,6 +309,8 @@ async function imageIntestinalPolypsSegmentation() {
           seriesInfo.seriesFeature = [dataResult.imageFeature]
           pushseriesModelsListsSession(seriesInfo)
           imageOperationStateStore.pushSeriesModelsList(seriesInfo)
+
+          changeSeriesListWindowsToSessionAndSeriesInfoWindows(seriesInfo, 'segmentModel')
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -345,6 +357,8 @@ async function seriesIntestinalPolypsSegmentation() {
           seriesInfo.seriesFeature = seriesFeature
           pushseriesModelsListsSession(seriesInfo)
           imageOperationStateStore.pushSeriesModelsList(seriesInfo)
+
+          changeSeriesListWindowsToSessionAndSeriesInfoWindows(seriesInfo, 'segmentModel')
           message(data.msg, { type: 'success' })
         } else {
           message(data.msg, { type: 'error' })
@@ -363,10 +377,74 @@ function getSeriesInfoWindows(seriesId: number) {
     )
   )
 }
+
+function changeSeriesListWindowsToSessionAndSeriesInfoWindows(
+  seriesInfo: SeriesInfo,
+  seriesModelType: string
+) {
+  const seriesListWindows = imageOperationStateStore.seriesListWindows
+  for (var i = 0; i < seriesListWindows.length; i++) {
+    if (seriesListWindows[i] != 0) {
+      const seriesListWindow: SeriesInfoWindows = seriesListWindows[i] as SeriesInfoWindows
+      if (seriesListWindow.seriesInfo.seriesModelType == seriesModelType) {
+        if (
+          seriesListWindow.seriesInfo.seriesId == seriesInfo.seriesId &&
+          seriesListWindow.seriesInfo.imageList[0].imageModelData?.modelId ==
+            seriesInfo.imageList[0].imageModelData?.modelId
+        ) {
+          if (seriesListWindow.seriesInfo.imageList.length < seriesInfo.imageList.length) {
+            for (var j = 0; j < seriesInfo.imageList.length; j++) {
+              if (
+                seriesListWindow.seriesInfo.imageList[0].imageId == seriesInfo.imageList[j].imageId
+              ) {
+                seriesListWindow.seriesInfo.imageList[0] = seriesInfo.imageList[j]
+              }
+            }
+          } else if (seriesListWindow.seriesInfo.imageList.length > seriesInfo.imageList.length) {
+            for (var j = 0; j < seriesListWindow.seriesInfo.imageList.length; j++) {
+              if (
+                seriesListWindow.seriesInfo.imageList[j].imageId == seriesInfo.imageList[0].imageId
+              ) {
+                seriesListWindow.seriesInfo.imageList[j] = seriesInfo.imageList[0]
+              }
+            }
+          } else if (seriesListWindow.seriesInfo.imageList.length == seriesInfo.imageList.length) {
+            if (
+              seriesListWindow.seriesInfo.imageList[0].imageId == seriesInfo.imageList[0].imageId
+            ) {
+              seriesListWindow.seriesInfo = seriesInfo
+            }
+          }
+          changeSeriesListWindowsToSession(seriesListWindow, i)
+        }
+      }
+    }
+  }
+}
+
+const computedCheckWindowsType = computed(() => {
+  const selectSeriesWindow =
+    imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+  if (selectSeriesWindow != 0) {
+    if (
+      selectSeriesWindow.seriesInfo.seriesModelType == 'segmentModel' ||
+      selectSeriesWindow.seriesInfo.seriesModelType == 'detectModel'
+    ) {
+      return false
+    } else {
+      return true
+    }
+  }else{
+    return false
+  }
+})
 </script>
 
 <template>
-  <div class="divide-x-0 divide-y-2 divide-slate-400/50 divide-solid">
+  <div
+    class="divide-x-0 divide-y-2 divide-slate-400/50 divide-solid"
+    v-show="computedCheckWindowsType"
+  >
     <div class="flex flex-wrap justify-center bg-stone-50 dark:border-gray-700 dark:bg-gray-800">
       <div class="flex items-center">
         <p class="inline ml-3 text-sm text-gray-600 dark:text-white">甲状腺结节图像分割</p>
@@ -431,9 +509,7 @@ function getSeriesInfoWindows(seriesId: number) {
 
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="imageClassifyOfThyroidNodules"
-                >图像分类</el-dropdown-item
-              >
+              <el-dropdown-item @click="imageClassifyOfThyroidNodules">图像分类</el-dropdown-item>
               <el-dropdown-item @click="seriesClassifyOfThyroidNodules">序列分类</el-dropdown-item>
             </el-dropdown-menu>
           </template>
@@ -468,7 +544,7 @@ function getSeriesInfoWindows(seriesId: number) {
     </div>
 
     <el-dialog v-model="dialogVisible" title="甲状腺结节良性恶性分类结果" width="500">
-      <pie-chart :seriesName="pieName" :data="pieData" :description="pieDescription" ></pie-chart>
+      <pie-chart :seriesName="pieName" :data="pieData" :description="pieDescription"></pie-chart>
       <template #footer>
         <div class="dialog-footer">
           <el-button @click="dialogVisible = false">取消</el-button>

@@ -22,8 +22,7 @@ import {
   pushseriesModelsListsSession
 } from '@/composables/image/utils'
 import { message } from '@/utils/message'
-
-const { ViewportType } = Enums
+import {StackScrollMouseWheelTool} from '@cornerstonejs/tools'
 
 const props = defineProps<{
   completeViewImageWindowOpen?: boolean
@@ -58,6 +57,7 @@ const imageOperationStateStore = useImageOperationStateStore()
 var parentNode: HTMLElement | null = null
 var divElement: HTMLElement | null = null
 var divForDownloadViewport: HTMLDivElement | null = null
+var ro: ResizeObserver | null = null
 
 function onOpened() {
   divForDownloadViewport = document.querySelector(
@@ -65,9 +65,22 @@ function onOpened() {
   ) as HTMLDivElement
   parentNode = divForDownloadViewport.parentNode as HTMLDivElement
   divElement = document.getElementById('previewCanvas') as HTMLDivElement
+  
+
+  // 创建一个新的 ResizeObserver 实例
+  ro = new ResizeObserver((entries) => {
+    console.log('ResizeObserver')
+    setTimeout(() => {
+      // viewport.resize()
+      imageOperationStateStore.renderingEngine.resize(true, true)
+    }, 100) // 延迟1000毫秒后调用
+  })
+  ro.observe(divElement)
+
   divElement.appendChild(divForDownloadViewport)
   divForDownloadViewport!.style.width = imageFileInfo.imageWidth + 'px'
   divForDownloadViewport!.style.height = imageFileInfo.imageHeight + 'px'
+  imageOperationStateStore.toolGroup.setToolPassive(StackScrollMouseWheelTool.toolName)
 }
 
 function onClosed() {
@@ -75,7 +88,9 @@ function onClosed() {
   imageFileInfo.imageHeight = 512
   divForDownloadViewport!.style.width = '100%'
   divForDownloadViewport!.style.height = '100%'
+  ro!.unobserve(divElement!)
   parentNode!.insertBefore(divForDownloadViewport!, parentNode!.firstChild)
+  imageOperationStateStore.toolGroup.setToolActive(StackScrollMouseWheelTool.toolName)
 }
 
 function viewReader() {
@@ -83,7 +98,9 @@ function viewReader() {
     let formData = new FormData()
     let imageData = canvas.toDataURL(imageFileInfo.imageType, 1.0)
     let blob = dataURLtoBlob(imageData)
-    let file = new File([blob], imageFileInfo.imageName+'.'+imageFileInfo.imageType, { type: imageFileInfo.imageType })
+    let file = new File([blob], imageFileInfo.imageName + '.' + imageFileInfo.imageType, {
+      type: imageFileInfo.imageType
+    })
 
     const imageInfo: ImageInfo = imageKeyValueStore.get(
       imageOperationStateStore.viewports[

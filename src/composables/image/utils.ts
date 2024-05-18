@@ -62,13 +62,13 @@ export function pushseriesModelsListsSession(seriesInfo: SeriesInfo) {
       ) {
         if (list[i].imageList.length < seriesInfo.imageList.length) {
           for (var j = 0; j < seriesInfo.imageList.length; j++) {
-            if (list[i].imageList[0] == seriesInfo.imageList[j]) {
+            if (list[i].imageList[0].imageId == seriesInfo.imageList[j].imageId) {
               list[i].imageList[0] = seriesInfo.imageList[j]
             }
           }
         } else if (list[i].imageList.length > seriesInfo.imageList.length) {
           for (var j = 0; j < list[i].imageList.length; j++) {
-            if (list[i].imageList[j] == seriesInfo.imageList[0]) {
+            if (list[i].imageList[j].imageId == seriesInfo.imageList[0].imageId) {
               list[i].imageList[j] = seriesInfo.imageList[0]
             }
           }

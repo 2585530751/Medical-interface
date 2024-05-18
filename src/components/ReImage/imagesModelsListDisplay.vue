@@ -25,7 +25,7 @@ const emit = defineEmits<{
 const checked = ref(false)
 const imageIds: string[] = []
 const { ViewportType } = Enums
-const imageOperationStateStore =useImageOperationStateStore()
+const imageOperationStateStore: any = useImageOperationStateStore()
 let elementId = ref('cornerstone-element-imagesModelsList-' + props.index)
 const viewportId = 'stackViewPort-imagesModelsList-' + props.index
 const renderingEngine = imageOperationStateStore.renderingEngine
@@ -88,7 +88,7 @@ onUnmounted(() => {
     >
       <div class="flex items-center justify-between">
         <span class="text-xs text-gray-500">
-          {{ props.imagesModelsList.seriesEquipment }}
+          {{ props.imagesModelsList.seriesModality }}
         </span>
         <span class="text-xs text-gray-500"
           ><IconifyIconOffline
@@ -121,7 +121,7 @@ onUnmounted(() => {
             :icon="files"
             :style="{ fontSize: '10px' }"
           ></IconifyIconOffline
-          >{{ props.imagesModelsList.seriesCount }}</span
+          >{{ props.imagesModelsList.imageList.length }}</span
         >
       </div>
     </div>

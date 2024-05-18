@@ -1,6 +1,6 @@
 import { http } from '@/utils/http'
 import { baseUrlApi } from './utils'
-import type { ResponseResuilt } from '@/types/global'
+import type { ResponseResult } from '@/types/global'
 import type { SeriesInfo } from '@/types/series'
 
 export const getSeriesImagePageApi = (data?: object) => {
@@ -21,7 +21,7 @@ export const getSeriesImageByIdApi = (params?: object) => {
 }
 
 export const viewReaderApi = (data?: object) => {
-  return http.request<ResponseResuilt<SeriesInfo>>(
+  return http.request<ResponseResult<SeriesInfo>>(
     'post',
     baseUrlApi('view/reader'),
     { data },
@@ -34,7 +34,7 @@ export const viewReaderApi = (data?: object) => {
 }
 
 export const viewDoctorApi = (data?: object) => {
-  return http.request<ResponseResuilt<SeriesInfo>>(
+  return http.request<ResponseResult<SeriesInfo>>(
     'post',
     baseUrlApi('view/doctor'),
     { data },

@@ -60,7 +60,7 @@ onBeforeMount(() => {
 })
 
 const cols = [
-{ label: '创建时间', prop: 'createTime' },
+  { label: '创建时间', prop: 'createTime' },
   { label: '序列名称', prop: 'seriesName' },
   { label: '序列格式', prop: 'seriesFormat' },
   { label: '图像数量', prop: 'seriesCount' },
@@ -151,11 +151,13 @@ function refreshTable() {
     </template>
     <div class="flex items-center justify-between">
       <div class="flex flex-wrap w-auto h-auto">
-        <el-button round @click="centerDialogVisible = true">
-          <template #icon>
-            <IconifyIconOffline :icon="plus"></IconifyIconOffline>
-          </template>
-          新增序列</el-button
+        <role-permission :value="['doctor']"
+          ><el-button round @click="centerDialogVisible = true">
+            <template #icon>
+              <IconifyIconOffline :icon="plus"></IconifyIconOffline>
+            </template>
+            新增序列</el-button
+          ></role-permission
         >
         <el-button round :icon="applicationImport">导入序列</el-button>
         <el-button

@@ -91,7 +91,6 @@ import {
 import type { ContourConfig } from '@cornerstonejs/tools/src/types/ContourTypes'
 import { reactive, ref, watch } from 'vue'
 import vtkColormaps from '@kitware/vtk.js/Rendering/Core/ColorTransferFunction/ColorMaps'
-import { image } from 'html2canvas/dist/types/css/types/image'
 
 const {
   Synchronizer,
@@ -1673,4 +1672,3 @@ function removeAllSeriesListWindowsToSession(renderingEngineId: string) {
 </template>
 
 <style lang="scss" scoped></style>
-@/store/imageOperationState

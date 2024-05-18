@@ -22,6 +22,7 @@ import rolePermission from '@/components/rolePermission.vue'
 import { basicImageUrl } from '@/api/utils'
 import seriesDicom from '@/components/ReImage/seriesDicom.vue'
 import seriesDiagnosticResult from '@/layouts/components/series/seriesDiagnosticResult.vue'
+import plus from '@iconify-icons/ep/plus'
 
 const props = defineProps<{
   tableSize: string
@@ -111,7 +112,17 @@ function updateModifiedSeriesInfo() {
           >
             <p m="t-0 b-2">检查UID: {{ props.row.studyInstanceUid }}</p>
             <div class="w-11/12">
-              <h3>序列详情</h3>
+              <div class="flex items-center justify-between">
+                <h3 class="inline-block">序列详情</h3>
+                <role-permission :value="['doctor']"
+                  ><el-button round class="font-semibold">
+                    <template #icon>
+                      <IconifyIconOffline :icon="plus"></IconifyIconOffline>
+                    </template>
+                    新增序列</el-button
+                  ></role-permission
+                >
+              </div>
               <el-table
                 :data="props.row.seriesList"
                 :border="true"
@@ -136,7 +147,7 @@ function updateModifiedSeriesInfo() {
                         "
                       />
                       <seriesDicom
-                        class="size-24 "
+                        class="size-24"
                         key-value="SeriesPreview"
                         :series-info="scope.row"
                         :series-path="scope.row.seriesPreviewPath"

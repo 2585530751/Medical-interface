@@ -147,11 +147,13 @@ onBeforeMount(() => {
     </template>
     <div class="flex items-center justify-between">
       <div class="flex flex-wrap w-auto h-auto">
-        <el-button round>
-          <template #icon>
-            <IconifyIconOffline :icon="plus"></IconifyIconOffline>
-          </template>
-          新增患者</el-button
+        <role-permission :value="['doctor']">
+          <el-button round>
+            <template #icon>
+              <IconifyIconOffline :icon="plus"></IconifyIconOffline>
+            </template>
+            新增患者</el-button
+          ></role-permission
         >
         <el-button round :icon="applicationImport" @click="patientStateStore.getPatientListPage"
           >导入患者</el-button

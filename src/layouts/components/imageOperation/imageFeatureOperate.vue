@@ -25,9 +25,6 @@ const drawerVisible = ref()
 const seriesFeature = ref()
 const imageFeature = ref<ImageFeature>()
 
-const checkWindowsType = ref(true)
-const checkSeriesStatus = ref(true)
-
 function seriesFeatureTableVisible() {
   const seriesInfoWindows = imageOperationStateStore.seriesListWindows[
     imageOperationStateStore.selectSeriesWindows
@@ -50,60 +47,63 @@ function imageFeatureTableVisible() {
   delete imageFeature.value?.file_name
 }
 
-onMounted(() => {
+const computedCheckWindowsType = computed(() => {
   const selectSeriesWindow =
     imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
   if (selectSeriesWindow != 0) {
     if (selectSeriesWindow.seriesInfo.seriesModelType == 'segmentModel') {
-      checkWindowsType.value = true
+      return true
     } else {
-      checkWindowsType.value = false
+      return false
     }
-    if (selectSeriesWindow.seriesInfo.seriesStatus == '0') {
-      checkSeriesStatus.value = true
-    } else {
-      checkSeriesStatus.value = false
-    }
+  }else{
+    return false
   }
 })
 
-watch(
-  () => imageOperationStateStore.selectSeriesWindows,
-  () => {
-    const selectSeriesWindow =
-      imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
-    if (selectSeriesWindow != 0) {
-      if (selectSeriesWindow.seriesInfo.seriesModelType == 'segmentModel') {
-        checkWindowsType.value = true
-      } else {
-        checkWindowsType.value = false
-      }
-      if (selectSeriesWindow.seriesInfo.seriesStatus == '0') {
-        checkSeriesStatus.value = true
-      } else {
-        checkSeriesStatus.value = false
-      }
+const computedCheckSeriesStatus = computed(() => {
+  const selectSeriesWindow =
+    imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+  if (selectSeriesWindow != 0) {
+    if (selectSeriesWindow.seriesInfo.seriesStatus == '0') {
+      return true
+    } else {
+      return false
     }
-  },
-  {
-    deep: true
+  }else{
+    return false
   }
-)
+})
+
+const computedCheckSelectSeriesWindow = computed(() => {
+  const selectSeriesWindow =
+    imageOperationStateStore.seriesListWindows[imageOperationStateStore.selectSeriesWindows]
+  if (selectSeriesWindow != 0) {
+    return true
+  } else {
+    return false
+  }
+})
 </script>
 
 <template>
-  <div class="divide-x-0 divide-y-2 divide-slate-400/50 divide-solid">
-    <div class="flex flex-wrap justify-evenly bg-stone-50 dark:border-gray-700 dark:bg-gray-800">
+  <div class="divide-x-0 divide-y-2 divide-slate-400/50 divide-solid" v-show="computedCheckSelectSeriesWindow">
+    <div class="flex flex-wrap justify-evenly bg-stone-50 dark:border-gray-700 dark:bg-gray-800" >
       <el-button class="my-1" size="default" round @click="saveCompletedImageVisible = true"
         ><el-icon><DocumentAdd /></el-icon> 保存图像</el-button
       >
 
-      <el-button v-show="checkSeriesStatus" class="my-1" size="default" round @click="completeViewImageVisible = true"
+      <el-button
+        v-show="computedCheckSeriesStatus"
+        class="my-1"
+        size="default"
+        round
+        @click="completeViewImageVisible = true"
         ><el-icon><Check /></el-icon>完成阅片</el-button
       >
     </div>
     <div
-      v-show="checkWindowsType"
+      v-show="computedCheckWindowsType"
       class="flex flex-wrap justify-evenly bg-stone-50 dark:border-gray-700 dark:bg-gray-800"
     >
       <el-button class="my-1" size="default" @click="imageFeatureTableVisible()"
@@ -113,7 +113,7 @@ watch(
         ><el-icon><DocumentCopy /></el-icon>序列特征</el-button
       >
     </div>
-    <div v-show="checkWindowsType">
+    <div v-show="computedCheckWindowsType">
       <el-descriptions direction="vertical" :column="1" size="default" border>
         <el-descriptions-item
           v-for="(value, key) in imageFeature"
