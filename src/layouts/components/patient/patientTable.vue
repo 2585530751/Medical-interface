@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { TableInstance } from 'element-plus'
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, watch, reactive } from 'vue'
 import zoomIn from '@iconify-icons/ep/zoom-in'
 import pictrueIcon from '@iconify-icons/ep/picture'
 import filmIcon from '@iconify-icons/ep/film'
@@ -13,6 +13,8 @@ import { setAllPropertiesToNull } from '@/utils/commonUtils'
 import router from '@/router'
 import rolePermission from '@/components/rolePermission.vue'
 import deleteItem from '@iconify-icons/ep/delete'
+import addStudy from '@/layouts/components/study/addStudy.vue'
+import type { PatientInfo } from '@/types/patient'
 
 const props = defineProps<{
   tableSize: string
@@ -23,6 +25,9 @@ const tableRef = ref<TableInstance>()
 const patientStateStore = usePatientStateStore()
 const studyStateStore = useStudyStateStore()
 const seriesStateStore = useSeriesStateStore()
+
+const studyDialogVisible = ref(false)
+var dialogPatientId = ref(0)
 
 const filterGender = (value: string, row: any, column: any) => {
   return row.patientGender === value
@@ -57,6 +62,11 @@ function viewSerieslistByStudyId(studyId: number) {
   seriesStateStore.getSeriesListPage()
   router.push('/series')
 }
+
+function addStudyWindows(patientId:number) {
+  dialogPatientId.value=patientId
+  studyDialogVisible.value = true
+}
 </script>
 
 <template>
@@ -78,7 +88,7 @@ function viewSerieslistByStudyId(studyId: number) {
               <div class="flex items-center justify-between">
                 <h3 class="inline-block">检查详情</h3>
                 <role-permission :value="['doctor']"
-                  ><el-button round class="font-semibold">
+                  ><el-button round class="font-semibold" @click="addStudyWindows(props.row.patientId)">
                     <template #icon>
                       <IconifyIconOffline :icon="plus"></IconifyIconOffline>
                     </template>
@@ -287,6 +297,11 @@ function viewSerieslistByStudyId(studyId: number) {
         </template>
       </el-table-column>
     </el-table>
+    <addStudy
+      :dialog-patient-id="dialogPatientId"
+      :upload-window-open="studyDialogVisible"
+      @upload-window-close="studyDialogVisible = false"
+    ></addStudy>
   </el-card>
 </template>
 

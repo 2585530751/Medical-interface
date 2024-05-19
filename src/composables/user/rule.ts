@@ -42,6 +42,7 @@ const loginRules = reactive(<FormRules>{
 const REGEXP_USERNAME = /^[a-zA-Z0-9_]{4,16}$/ // 用户名规则示例
 const REGEXP_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/ // 邮箱规则示例
 const REGEXP_PHONE_NUMBER = /^1[3456789]\d{9}$/ // 中国大陆手机号码规则示例
+export const REGEXP_ID_CARD = /^[1-9]\d{5}(18|19|20)\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$/ // 身份证号码规则示例
 
 /** 注册校验 */
 const registerRules = reactive(<FormRules>{

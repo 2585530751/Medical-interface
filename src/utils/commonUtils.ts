@@ -1,4 +1,4 @@
-import { dayjs } from 'element-plus'
+import { dayjs, type FormInstance } from 'element-plus'
 import XLSX from 'xlsx'
 
 export function chineseStandardTimeFormat(date: string): string {
@@ -38,4 +38,9 @@ export function exportJsonToExcel(dataJson: Record<string, any>[],fileName: stri
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Sheet1')
   XLSX.writeFile(wb, fileName)
+}
+
+export const resetForm = (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  formEl.resetFields()
 }

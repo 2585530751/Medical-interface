@@ -9,7 +9,7 @@ import { uploadImages } from '@/api/image'
 import { Delete, Download, Plus, ZoomIn } from '@element-plus/icons-vue'
 import { uploadModelInfoApi } from '@/api/model'
 import { genFileId } from 'element-plus'
-import { ModelInfo } from '@/types/model'
+import {type ModelInfo } from '@/types/model'
 
 defineOptions({
   name: ''

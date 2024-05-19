@@ -12,6 +12,7 @@ import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
 import { useStudyStateStore } from '@/store/modules/studyState'
 
+
 defineOptions({
   name: 'studySelection'
 })
@@ -207,7 +208,7 @@ function refreshTable() {
                 <el-dropdown-item :divided="true"></el-dropdown-item>
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
                   <el-dropdown-item v-for="(col, index) in cols" :key="index">
-                    <el-checkbox :key="col.prop" :label="col.prop">{{ col.label }}</el-checkbox>
+                    <el-checkbox :key="col.prop" :value="col.prop">{{ col.label }}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>

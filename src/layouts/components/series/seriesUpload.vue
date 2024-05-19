@@ -2,7 +2,7 @@
 import { reactive, type Ref, ref, watch, onMounted } from 'vue'
 import { Delete, ZoomIn, Download } from '@element-plus/icons-vue'
 import { UploadFilled } from '@element-plus/icons-vue'
-import { type UploadFile } from 'element-plus'
+import { type FormInstance, type FormRules, type UploadFile } from 'element-plus'
 import { message } from '@/utils/message'
 import type { UploadUserFile } from 'element-plus'
 import type { UploadInstance } from 'element-plus'
@@ -33,8 +33,9 @@ const imagesInfo = reactive({
   departmentNameList: []
 })
 
+const ruleFormRef = ref<FormInstance>()
+
 const handleRemove = (file: UploadFile) => {
-  console.log(file)
   let index = imageList.value.indexOf(file)
   imageList.value.splice(index, 1)
 }
@@ -61,35 +62,46 @@ watch(
 )
 
 // 提交上传文件
-function submitFileForm() {
-  // 创建新的数据对象
-  let formData = new FormData()
-  // 将上传的文件放到数据对象中
-  imageList.value.forEach((file) => {
-    formData.append('files', file.raw!)
-  })
-  const params = {
-    departmentNameList: imagesInfo.departmentNameList
-  }
-  // 文件名
-  formData.append('seriesInfo', JSON.stringify(params))
-  uploadSeriesApi(formData)
-    .then((res) => {
-      if (res.success) {
-        console.log('res', res)
-        seriesStateStore.getSeriesListPage()
-        emits('uploadWindowClose')
-      } else {
-        message(res.msg, { type: 'error' })
+async function submitFileForm() {
+  console.log('ruleFormRef', ruleFormRef)
+  if (!ruleFormRef) return
+  await ruleFormRef.value!.validate((valid, fields) => {
+    if (valid) {
+      if(imageList.value.length === 0) {
+        message('请上传文件', { type: 'error' })
+        return
       }
-    })
-    .catch((error) => {
-      message(error, { type: 'error' })
-    })
+      // 创建新的数据对象
+      let formData = new FormData()
+      // 将上传的文件放到数据对象中
+      imageList.value.forEach((file) => {
+        formData.append('files', file.raw!)
+      })
+      const params = {
+        departmentNameList: imagesInfo.departmentNameList
+      }
+      // 文件名
+      formData.append('seriesInfo', JSON.stringify(params))
+      uploadSeriesApi(formData)
+        .then((res) => {
+          if (res.success) {
+            console.log('res', res)
+            seriesStateStore.getSeriesListPage()
+            emits('uploadWindowClose')
+          } else {
+            message(res.msg, { type: 'error' })
+          }
+        })
+        .catch((error) => {
+          message(error, { type: 'error' })
+        })
+    } else {
+      message('请填写完整信息', { type: 'error' })
+    }
+  })
 }
 
 function handleDownload(file: UploadFile) {
-  console.log('file', file)
   var link = document.createElement('a') //定义一个a标签
   link.download = file.name //下载后的文件名称
   link.href = file.url ?? '' //需要生成一个 URL 来实现下载
@@ -114,6 +126,16 @@ function obtainDepartmentList() {
 onMounted(() => {
   obtainDepartmentList()
 })
+
+const rules = reactive<FormRules>({
+  departmentNameList: [
+    {
+      required: true,
+      message: '请选择科室',
+      trigger: 'change'
+    }
+  ]
+})
 </script>
 
 <template>
@@ -124,35 +146,40 @@ onMounted(() => {
     width="60%"
     center
   >
-    <el-form-item label="科室" >
-      <el-select
-        v-model="imagesInfo.departmentNameList"
-        multiple
-        collapse-tags
-        collapse-tags-tooltip
-        :max-collapse-tags="3"
-        placeholder="选择科室"
-        class="w-1/3"
-      >
-        <el-option
-          v-for="item in options"
-          :key="item.permissionId"
-          :label="item.description"
-          :value="item.permissionName"
+    <el-form :rules="rules" :model="imagesInfo" label-width="auto" ref="ruleFormRef" status-icon>
+      <el-form-item label="科室" prop="departmentNameList">
+        <el-select
+          v-model="imagesInfo.departmentNameList"
+          multiple
+          collapse-tags
+          collapse-tags-tooltip
+          :max-collapse-tags="3"
+          placeholder="选择科室"
+          class="w-1/3"
         >
-          <span style="float: left">{{ item.description }}</span>
-          <span
-            class="pl-6"
-            style="float: right; color: var(--el-text-color-secondary); font-size: 13px"
+          <el-option
+            v-for="item in options"
+            :key="item.permissionId"
+            :label="item.description"
+            :value="item.permissionName"
           >
-            {{ item.permissionName }}
-          </span>
-        </el-option>
-      </el-select>
-      <el-tooltip  content="选择的科室都有权限查看此内容！" placement="bottom">
-        <el-icon class="pl-2" color="red" size="16"><Warning /></el-icon>
-      </el-tooltip>
-    </el-form-item>
+            <span style="float: left">{{ item.description }}</span>
+            <span
+              class="pl-6"
+              style="float: right; color: var(--el-text-color-secondary); font-size: 13px"
+            >
+              {{ item.permissionName }}
+            </span>
+          </el-option>
+        </el-select>
+        <el-tooltip content="选择的科室都有权限查看此内容！" placement="bottom">
+          <el-icon class="pl-2" color="red" size="16"><Warning /></el-icon>
+        </el-tooltip>
+      </el-form-item>
+      <el-form-item>
+        
+      </el-form-item>
+    </el-form>
     <el-upload
       list-type="picture-card"
       :auto-upload="false"

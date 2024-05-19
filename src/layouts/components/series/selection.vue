@@ -12,6 +12,7 @@ import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
 import { useSeriesStateStore } from '@/store/modules/seriesState'
 import seriesUpload from '@/layouts/components/series/seriesUpload.vue'
+import rolePermission from '@/components/rolePermission.vue'
 
 defineOptions({
   name: 'seriesSelection'
@@ -222,7 +223,7 @@ function refreshTable() {
 
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
                   <el-dropdown-item v-for="(col, index) in cols" :key="index">
-                    <el-checkbox :key="col.prop" :label="col.prop">{{ col.label }}</el-checkbox>
+                    <el-checkbox :key="col.prop" :value="col.prop">{{ col.label }}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>

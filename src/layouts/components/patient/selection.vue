@@ -11,6 +11,9 @@ import { chineseStandardTimeFormat, setAllPropertiesToNull, exportExcel } from '
 import applicationExport from '@/assets/svg/MdiApplicationExport.svg?component'
 import applicationImport from '@/assets/svg/MdiApplicationImport.svg?component'
 import { usePatientStateStore } from '@/store/modules/patientState'
+import rolePermission from '@/components/rolePermission.vue'
+import addPatient from '@/layouts/components/patient/addPatient.vue'
+
 
 defineOptions({
   name: 'patientSelection'
@@ -36,6 +39,8 @@ const patientForm: Record<string, any> = reactive({
   address: null,
   email: null
 })
+
+const centerDialogVisible = ref(false)
 
 const checkAll = ref(false)
 const isIndeterminate = ref(true)
@@ -146,17 +151,14 @@ onBeforeMount(() => {
       </div>
     </template>
     <div class="flex items-center justify-between">
-      <div class="flex flex-wrap w-auto h-auto">
+      <div class="flex flex-wrap w-auto h-auto gap-2">
         <role-permission :value="['doctor']">
-          <el-button round>
+          <el-button round @click="centerDialogVisible = true">
             <template #icon>
               <IconifyIconOffline :icon="plus"></IconifyIconOffline>
             </template>
             新增患者</el-button
           ></role-permission
-        >
-        <el-button round :icon="applicationImport" @click="patientStateStore.getPatientListPage"
-          >导入患者</el-button
         >
         <el-button
           round
@@ -223,7 +225,7 @@ onBeforeMount(() => {
 
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
                   <el-dropdown-item v-for="(col, index) in cols" :key="index">
-                    <el-checkbox :key="col.prop" :label="col.prop">{{ col.label }}</el-checkbox>
+                    <el-checkbox :key="col.prop" :value="col.prop">{{ col.label }}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>
@@ -233,6 +235,10 @@ onBeforeMount(() => {
       </div>
     </div>
   </el-card>
+  <add-patient
+    :upload-window-open="centerDialogVisible"
+    @upload-window-close="centerDialogVisible = false"
+  ></add-patient>
   <el-drawer v-model="visible" title="高级筛选">
     <el-form :model="patientForm" label-width="120px">
       <el-form-item label="姓名">

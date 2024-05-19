@@ -40,3 +40,16 @@ export const uploadSeriesApi = (data?: object) => {
     }
   )
 }
+
+export const addOneStudyApi = (data?: object) => {
+  return http.request<any>(
+    'post',
+    baseUrlApi('study/addOneStudy'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  )
+}

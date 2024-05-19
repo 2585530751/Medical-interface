@@ -13,3 +13,16 @@ export const getPatientStudyPageApi = (data?: object) => {
     }
   )
 }
+
+export const addOnePatientApi = (data?: object) => {
+  return http.request<any>(
+    'post',
+    baseUrlApi('patient/addOnePatient'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  )
+}

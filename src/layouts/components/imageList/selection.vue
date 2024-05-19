@@ -183,7 +183,7 @@ const handleCheckedColsChange = (value: string[]) => {
                 <el-dropdown-item :divided="true"></el-dropdown-item>
                 <el-checkbox-group v-model="checkedCols" @change="handleCheckedColsChange">
                   <el-dropdown-item v-for="(col, index) in cols" :key="index">
-                    <el-checkbox :key="col.prop" :label="col.prop">{{ col.label }}</el-checkbox>
+                    <el-checkbox :key="col.prop" :value="col.prop">{{ col.label }}</el-checkbox>
                   </el-dropdown-item>
                 </el-checkbox-group>
               </el-dropdown-menu>
