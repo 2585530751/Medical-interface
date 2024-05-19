@@ -48,11 +48,16 @@
   </div>
 </template>
 
-<script setup>
-import { reactive, ref } from 'vue'
+<script setup lang="ts">
+import { onMounted, reactive, ref } from 'vue'
 import { WarningFilled } from '@element-plus/icons-vue'
-import {updateUserAddressApi} from '@/api/user'
+import { updateUserAddressApi } from '@/api/user'
 import { message } from '@/utils/message'
+
+const props = defineProps<{
+  userInfo: UserInfo
+}>()
+
 const mapRef = ref(null)
 const BMapRef = ref(null)
 const geocoder = ref(null)
@@ -64,16 +69,13 @@ const ready = ({ BMap, map }) => {
   geocoder.value = new BMap.Geocoder(map)
 }
 
-
-
-function updateUserAddress(){
-  updateUserAddressApi(detailedAddress.value).then((data)=>{
-     if(data.success==true){
+function updateUserAddress() {
+  updateUserAddressApi(detailedAddress.value).then((data) => {
+    if (data.success == true) {
       message(data.msg, { type: 'success' })
-     }
-     else{
+    } else {
       message(data.msg, { type: 'error' })
-     }
+    }
   })
 }
 
@@ -122,6 +124,12 @@ function dragEndEvent(event) {
     }
   })
 }
+
+onMounted(() => {
+  if (props.userInfo.address != undefined && props.userInfo.address != '') {
+    detailedAddress.value = props.userInfo.address
+  }
+})
 </script>
 
 <style></style>

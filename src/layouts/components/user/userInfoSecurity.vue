@@ -3,11 +3,15 @@ import { computed, reactive, ref, watch, type Ref, onMounted } from 'vue'
 import type { FormInstance } from 'element-plus'
 import { useUserStoreHook } from '@/store/modules/user'
 import { message } from '@/utils/message'
-import { loginRules, registerRules, forgetRules } from '@/composables/user/rule'
+import { forgetRules } from '@/composables/user/rule'
 import { forgetPassword } from '@/api/user'
 import { isLoggedIn } from '@/utils/auth'
 import securityCode from '@/layouts/components/user/securityCode.vue'
+import type { UserInfo } from '@/types/user'
 
+const props = defineProps<{
+  userInfo: UserInfo
+}>()
 const loading = ref(false)
 const forgetRuleFormRef = ref<FormInstance>()
 const forgetRuleForm = reactive({
@@ -68,7 +72,6 @@ const validateCheckPass1 = (rule: any, value: any, callback: any) => {
   }
 }
 
-
 //验证码功能
 const isFetching = ref(false)
 const timer: Ref<NodeJS.Timer | null> = ref(null)
@@ -107,7 +110,6 @@ function startCountdown() {
   }, 1000)
 }
 
-
 //图像验证码
 const identifyCode = ref('')
 
@@ -133,6 +135,8 @@ function makeCode(length: number) {
 
 onMounted(() => {
   makeCode(4)
+  forgetRuleForm.account = props.userInfo.account
+  forgetRuleForm.phoneNumber = props.userInfo.phoneNumber
 })
 </script>
 
@@ -142,10 +146,15 @@ onMounted(() => {
       <div>
         <el-form ref="forgetRuleFormRef" :model="forgetRuleForm" :rules="forgetRules" size="large">
           <el-form-item prop="account">
-            <el-input clearable v-model="forgetRuleForm.account" placeholder="账号" disabled/>
+            <el-input clearable v-model="forgetRuleForm.account" placeholder="账号" disabled />
           </el-form-item>
           <el-form-item prop="phoneNumber">
-            <el-input clearable v-model="forgetRuleForm.phoneNumber" placeholder="手机号" disabled/>
+            <el-input
+              clearable
+              v-model="forgetRuleForm.phoneNumber"
+              placeholder="手机号"
+              disabled
+            />
           </el-form-item>
           <el-form-item prop="password">
             <el-input

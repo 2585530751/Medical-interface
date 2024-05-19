@@ -116,6 +116,13 @@ onMounted(() => {
 })
 
 const rules = reactive<FormRules>({
+  accessionNumber: [
+    {
+      required: true,
+      message: '请输入检查号',
+      trigger: 'blur'
+    }
+  ],
   departmentIdList: [
     {
       required: true,

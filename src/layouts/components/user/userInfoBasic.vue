@@ -11,6 +11,8 @@ import {
 } from '@/utils/chinaArea'
 import { getUserInformationApi, postUserInformationApi } from '@/api/user'
 import { message } from '@/utils/message'
+import { REGEXP_ID_CARD } from '@/composables/user/rule'
+
 interface userRuleForm {
   name: string
   account: string
@@ -103,6 +105,22 @@ const updateUserInformation = async (formEl: FormInstance | undefined) => {
     }
   })
 }
+
+const rules = reactive<FormRules>({
+  idCard: [
+    { required: true, message: '请输入身份证号', trigger: 'blur' },
+    {
+      validator: (rule, value, callback) => {
+        if (!REGEXP_ID_CARD.test(value)) {
+          callback(new Error('身份证格式不正确！'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
+  ]
+})
 </script>
 
 <template>
@@ -118,6 +136,7 @@ const updateUserInformation = async (formEl: FormInstance | undefined) => {
         label-width="auto"
         class="w-full"
         :size="formSize"
+        :rules="rules"
         :inline="true"
         status-icon
       >
@@ -144,14 +163,14 @@ const updateUserInformation = async (formEl: FormInstance | undefined) => {
           <el-date-picker
             v-model="userRuleForm.birthOfDate"
             type="date"
-            label="选择日期"
+            aria-label="选择日期"
             placeholder="选择日期"
           />
         </el-form-item>
         <el-form-item label="性别">
           <el-radio-group v-model="userRuleForm.gender">
-            <el-radio label="男性" border>男性</el-radio>
-            <el-radio label="女性" border>女性</el-radio>
+            <el-radio value ="男性" border>男性</el-radio>
+            <el-radio value ="女性" border>女性</el-radio>
           </el-radio-group>
         </el-form-item>
         <br />

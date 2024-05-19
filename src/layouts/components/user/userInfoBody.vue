@@ -8,17 +8,42 @@ import {
   User,
   Postcard
 } from '@element-plus/icons-vue'
-import { shallowRef } from 'vue'
+import { onMounted, reactive, shallowRef } from 'vue'
 import userInfoRealNameVerificationVue from '@/layouts/components/user/userInfoRealNameVerification.vue'
 import userInfoSecurity from '@/layouts/components/user/userInfoSecurity.vue'
 import userInfoMapVue from '@/layouts/components/user/userInfoMap.vue'
 import userInfoRecord from '@/layouts/components/user/userInfoRecord.vue'
+import type { UserInfo } from '@/types/user'
+import { getUserInformationApi } from '@/api/user'
 
 var currentComp = shallowRef(userInfoBasic)
+var userInformation = reactive<UserInfo>({
+  userId: 0,
+  account: '',
+  phoneNumber: '',
+  createTime: '',
+  birthOfDate: '',
+  gender: '',
+  place: '',
+  idCard: '',
+  name: ''
+})
 
 function changeCurrentComp(comp: any): void {
   currentComp.value = comp
 }
+
+function getUserInformation() {
+  //将个人信息界面中用户信息显示到表格中
+
+  getUserInformationApi().then((data) => {
+    if (data.success == true) {
+      userInformation = reactive(data.data)
+    }
+  })
+}
+
+getUserInformation()
 </script>
 
 <template>
@@ -54,7 +79,7 @@ function changeCurrentComp(comp: any): void {
         </el-menu></el-col
       >
       <el-col :span="20">
-        <component :is="currentComp" />
+        <component :is="currentComp" :user-info="userInformation" />
       </el-col>
     </el-row>
   </el-card>
