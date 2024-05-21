@@ -42,12 +42,25 @@ const seriesInfo: SeriesForm = reactive({
   seriesDesc: null,
   studyId: props.dialogStudyId,
   seriesTime: null, // 假设这也是一个日期时间字符串
+  seriesModality: null,
   departmentIdList: []
 })
 
 const seriesFormRef = ref<FormInstance>()
 
 const departmentOptions: Ref<PermissionEntity[]> = ref([])
+const seriesModalityOptions: Ref<PermissionEntity[]> = ref([
+  {
+    permissionId: 72,
+    permissionName: 'CT',
+    description: 'CT'
+  },
+  {
+    permissionId: 73,
+    permissionName: 'MRI',
+    description: 'MRI'
+  }
+])
 
 watch(
   () => {
@@ -127,6 +140,14 @@ const rules = reactive<FormRules>({
       message: '请选择科室',
       trigger: 'change'
     }
+  ],
+  seriesModality:[
+    {
+      required: true,
+      message: '请选择序列类型',
+      trigger: 'change'
+    }
+  
   ]
 })
 </script>
@@ -171,7 +192,7 @@ const rules = reactive<FormRules>({
       </el-row>
 
       <el-row :gutter="20">
-        <el-col :span="24">
+        <el-col :span="12">
           <el-form-item label="科室" prop="departmentIdList">
             <el-select
               v-model="seriesInfo.departmentIdList"
@@ -200,6 +221,33 @@ const rules = reactive<FormRules>({
             <el-tooltip content="选择的科室都有权限查看此内容！" placement="bottom">
               <el-icon class="pl-2" color="red" size="16"><Warning /></el-icon>
             </el-tooltip>
+          </el-form-item>
+        </el-col>
+        <el-col :span="12">
+          <el-form-item label="序列类型" prop="seriesModality">
+            <el-select
+              v-model="seriesInfo.seriesModality"
+              collapse-tags
+              collapse-tags-tooltip
+              :max-collapse-tags="3"
+              placeholder="选择序列类型"
+              class="w-2/3"
+            >
+              <el-option
+                v-for="item in seriesModalityOptions"
+                :key="item.permissionId"
+                :label="item.description"
+                :value="item.permissionName"
+              >
+                <span style="float: left">{{ item.description }}</span>
+                <span
+                  class="pl-6"
+                  style="float: right; color: var(--el-text-color-secondary); font-size: 13px"
+                >
+                  {{ item.permissionName }}
+                </span>
+              </el-option>
+            </el-select>
           </el-form-item>
         </el-col>
       </el-row>

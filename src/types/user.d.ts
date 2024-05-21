@@ -3,7 +3,7 @@ export interface PermissionEntity {
   permissionParentId?: string | null // 如果parentId可能为null或不存在，可以使用string | null
   permissionParentName?: string // 如果parentName可能不存在，可以使用可选类型
   permissionName: string
-  createTime: string // 假设时间是以ISO 8601格式的字符串表示
+  createTime?: string // 假设时间是以ISO 8601格式的字符串表示
   description: string
 }
 

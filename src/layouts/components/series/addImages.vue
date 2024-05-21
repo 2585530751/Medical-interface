@@ -1,23 +1,21 @@
 <script setup lang="ts">
 import { reactive, type Ref, ref, watch, onMounted } from 'vue'
-import type { ImageEntity } from '@/types/image'
-import { dayjs, type FormInstance, type FormRules } from 'element-plus'
-import { getPermissionByCurrentUserIdApi } from '@/api/user'
-import type { PermissionEntity } from '@/types/user'
+import { type UploadUserFile, type UploadFile } from 'element-plus'
 import { message } from '@/utils/message'
-import { Warning } from '@element-plus/icons-vue'
-import { resetForm } from '@/utils/commonUtils'
+import { Delete, ZoomIn, Download, UploadFilled } from '@element-plus/icons-vue'
 import { addImagesApi } from '@/api/image'
-import { useStudyStateStore } from '@/store/modules/studyState'
+import { useSeriesStateStore } from '@/store/modules/seriesState'
 
 defineOptions({
   name: ''
 })
-const studyStateStore = useStudyStateStore()
+
+const seriesStateStore = useSeriesStateStore()
 const props = defineProps<{
   uploadWindowOpen?: boolean
   dialogPatientId: number
   dialogStudyId: number
+  dialogSeriesId: number
 }>()
 
 const emits = defineEmits<{
@@ -26,28 +24,11 @@ const emits = defineEmits<{
 
 let centerDialogVisible = ref(props.uploadWindowOpen)
 
-interface ImageForm extends ImageEntity {
-  // 这里可以添加额外的属性，比如departmentIdList
-  departmentIdList: number[]
-}
-
-type ImageRequired = {
-  image: ImageEntity
-  departmentIdList: number[]
-}
-
-const imageInfo: ImageForm = reactive({
+const imageInfo = reactive({
   patientId: props.dialogPatientId,
-  imageDate: null, // 假设这是一个日期字符串
-  imageDesc: null,
   studyId: props.dialogStudyId,
-  imageTime: null, // 假设这也是一个日期时间字符串
-  departmentIdList: []
+  seriesId: props.dialogSeriesId
 })
-
-const imageFormRef = ref<FormInstance>()
-
-const departmentOptions: Ref<PermissionEntity[]> = ref([])
 
 watch(
   () => {
@@ -58,11 +39,22 @@ watch(
   }
 )
 
-function obtainDepartmentList() {
-  getPermissionByCurrentUserIdApi()
+async function addImages() {
+  let formData = new FormData()
+  imagesList.value.forEach((file) => {
+    formData.append('files', file.raw!)
+  })
+  imageInfo.patientId = props.dialogPatientId
+  imageInfo.studyId = props.dialogStudyId
+  imageInfo.seriesId = props.dialogSeriesId
+  formData.append('info', JSON.stringify(imageInfo))
+  addImagesApi(formData)
     .then((res) => {
       if (res.success) {
-        departmentOptions.value = res.data as PermissionEntity[]
+        message('添加成功', { type: 'success' })
+        imagesList.value.length = 0
+        seriesStateStore.getSeriesListPage()
+        emits('uploadWindowClose')
       } else {
         message(res.msg, { type: 'error' })
       }
@@ -72,63 +64,30 @@ function obtainDepartmentList() {
     })
 }
 
-async function addOneImage() {
-  if (!imageFormRef) return
-  await imageFormRef.value!.validate((valid, fields) => {
-    if (valid) {
-      const imageRequired: ImageRequired = {
-        image: imageInfo,
-        departmentIdList: imageInfo.departmentIdList
-      }
-      console.log(imageRequired)
-      const imageRequiredJson = JSON.parse(JSON.stringify(imageRequired))
-      imageRequiredJson.image.patientId = props.dialogPatientId
-      imageRequiredJson.image.studyId = props.dialogStudyId
-      if (imageInfo.imageDate != '' && imageInfo.imageDate != null)
-        imageRequiredJson.image.imageDate = dayjs(imageInfo.imageDate).format('YYYY-MM-DD')
-      if (imageInfo.imageTime != '' && imageInfo.imageTime != null)
-        imageRequiredJson.image.imageTime = dayjs(imageInfo.imageTime).format('HH:mm:ss')
-      console.log(imageRequiredJson)
-      addOneImageApi(imageRequiredJson)
-        .then((res) => {
-          if (res.success) {
-            message('添加成功', { type: 'success' })
-            resetForm(imageFormRef.value!)
-            studyStateStore.getStudyListPage()
-            emits('uploadWindowClose')
-          } else {
-            message(res.msg, { type: 'error' })
-          }
-        })
-        .catch((error) => {
-          message(error, { type: 'error' })
-        })
-    } else {
-      message('请序列表单', { type: 'error' })
-    }
-  })
+const headers: Record<string, any> = {
+  'Content-Type': 'multipart/form-data'
 }
-
-onMounted(() => {
-  obtainDepartmentList()
-})
-
-const rules = reactive<FormRules>({
-  accessionNumber: [
-    {
-      required: true,
-      message: '请输入序列号',
-      trigger: 'blur'
-    }
-  ],
-  departmentIdList: [
-    {
-      required: true,
-      message: '请选择科室',
-      trigger: 'change'
-    }
-  ]
-})
+const disabled = ref(false)
+const imagesList = ref<UploadUserFile[]>([])
+const dialogImageUrl = ref('')
+const dialogVisible = ref(false)
+const handlePictureCardPreview = (file: UploadFile) => {
+  dialogImageUrl.value = file.url!
+  dialogVisible.value = true
+}
+function handleDownload(file: UploadFile) {
+  console.log('file', file)
+  var link = document.createElement('a') //定义一个a标签
+  link.download = file.name //下载后的文件名称
+  link.href = file.url ?? '' //需要生成一个 URL 来实现下载
+  link.click() //模拟在按钮上实现一次鼠标点击
+  window.URL.revokeObjectURL(link.href)
+}
+const handleRemove = (file: UploadFile) => {
+  console.log(file)
+  let index = imagesList.value.indexOf(file)
+  imagesList.value.splice(index, 1)
+}
 </script>
 
 <template>
@@ -139,88 +98,55 @@ const rules = reactive<FormRules>({
     width="60%"
     center
   >
-    <el-form :model="imageInfo" label-position="top" :rules="rules" ref="imageFormRef">
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-form-item label="序列名称" prop="imageName">
-            <el-input v-model="imageInfo.imageName" placeholder="请输入序列名称" />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="检查部位" prop="imageCheckPart">
-            <el-input v-model="imageInfo.imageCheckPart" placeholder="请输入序列部位" />
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="20">
-        <el-col :span="12">
-          <el-form-item label="序列日期" prop="imageDate">
-            <el-date-picker
-              v-model="imageInfo.imageDate"
-              type="date"
-              placeholder="请输入序列日期"
-              clearable
-            />
-          </el-form-item>
-        </el-col>
-        <el-col :span="12">
-          <el-form-item label="序列时间" prop="imageTime">
-            <el-time-picker v-model="imageInfo.imageTime" placeholder="请输入序列时间" />
-          </el-form-item>
-        </el-col>
-      </el-row>
-
-      <el-row :gutter="20">
-        <el-col :span="24">
-          <el-form-item label="科室" prop="departmentIdList">
-            <el-select
-              v-model="imageInfo.departmentIdList"
-              multiple
-              collapse-tags
-              collapse-tags-tooltip
-              :max-collapse-tags="3"
-              placeholder="选择科室"
-              class="w-2/3"
+    <el-upload
+      list-type="picture-card"
+      :auto-upload="false"
+      v-model:file-list="imagesList"
+      ref="uploadRef"
+      :headers="headers"
+      show-file-list
+      multiple
+      drag
+    >
+      <el-icon class=""><upload-filled /></el-icon>
+      <div class="el-upload__text">Drop file here or <em>click to upload</em></div>
+      <template #tip>
+        <div class="el-upload__tip">jpg/png files with a size less than 500kb</div>
+      </template>
+      <template #file="{ file }">
+        <div @click="console.log(file.raw)">
+          <img
+            class="el-upload-list__item-thumbnail"
+            :src="file.url"
+            :alt="file.name"
+            v-show="!file.name.endsWith('dcm')"
+          />
+          <div class="text-lg text-justify pt-14">{{ file.name }}</div>
+          <span class="el-upload-list__item-actions">
+            <span
+              class="el-upload-list__item-preview"
+              v-show="!file.name.endsWith('dcm')"
+              @click="handlePictureCardPreview(file)"
             >
-              <el-option
-                v-for="item in departmentOptions"
-                :key="item.permissionId"
-                :label="item.description"
-                :value="item.permissionId"
-              >
-                <span style="float: left">{{ item.description }}</span>
-                <span
-                  class="pl-6"
-                  style="float: right; color: var(--el-text-color-secondary); font-size: 13px"
-                >
-                  {{ item.permissionName }}
-                </span>
-              </el-option>
-            </el-select>
-            <el-tooltip content="选择的科室都有权限查看此内容！" placement="bottom">
-              <el-icon class="pl-2" color="red" size="16"><Warning /></el-icon>
-            </el-tooltip>
-          </el-form-item>
-        </el-col>
-      </el-row>
-      <el-row :gutter="20">
-        <el-col :span="24">
-          <el-form-item label="序列描述" prop="imageDesc">
-            <el-input
-              v-model="imageInfo.imageDesc"
-              style="width: 100%"
-              :autosize="{ minRows: 5, maxRows: 20 }"
-              type="textarea"
-              placeholder="请输入序列详情描述"
-            />
-          </el-form-item>
-        </el-col>
-      </el-row>
-    </el-form>
-
+              <el-icon><zoom-in /></el-icon>
+            </span>
+            <span
+              v-if="!disabled"
+              class="el-upload-list__item-delete"
+              @click="handleDownload(file)"
+            >
+              <el-icon><Download /></el-icon>
+            </span>
+            <span v-if="!disabled" class="el-upload-list__item-delete" @click="handleRemove(file)">
+              <el-icon><Delete /></el-icon>
+            </span>
+          </span>
+        </div>
+      </template>
+    </el-upload>
     <template #footer>
-      <el-button @click="resetForm(imageFormRef)">重置</el-button>
-      <el-button type="primary" @click="addOneImage()"> 保存 </el-button>
+      <el-button>重置</el-button>
+      <el-button type="primary" @click="addImages()"> 保存 </el-button>
     </template>
   </el-dialog>
 </template>

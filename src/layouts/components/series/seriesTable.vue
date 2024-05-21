@@ -17,6 +17,7 @@ import seriesDiagnosticResult from '@/layouts/components/series/seriesDiagnostic
 import rolePermission from '@/components/rolePermission.vue'
 import seriesDicom from '@/components/ReImage/seriesDicom.vue'
 import plus from '@iconify-icons/ep/plus'
+import addImages from '@/layouts/components/series/addImages.vue'
 
 const props = defineProps<{
   tableSize: string
@@ -32,6 +33,7 @@ var seriesInfoDiagnosticResult = reactive({} as SeriesInfo)
 const seriesDialogVisible = ref(false)
 var dialogPatientId = ref(0)
 var dialogStudyId = ref(0)
+var dialogSeriesId = ref(0)
 
 const tableRef = ref<TableInstance>()
 
@@ -77,7 +79,8 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
   seriesDiagnosticResultVisible.value = true
 }
 
-function addSeriesWindows(patientId: number, studyId: number) {
+function addImagesWindows(patientId: number, studyId: number, seriesId: number) {
+  dialogSeriesId.value = seriesId
   dialogStudyId.value = studyId
   dialogPatientId.value = patientId
   seriesDialogVisible.value = true
@@ -104,7 +107,13 @@ function addSeriesWindows(patientId: number, studyId: number) {
               <div class="flex items-center justify-between">
                 <h3 class="inline-block">图像详情</h3>
                 <role-permission :value="['doctor']"
-                  ><el-button round class="font-semibold" @click="addSeriesWindows(props.row.patientId,props.row.studyId)"> 
+                  ><el-button
+                    round
+                    class="font-semibold"
+                    @click="
+                      addImagesWindows(props.row.patientId, props.row.studyId, props.row.seriesId)
+                    "
+                  >
                     <template #icon>
                       <IconifyIconOffline :icon="plus"></IconifyIconOffline>
                     </template>
@@ -397,12 +406,13 @@ function addSeriesWindows(patientId: number, studyId: number) {
     @modified-series-info="updateModifiedSeriesInfo"
     :series-info="seriesInfoDiagnosticResult"
   ></seriesDiagnosticResult>
-  <addSeries
+  <addImages
+    :dialog-series-id="dialogSeriesId"
     :dialog-study-id="dialogStudyId"
     :dialog-patient-id="dialogPatientId"
     :upload-window-open="seriesDialogVisible"
     @upload-window-close="seriesDialogVisible = false"
-  ></addSeries>
+  ></addImages>
 </template>
 
 <style lang="scss" scoped></style>
