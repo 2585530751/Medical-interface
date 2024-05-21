@@ -45,3 +45,16 @@ export const viewDoctorApi = (data?: object) => {
     }
   )
 }
+
+export const addOneSeriesApi = (data?: object) => {
+  return http.request<any>(
+    'post',
+    baseUrlApi('series/addOneSeries'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }
+  )
+}

@@ -29,6 +29,10 @@ const imageOperationStateStore = useImageOperationStateStore()
 const seriesDiagnosticResultVisible = ref(false)
 var seriesInfoDiagnosticResult = reactive({} as SeriesInfo)
 
+const seriesDialogVisible = ref(false)
+var dialogPatientId = ref(0)
+var dialogStudyId = ref(0)
+
 const tableRef = ref<TableInstance>()
 
 onMounted(() => {
@@ -72,6 +76,12 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
   seriesInfoDiagnosticResult = seriesInfo
   seriesDiagnosticResultVisible.value = true
 }
+
+function addSeriesWindows(patientId: number, studyId: number) {
+  dialogStudyId.value = studyId
+  dialogPatientId.value = patientId
+  seriesDialogVisible.value = true
+}
 </script>
 
 <template>
@@ -94,7 +104,7 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
               <div class="flex items-center justify-between">
                 <h3 class="inline-block">图像详情</h3>
                 <role-permission :value="['doctor']"
-                  ><el-button round class="font-semibold">
+                  ><el-button round class="font-semibold" @click="addSeriesWindows(props.row.patientId,props.row.studyId)"> 
                     <template #icon>
                       <IconifyIconOffline :icon="plus"></IconifyIconOffline>
                     </template>
@@ -387,6 +397,12 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
     @modified-series-info="updateModifiedSeriesInfo"
     :series-info="seriesInfoDiagnosticResult"
   ></seriesDiagnosticResult>
+  <addSeries
+    :dialog-study-id="dialogStudyId"
+    :dialog-patient-id="dialogPatientId"
+    :upload-window-open="seriesDialogVisible"
+    @upload-window-close="seriesDialogVisible = false"
+  ></addSeries>
 </template>
 
 <style lang="scss" scoped></style>

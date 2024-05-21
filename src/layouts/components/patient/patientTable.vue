@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { TableInstance } from 'element-plus'
 import { onMounted, ref, watch, reactive } from 'vue'
-import zoomIn from '@iconify-icons/ep/zoom-in'
 import pictrueIcon from '@iconify-icons/ep/picture'
 import filmIcon from '@iconify-icons/ep/film'
 import plus from '@iconify-icons/ep/plus'
@@ -14,7 +13,6 @@ import router from '@/router'
 import rolePermission from '@/components/rolePermission.vue'
 import deleteItem from '@iconify-icons/ep/delete'
 import addStudy from '@/layouts/components/study/addStudy.vue'
-import type { PatientInfo } from '@/types/patient'
 
 const props = defineProps<{
   tableSize: string

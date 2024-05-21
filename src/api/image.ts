@@ -53,13 +53,21 @@ export const deleteSingleImageById = (params?: object) => {
 }
 
 export const seriesSegmentationOfThyroidNodulesApi = (params?: object) => {
-  return http.request<ResponseResult<ImageModelResult[]>>('get', baseUrlApi('modelApi/seriesSegment'), {
-    params
-  })
+  return http.request<ResponseResult<ImageModelResult[]>>(
+    'get',
+    baseUrlApi('modelApi/seriesSegment'),
+    {
+      params
+    }
+  )
 }
 
 export const imageSegmentationOfThyroidNodulesApi = (params?: object) => {
-  return http.request<ResponseResult<ImageModelResult>>('get', baseUrlApi('modelApi/imageSegment'), { params })
+  return http.request<ResponseResult<ImageModelResult>>(
+    'get',
+    baseUrlApi('modelApi/imageSegment'),
+    { params }
+  )
 }
 
 export const imageClassifyOfThyroidNodulesApi = (params?: object) => {
@@ -79,12 +87,32 @@ export const seriesDetectionOfPulmonaryNodulesApi = (params?: object) => {
 }
 
 export const imageIntestinalPolypsSegmentationApi = (params?: object) => {
-  return http.request<ResponseResult<ImageModelResult>>('get', baseUrlApi('modelApi/intestinalPolypsImageSegmentation'), {
-    params
-  })
+  return http.request<ResponseResult<ImageModelResult>>(
+    'get',
+    baseUrlApi('modelApi/intestinalPolypsImageSegmentation'),
+    {
+      params
+    }
+  )
 }
 
 export const seriesIntestinalPolypsSegmentationApi = (params?: object) => {
-  return http.request<ResponseResult<ImageModelResult[]>>('get', baseUrlApi('modelApi/intestinalPolypsSeriesSegmentation'), { params })
+  return http.request<ResponseResult<ImageModelResult[]>>(
+    'get',
+    baseUrlApi('modelApi/intestinalPolypsSeriesSegmentation'),
+    { params }
+  )
 }
 
+export const addImagesApi = (data?: object) => {
+  return http.request<ResponseResult<string>>(
+    'post',
+    baseUrlApi('image/addImages'),
+    { data },
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }
+  )
+}

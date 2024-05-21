@@ -23,6 +23,7 @@ import { basicImageUrl } from '@/api/utils'
 import seriesDicom from '@/components/ReImage/seriesDicom.vue'
 import seriesDiagnosticResult from '@/layouts/components/series/seriesDiagnosticResult.vue'
 import plus from '@iconify-icons/ep/plus'
+import addSeries from '@/layouts/components/series/addSeries.vue'
 
 const props = defineProps<{
   tableSize: string
@@ -33,6 +34,10 @@ const studyStateStore = useStudyStateStore()
 const seriesStateStore = useSeriesStateStore()
 const imageOperationStateStore = useImageOperationStateStore()
 const tableRef = ref<TableInstance>()
+
+const seriesDialogVisible = ref(false)
+var dialogPatientId = ref(0)
+var dialogStudyId = ref(0)
 
 const seriesDiagnosticResultVisible = ref(false)
 var seriesInfoDiagnosticResult = reactive({} as SeriesInfo)
@@ -93,6 +98,12 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
 function updateModifiedSeriesInfo() {
   studyStateStore.getStudyListPage()
 }
+
+function addSeriesWindows(patientId: number, studyId: number) {
+  dialogStudyId.value = studyId
+  dialogPatientId.value = patientId
+  seriesDialogVisible.value = true
+}
 </script>
 
 <template>
@@ -115,7 +126,11 @@ function updateModifiedSeriesInfo() {
               <div class="flex items-center justify-between">
                 <h3 class="inline-block">序列详情</h3>
                 <role-permission :value="['doctor']"
-                  ><el-button round class="font-semibold">
+                  ><el-button
+                    round
+                    class="font-semibold"
+                    @click="addSeriesWindows(props.row.patientId, props.row.studyId)"
+                  >
                     <template #icon>
                       <IconifyIconOffline :icon="plus"></IconifyIconOffline>
                     </template>
@@ -327,6 +342,12 @@ function updateModifiedSeriesInfo() {
       </el-table-column>
     </el-table>
   </el-card>
+  <addSeries
+    :dialog-study-id="dialogStudyId"
+    :dialog-patient-id="dialogPatientId"
+    :upload-window-open="seriesDialogVisible"
+    @upload-window-close="seriesDialogVisible = false"
+  ></addSeries>
   <seriesDiagnosticResult
     :diagnostic-result-window-open="seriesDiagnosticResultVisible"
     @diagnostic-result-window-close="seriesDiagnosticResultVisible = false"

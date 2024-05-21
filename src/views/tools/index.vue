@@ -105,7 +105,6 @@ const uploadAvatar = (options: UploadRequestOptions) => {
 function getExcelInformation(){
     getExcelApi().then((res: any) => {
     if (res.success) {
-      
       tableData.value=res.data
     }
   })

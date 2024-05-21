@@ -93,3 +93,42 @@ export interface SeriesInfo {
   seriesFeature: ImageFeature[] | null
   seriesModelType: string | null
 }
+
+interface SeriesEntity {  
+  createTime?: SeriesDateTime;  
+  creatorId?: number | null;  
+  creatorName?: string | null;  
+  doctorView?: string | null;  
+  doctorViewId?: number | null;  
+  doctorViewName?: string | null;  
+  doctorViewTime?: SeriesDateTime;  
+  imagePosition?: string | null;  
+  isDeleted?: number | null; // 通常布尔值用 boolean 表示，但这里用 number  
+  markSeriesName?: string | null;  
+  markSeriesPreviewPath?: string | null;  
+  mrAcquisitionType?: string | null;  
+  patientId?: number | null;  
+  patientName?: string | null;  
+  readerView?: string | null;  
+  readerViewId?: number | null;  
+  readerViewName?: string | null;  
+  readerViewTime?: SeriesDateTime;  
+  seriesCheckPart?: string | null;  
+  seriesCheckTime?: SeriesDateTime;  
+  seriesCount?: number | null;  
+  seriesDate?: string | null;  
+  seriesDesc?: string | null;  
+  seriesEquipment?: string | null;  
+  seriesFormat?: string | null;  
+  seriesId?: number | null;  
+  seriesInstanceUid?: string | null;  
+  seriesModality?: string | null;  
+  seriesName?: string | null;  
+  seriesNumber?: string | null;  
+  seriesPath?: string | null;  
+  seriesPreviewPath?: string | null;  
+  seriesStatus?: number | null; // 通常状态用枚举或 boolean 表示，但这里用 number  
+  seriesTime?: SeriesDateTime; // 注意：这里为空字符串在 TypeScript 中可能不是一个好的选择，建议使用 null 或 '' | null  
+  spacingBetweenSlices?: string | null;  
+  studyId?: number | null;  
+}  
