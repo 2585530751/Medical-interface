@@ -168,7 +168,7 @@ const rules = reactive<FormRules>({
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="检查部位" prop="seriesCheckPart">
+          <el-form-item label="序列部位" prop="seriesCheckPart">
             <el-input v-model="seriesInfo.seriesCheckPart" placeholder="请输入序列部位" />
           </el-form-item>
         </el-col>

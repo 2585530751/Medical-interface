@@ -18,6 +18,7 @@ import rolePermission from '@/components/rolePermission.vue'
 import seriesDicom from '@/components/ReImage/seriesDicom.vue'
 import plus from '@iconify-icons/ep/plus'
 import addImages from '@/layouts/components/series/addImages.vue'
+import deleteItem from '@iconify-icons/ep/delete'
 
 const props = defineProps<{
   tableSize: string
@@ -34,6 +35,7 @@ const seriesDialogVisible = ref(false)
 var dialogPatientId = ref(0)
 var dialogStudyId = ref(0)
 var dialogSeriesId = ref(0)
+var dialogSeriesFileType = ref('dcm')
 
 const tableRef = ref<TableInstance>()
 
@@ -79,10 +81,16 @@ function diagnosticResultWindowOpen(seriesInfo: SeriesInfo) {
   seriesDiagnosticResultVisible.value = true
 }
 
-function addImagesWindows(patientId: number, studyId: number, seriesId: number) {
+function addImagesWindows(
+  patientId: number,
+  studyId: number,
+  seriesId: number,
+  seriesModality: string
+) {
   dialogSeriesId.value = seriesId
   dialogStudyId.value = studyId
   dialogPatientId.value = patientId
+  dialogSeriesFileType.value = seriesModality
   seriesDialogVisible.value = true
 }
 </script>
@@ -111,7 +119,12 @@ function addImagesWindows(patientId: number, studyId: number, seriesId: number) 
                     round
                     class="font-semibold"
                     @click="
-                      addImagesWindows(props.row.patientId, props.row.studyId, props.row.seriesId)
+                      addImagesWindows(
+                        props.row.patientId,
+                        props.row.studyId,
+                        props.row.seriesId,
+                        props.row.seriesModality
+                      )
                     "
                   >
                     <template #icon>
@@ -183,6 +196,20 @@ function addImagesWindows(patientId: number, studyId: number, seriesId: number) 
                 <el-table-column fixed="right" label="操作">
                   <template #default="scope">
                     <role-permission :value="['doctor']">
+                      <el-popconfirm
+                        title="将会删除该图像，您确定吗?"
+                        @confirm="console.log(scope)"
+                        width="200"
+                      >
+                        <template #reference>
+                          <el-button link type="primary" size="small">
+                            <template #icon>
+                              <IconifyIconOffline :icon="deleteItem"></IconifyIconOffline>
+                            </template>
+                            删除</el-button
+                          >
+                        </template>
+                      </el-popconfirm>
                       <div class="flex items-center gap-1">
                         <el-dropdown class="">
                           <el-button :icon="IonEllipsisHorizontal" link type="primary"></el-button>
@@ -345,6 +372,20 @@ function addImagesWindows(patientId: number, studyId: number, seriesId: number) 
       <el-table-column fixed="right" label="操作">
         <template #default="scope">
           <role-permission :value="['doctor']">
+            <el-popconfirm
+              title="将会删除该序列及其相关图像，您确定吗?"
+              @confirm="console.log(scope)"
+              width="200"
+            >
+              <template #reference>
+                <el-button link type="primary" size="small">
+                  <template #icon>
+                    <IconifyIconOffline :icon="deleteItem"></IconifyIconOffline>
+                  </template>
+                  删除</el-button
+                >
+              </template>
+            </el-popconfirm>
             <div class="flex items-center gap-1">
               <el-button
                 v-if="scope.row.seriesStatus == '1'"
@@ -407,6 +448,7 @@ function addImagesWindows(patientId: number, studyId: number, seriesId: number) 
     :series-info="seriesInfoDiagnosticResult"
   ></seriesDiagnosticResult>
   <addImages
+    :dialog-series-file-type="dialogSeriesFileType"
     :dialog-series-id="dialogSeriesId"
     :dialog-study-id="dialogStudyId"
     :dialog-patient-id="dialogPatientId"

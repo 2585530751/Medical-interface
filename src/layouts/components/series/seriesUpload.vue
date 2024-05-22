@@ -2,7 +2,7 @@
 import { reactive, type Ref, ref, watch, onMounted } from 'vue'
 import { Delete, ZoomIn, Download } from '@element-plus/icons-vue'
 import { UploadFilled } from '@element-plus/icons-vue'
-import { type FormInstance, type FormRules, type UploadFile } from 'element-plus'
+import { type UploadProps, type FormInstance, type FormRules, type UploadFile } from 'element-plus'
 import { message } from '@/utils/message'
 import type { UploadUserFile } from 'element-plus'
 import type { UploadInstance } from 'element-plus'
@@ -11,6 +11,8 @@ import { useSeriesStateStore } from '@/store/modules/seriesState'
 import { getPermissionByCurrentUserIdApi } from '@/api/user'
 import type { PermissionEntity } from '@/types/user'
 import { Warning } from '@element-plus/icons-vue'
+import { ElNotification } from 'element-plus'
+import { checkFilesType } from '@/utils/commonUtils'
 
 const props = defineProps<{
   uploadWindowOpen?: boolean
@@ -67,10 +69,11 @@ async function submitFileForm() {
   if (!ruleFormRef) return
   await ruleFormRef.value!.validate((valid, fields) => {
     if (valid) {
-      if(imageList.value.length === 0) {
+      if (imageList.value.length === 0) {
         message('请上传文件', { type: 'error' })
         return
       }
+      if (!checkFilesType(imageList.value, '.dcm')) return
       // 创建新的数据对象
       let formData = new FormData()
       // 将上传的文件放到数据对象中
@@ -176,9 +179,7 @@ const rules = reactive<FormRules>({
           <el-icon class="pl-2" color="red" size="16"><Warning /></el-icon>
         </el-tooltip>
       </el-form-item>
-      <el-form-item>
-        
-      </el-form-item>
+      <el-form-item> </el-form-item>
     </el-form>
     <el-upload
       list-type="picture-card"

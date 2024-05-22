@@ -44,7 +44,7 @@ const patientInfo: PatientForm = reactive({
   patientWeight: null,
   address: null,
   email: null,
-  telephoneNumber: null,
+  phoneNumber: null,
   departmentIdList: []
 })
 
@@ -158,8 +158,8 @@ const rules = reactive<FormRules>({
         <el-col :span="12">
           <el-form-item label="患者性别" prop="patientGender">
             <el-radio-group v-model="patientInfo.patientGender">
-              <el-radio label="男性" value="male" />
-              <el-radio label="女性" value="female" />
+              <el-radio label="男性" value="男" />
+              <el-radio label="女性" value="女" />
             </el-radio-group>
           </el-form-item>
         </el-col>
@@ -177,12 +177,12 @@ const rules = reactive<FormRules>({
 
       <el-row :gutter="20">
         <el-col :span="12">
-          <el-form-item label="患者体重" prop="patientWeight">
+          <el-form-item label="患者体重(kg)" prop="patientWeight">
             <el-input v-model="patientInfo.patientWeight" placeholder="请输入患者体重" />
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="患者年龄" prop="patientHeight">
+          <el-form-item label="患者身高(cm)" prop="patientHeight">
             <el-input v-model="patientInfo.patientHeight" placeholder="请输入患者身高" />
           </el-form-item>
         </el-col>
@@ -234,8 +234,8 @@ const rules = reactive<FormRules>({
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="手机号码" prop="telephoneNumber">
-            <el-input v-model="patientInfo.telephoneNumber" placeholder="请输入手机号码" />
+          <el-form-item label="手机号码" prop="phoneNumber">
+            <el-input v-model="patientInfo.phoneNumber" placeholder="请输入手机号码" />
           </el-form-item>
         </el-col>
       </el-row>

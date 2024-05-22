@@ -24,6 +24,7 @@ import seriesDicom from '@/components/ReImage/seriesDicom.vue'
 import seriesDiagnosticResult from '@/layouts/components/series/seriesDiagnosticResult.vue'
 import plus from '@iconify-icons/ep/plus'
 import addSeries from '@/layouts/components/series/addSeries.vue'
+import deleteItem from '@iconify-icons/ep/delete'
 
 const props = defineProps<{
   tableSize: string
@@ -216,6 +217,20 @@ function addSeriesWindows(patientId: number, studyId: number) {
                   <template #default="scope">
                     <role-permission :value="['doctor']">
                       <div class="flex items-center gap-1">
+                        <el-popconfirm
+                          title="将会删除该序列及其相关图像，您确定吗?"
+                          @confirm="console.log(scope)"
+                          width="200"
+                        >
+                          <template #reference>
+                            <el-button link type="primary" size="small">
+                              <template #icon>
+                                <IconifyIconOffline :icon="deleteItem"></IconifyIconOffline>
+                              </template>
+                              删除</el-button
+                            >
+                          </template>
+                        </el-popconfirm>
                         <el-button
                           v-if="scope.row.seriesStatus == '1'"
                           link
@@ -328,6 +343,20 @@ function addSeriesWindows(patientId: number, studyId: number) {
       />
       <el-table-column fixed="right" label="操作">
         <template #default="scope">
+          <el-popconfirm
+            title="将会删除该检查及其相关序列和图像，您确定吗?"
+            @confirm="console.log(scope)"
+            width="200"
+          >
+            <template #reference>
+              <el-button link type="primary" size="small">
+                <template #icon>
+                  <IconifyIconOffline :icon="deleteItem"></IconifyIconOffline>
+                </template>
+                删除</el-button
+              >
+            </template>
+          </el-popconfirm>
           <el-button
             link
             type="primary"

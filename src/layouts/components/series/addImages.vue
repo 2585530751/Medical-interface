@@ -16,6 +16,7 @@ const props = defineProps<{
   dialogPatientId: number
   dialogStudyId: number
   dialogSeriesId: number
+  dialogSeriesFileType: string
 }>()
 
 const emits = defineEmits<{

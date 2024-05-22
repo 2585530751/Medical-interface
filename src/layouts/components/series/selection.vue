@@ -151,13 +151,13 @@ function refreshTable() {
       </div>
     </template>
     <div class="flex items-center justify-between">
-      <div class="flex flex-wrap w-auto h-auto">
+      <div class="flex flex-wrap w-auto h-auto gap-1">
         <role-permission :value="['doctor']"
           ><el-button round @click="centerDialogVisible = true">
             <template #icon>
               <IconifyIconOffline :icon="plus"></IconifyIconOffline>
             </template>
-            新增序列</el-button
+            导入DICOM</el-button
           ></role-permission
         >
         <el-button round :icon="applicationImport">导入序列</el-button>
