@@ -129,8 +129,8 @@ function handleDownload(file: UploadFile) {
           <el-col :span="12">
             <el-form-item label="患者性别" prop="patientGender">
               <el-radio-group v-model="imagesInfo.patientGender">
-                <el-radio label="男性" value="male" />
-                <el-radio label="女性" value="female" />
+                <el-radio label="男性" value="男" />
+                <el-radio label="女性" value="女" />
               </el-radio-group>
             </el-form-item>
           </el-col>
@@ -148,12 +148,12 @@ function handleDownload(file: UploadFile) {
 
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="患者体重" prop="patientWeight">
+            <el-form-item label="患者体重(KG)" prop="patientWeight">
               <el-input v-model="imagesInfo.patientWeight" placeholder="请输入患者体重" />
             </el-form-item>
           </el-col>
           <el-col :span="12">
-            <el-form-item label="患者年龄" prop="patientAge">
+            <el-form-item label="患者年龄(Y)" prop="patientAge">
               <el-input v-model="imagesInfo.patientAge" placeholder="请输入患者年龄" />
             </el-form-item>
           </el-col>
@@ -161,7 +161,7 @@ function handleDownload(file: UploadFile) {
 
         <el-row :gutter="20">
           <el-col :span="12">
-            <el-form-item label="检查部位" prop="imageCheckPart">
+            <el-form-item label="成像部位" prop="imageCheckPart">
               <el-input v-model="imagesInfo.imageCheckPart" placeholder="请输入成像部位" />
             </el-form-item>
           </el-col>
