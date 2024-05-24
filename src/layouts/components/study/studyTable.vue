@@ -25,6 +25,8 @@ import seriesDiagnosticResult from '@/layouts/components/series/seriesDiagnostic
 import plus from '@iconify-icons/ep/plus'
 import addSeries from '@/layouts/components/series/addSeries.vue'
 import deleteItem from '@iconify-icons/ep/delete'
+import { deleteOneStudyApi } from '@/api/study'
+import { deleteOneSeriesApi } from '@/api/series'
 
 const props = defineProps<{
   tableSize: string
@@ -104,6 +106,42 @@ function addSeriesWindows(patientId: number, studyId: number) {
   dialogStudyId.value = studyId
   dialogPatientId.value = patientId
   seriesDialogVisible.value = true
+}
+
+function deleteOneSeries(seriesId: number) {
+  const params = {
+    seriesId: seriesId
+  }
+  deleteOneSeriesApi(params).then((res) => {
+    if (res.code !== 200) {
+      message(res.msg, { type: 'error' })
+      return
+    }
+    message('删除成功', { type: 'success' })
+    studyStateStore.getStudyListPage()
+  })
+}
+
+function deleteOneStudy(studyId: number) {
+  const params = {
+    studyId: studyId
+  }
+  deleteOneSeriesApi(params)
+    .then((data) => {
+      if (data.code == 200) {
+        if (studyStateStore.studyListTableData.length == 1) {
+          studyStateStore.studyListTableData.length = 0
+        } else {
+          studyStateStore.getStudyListPage()
+        }
+        message(data.msg, { type: 'success' })
+      } else {
+        message(data.msg, { type: 'error' })
+      }
+    })
+    .catch((error) => {
+      message(error, { type: 'error' })
+    })
 }
 </script>
 
@@ -219,7 +257,7 @@ function addSeriesWindows(patientId: number, studyId: number) {
                       <div class="flex items-center gap-1">
                         <el-popconfirm
                           title="将会删除该序列及其相关图像，您确定吗?"
-                          @confirm="console.log(scope)"
+                          @confirm="deleteOneSeries(scope.row.seriesId)"
                           width="200"
                         >
                           <template #reference>
@@ -345,7 +383,7 @@ function addSeriesWindows(patientId: number, studyId: number) {
         <template #default="scope">
           <el-popconfirm
             title="将会删除该检查及其相关序列和图像，您确定吗?"
-            @confirm="console.log(scope)"
+            @confirm="deleteOneStudy(scope.row.studyId)"
             width="200"
           >
             <template #reference>

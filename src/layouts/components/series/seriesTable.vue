@@ -19,6 +19,9 @@ import seriesDicom from '@/components/ReImage/seriesDicom.vue'
 import plus from '@iconify-icons/ep/plus'
 import addImages from '@/layouts/components/series/addImages.vue'
 import deleteItem from '@iconify-icons/ep/delete'
+import { deleteOneImageApi } from '@/api/image'
+import { deleteOneSeriesApi } from '@/api/series'
+import { message } from '@/utils/message'
 
 const props = defineProps<{
   tableSize: string
@@ -92,6 +95,46 @@ function addImagesWindows(
   dialogPatientId.value = patientId
   dialogSeriesFileType.value = seriesFormat
   seriesDialogVisible.value = true
+}
+
+function deleteOneImage(imageId: number) {
+  const params = {
+    imageId: imageId
+  }
+  deleteOneImageApi(params)
+    .then((data) => {
+      if (data.code == 200) {
+        message(data.msg, { type: 'success' })
+        seriesStateStore.getSeriesListPage()
+      } else {
+        message(data.msg, { type: 'error' })
+      }
+    })
+    .catch((error) => {
+      message(error, { type: 'error' })
+    })
+}
+
+function deleteOneSeries(seriesId: number) {
+  const params = {
+    seriesId: seriesId
+  }
+  deleteOneSeriesApi(params)
+    .then((data) => {
+      if (data.code == 200) {
+        if (seriesStateStore.seriesListTableData.length == 1) {
+          seriesStateStore.seriesListTableData.length = 0
+        } else {
+          seriesStateStore.getSeriesListPage()
+        }
+        message(data.msg, { type: 'success' })
+      } else {
+        message(data.msg, { type: 'error' })
+      }
+    })
+    .catch((error) => {
+      message(error, { type: 'error' })
+    })
 }
 </script>
 
@@ -198,7 +241,7 @@ function addImagesWindows(
                     <role-permission :value="['doctor']">
                       <el-popconfirm
                         title="将会删除该图像，您确定吗?"
-                        @confirm="console.log(scope)"
+                        @confirm="deleteOneImage(scope.row.imageId)"
                         width="200"
                       >
                         <template #reference>
@@ -374,7 +417,7 @@ function addImagesWindows(
           <role-permission :value="['doctor']">
             <el-popconfirm
               title="将会删除该序列及其相关图像，您确定吗?"
-              @confirm="console.log(scope)"
+              @confirm="deleteOneSeries(scope.row.seriesId)"
               width="200"
             >
               <template #reference>

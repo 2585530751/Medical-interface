@@ -1,5 +1,6 @@
 import { http } from '@/utils/http'
 import { baseUrlApi } from './utils'
+import type { ResponseResult } from '@/types/global'
 
 export const getStudySeriesPageApi = (data?: object) => {
   return http.request<any>(
@@ -52,4 +53,10 @@ export const addOneStudyApi = (data?: object) => {
       }
     }
   )
+}
+
+export const deleteOneStudyApi = (params?: object) => {
+  return http.request<ResponseResult<string>>('get', baseUrlApi('study/deleteOneStudy'), {
+    params
+  })
 }

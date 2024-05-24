@@ -13,6 +13,9 @@ import router from '@/router'
 import rolePermission from '@/components/rolePermission.vue'
 import deleteItem from '@iconify-icons/ep/delete'
 import addStudy from '@/layouts/components/study/addStudy.vue'
+import { deleteOneStudyApi } from '@/api/study'
+import { deleteOnePatientApi } from '@/api/patient'
+import { message } from '@/utils/message'
 
 const props = defineProps<{
   tableSize: string
@@ -61,9 +64,45 @@ function viewSerieslistByStudyId(studyId: number) {
   router.push('/series')
 }
 
-function addStudyWindows(patientId:number) {
-  dialogPatientId.value=patientId
+function addStudyWindows(patientId: number) {
+  dialogPatientId.value = patientId
   studyDialogVisible.value = true
+}
+
+function deleteOneStudy(studyId: number) {
+  const params = {
+    studyId: studyId
+  }
+  deleteOneStudyApi(params)
+    .then((data) => {
+      if (data.code == 200) {
+        patientStateStore.getPatientListPage()
+        message(data.msg, { type: 'success' })
+      } else {
+        message(data.msg, { type: 'error' })
+      }
+    })
+    .catch((error) => {
+      message(error, { type: 'error' })
+    })
+}
+
+function deleteOnePatient(patientId: number) {
+  const params = {
+    patientId: patientId
+  }
+  deleteOnePatientApi(params)
+    .then((data) => {
+      if (data.code == 200) {
+        patientStateStore.getPatientListPage()
+        message(data.msg, { type: 'success' })
+      } else {
+        message(data.msg, { type: 'error' })
+      }
+    })
+    .catch((error) => {
+      message(error, { type: 'error' })
+    })
 }
 </script>
 
@@ -86,7 +125,11 @@ function addStudyWindows(patientId:number) {
               <div class="flex items-center justify-between">
                 <h3 class="inline-block">检查详情</h3>
                 <role-permission :value="['doctor']"
-                  ><el-button round class="font-semibold" @click="addStudyWindows(props.row.patientId)">
+                  ><el-button
+                    round
+                    class="font-semibold"
+                    @click="addStudyWindows(props.row.patientId)"
+                  >
                     <template #icon>
                       <IconifyIconOffline :icon="plus"></IconifyIconOffline>
                     </template>
@@ -113,7 +156,7 @@ function addStudyWindows(patientId:number) {
                       <div class="flex items-center gap-1">
                         <el-popconfirm
                           title="将会删除此检查及其相关的序列和图像，您确定吗?"
-                          @confirm="console.log(scope)"
+                          @confirm="deleteOneStudy(scope.row.studyId)"
                           width="200"
                         >
                           <template #reference>
@@ -223,7 +266,7 @@ function addStudyWindows(patientId:number) {
             <div class="flex items-center gap-1">
               <el-popconfirm
                 title="将会删除此患者及其相关的检车、序列和图像，您确定吗?"
-                @confirm="console.log(scope)"
+                @confirm="deleteOnePatient(scope.row.patientId)"
                 width="200"
               >
                 <template #reference>

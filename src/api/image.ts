@@ -116,3 +116,9 @@ export const addImagesApi = (data?: object) => {
     }
   )
 }
+
+export const deleteOneImageApi = (params?: object) => {
+  return http.request<ResponseResult<string>>('get', baseUrlApi('image/deleteOneImage'), {
+    params
+  })
+}

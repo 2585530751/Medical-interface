@@ -58,3 +58,9 @@ export const addOneSeriesApi = (data?: object) => {
     }
   )
 }
+
+export const deleteOneSeriesApi = (params?: object) => {
+  return http.request<ResponseResult<string>>('get', baseUrlApi('series/deleteOneSeries'), {
+    params
+  })
+}
