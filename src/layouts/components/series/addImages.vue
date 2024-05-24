@@ -5,6 +5,7 @@ import { message } from '@/utils/message'
 import { Delete, ZoomIn, Download, UploadFilled } from '@element-plus/icons-vue'
 import { addImagesApi } from '@/api/image'
 import { useSeriesStateStore } from '@/store/modules/seriesState'
+import { checkFilesType } from '@/utils/commonUtils'
 
 defineOptions({
   name: ''
@@ -41,6 +42,7 @@ watch(
 )
 
 async function addImages() {
+  if (!checkFilesType(imagesList.value, props.dialogSeriesFileType)) return
   let formData = new FormData()
   imagesList.value.forEach((file) => {
     formData.append('files', file.raw!)

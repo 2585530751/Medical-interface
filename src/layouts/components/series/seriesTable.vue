@@ -85,12 +85,12 @@ function addImagesWindows(
   patientId: number,
   studyId: number,
   seriesId: number,
-  seriesModality: string
+  seriesFormat: string
 ) {
   dialogSeriesId.value = seriesId
   dialogStudyId.value = studyId
   dialogPatientId.value = patientId
-  dialogSeriesFileType.value = seriesModality
+  dialogSeriesFileType.value = seriesFormat
   seriesDialogVisible.value = true
 }
 </script>
@@ -123,7 +123,7 @@ function addImagesWindows(
                         props.row.patientId,
                         props.row.studyId,
                         props.row.seriesId,
-                        props.row.seriesModality
+                        props.row.seriesFormat
                       )
                     "
                   >
