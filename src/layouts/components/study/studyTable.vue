@@ -126,7 +126,7 @@ function deleteOneStudy(studyId: number) {
   const params = {
     studyId: studyId
   }
-  deleteOneSeriesApi(params)
+  deleteOneStudyApi(params)
     .then((data) => {
       if (data.code == 200) {
         if (studyStateStore.studyListTableData.length == 1) {

@@ -160,7 +160,6 @@ function refreshTable() {
             导入DICOM</el-button
           ></role-permission
         >
-        <el-button round :icon="applicationImport">导入序列</el-button>
         <el-button
           round
           :icon="applicationExport"

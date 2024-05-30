@@ -11,7 +11,6 @@ import type { ImageFeature } from '@/types/image'
 import { imageFeaturePropertyTranslations } from '@/utils/commonVariables'
 import saveCompletedImage from '@/layouts/components/imageOperation/saveCompletedImage.vue'
 import completeViewImage from '@/layouts/components/imageOperation/completeViewImage.vue'
-import { tr } from 'element-plus/es/locale'
 
 defineOptions({
   name: ''
