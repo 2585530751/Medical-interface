@@ -61,6 +61,7 @@ export const useUserStore = defineStore({
       resetRouter()
       console.log(router.options.routes)
       router.push('/welcome')
+      // location.reload()
     },
     /** 刷新`token` */
     async handRefreshToken(data: any) {

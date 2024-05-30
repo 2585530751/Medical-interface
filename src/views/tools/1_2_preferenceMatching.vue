@@ -21,6 +21,7 @@ interface Attribute {
     fontColor: boolean           //分辨是否是哑变量添加出来的
     dataImputation: number        //数据填补方式
     attributeIndex: number         //下标
+    missingRate: number           //缺失率
 }
 const getAttribute = reactive<Attribute[]>([{              //响应式对象数组
     attributeName: '',
@@ -33,7 +34,8 @@ const getAttribute = reactive<Attribute[]>([{              //响应式对象数�
     isCovariate: false,
     fontColor: false,
     dataImputation: 0,
-    attributeIndex: 0
+    attributeIndex: 0,
+    missingRate: 0
 }])
 
 const hasGroupAttribute = computed(() => {                  //判断对象数组中是否有元素的isGroup属性值为true
@@ -50,6 +52,13 @@ function getInformation() {                                 //将从父组件得
 
         for (let i = 0; i < attribute.length; i++) {
             if (attribute[i].isDelete === false) {
+                let missingNumber = 0
+                for (let k = 0; k < attribute[i].attributeData.length; k++) {
+                    if (attribute[i].attributeData[k] === null || attribute[i].attributeData[k] === undefined || attribute[i].attributeData[k] === '') {
+                        missingNumber = missingNumber + 1
+                    }
+                }
+                const missingRate = missingNumber / attribute[i].attributeData.length
                 let obj: any = {
                     attributeName: attribute[i].attributeName,
                     attributeValue: attribute[i].attributeValue,
@@ -62,6 +71,7 @@ function getInformation() {                                 //将从父组件得
                     fontColor: false,
                     dataImputation: 0,
                     attributeIndex: j,
+                    missingRate: missingRate
                 }
                 getAttribute.push(obj)
                 j = j + 1
@@ -149,7 +159,7 @@ const sampleMissingValueHandlingOptions = [
 import { reactive, ref, computed, watch } from 'vue'
 import { message } from '@/utils/message'
 import axios from 'axios'
-const FPath = 'http://127.0.0.1:5000/preferenceMatching'
+const FPath = 'http://127.0.0.1:5001/preferenceMatching'
 const post = reactive({                              //定义响应式发送数据变量
     group: {                                        //分组变量
         attributeName: '',                            //分组变量名
@@ -213,8 +223,18 @@ const onSubmit = () => {                            //上传页面信息
     else {
         axios.post(FPath, post).then(res => {
             // console.log(res.data.count)
-            get.value = res.data.message
+            get.value = res.data.pdfUrl
+            console.log(get.value)
             //通过axios发送post请求，将mqttM发送给后端，FPath是定义了一个常量表示服务器登录接口的URL地址。
+            // 创建一个指向该Blob的URL  
+
+            // // 创建一个<a>标签，并设置href为Blob的URL，然后模拟点击下载  
+            const link = document.createElement('a');
+            link.href = get.value;
+            link.download = 'example.pdf'; // 设置下载文件的文件名  
+            document.body.appendChild(link);
+            link.click(); // 模拟点击下载文件  
+            document.body.removeChild(link); // 下载完成后移除<a>标签
         })
     }
 }
@@ -324,6 +344,13 @@ function primary() {
                     reEncodingList.push(0)
                 }
             }
+            let missingNumber = 0
+            for (let k = 0; k < reEncodingList.length; k++) {
+                if (reEncodingList[k] === null || reEncodingList[k] === undefined) {
+                    missingNumber = missingNumber + 1
+                }
+            }
+            const missingRate = missingNumber / reEncodingList.length
             let obj: any = {
                 attributeName: getAttribute[rowIndex.value].attributeName + '_类别' + i.toString(),
                 attributeValue: getAttribute[rowIndex.value].attributeValue,
@@ -335,7 +362,8 @@ function primary() {
                 isCovariate: false,
                 fontColor: true,
                 dataImputation: 0,
-                attributeIndex: j
+                attributeIndex: j,
+                missingRate: missingRate,
             }
             getAttribute.push(obj)
             j = j + 1
@@ -352,6 +380,13 @@ function primary() {
                 }
             }
         }
+        let missingNumber = 0
+        for (let k = 0; k < Data.length; k++) {
+            if (Data[k] === null || Data[k] === undefined) {
+                missingNumber = missingNumber + 1
+            }
+        }
+        const missingRate = missingNumber / Data.length
         let obj: any = {
             attributeName: getAttribute[rowIndex.value].attributeName + '（阈值分类）',
             attributeValue: getAttribute[rowIndex.value].attributeValue,
@@ -363,7 +398,8 @@ function primary() {
             isCovariate: false,
             fontColor: true,
             dataImputation: 0,
-            attributeIndex: j
+            attributeIndex: j,
+            missingRate: missingRate,
         }
         getAttribute.push(obj)
         j = j + 1
@@ -478,43 +514,53 @@ function constPrimary() {                 //常数填补法具体操作
             }
         }
     }
+    let missingNumber = 0
+    for (let k = 0; k < getAttribute[complementIndex.value].attributeData.length; k++) {
+        if (getAttribute[complementIndex.value].attributeData[k] === null || getAttribute[complementIndex.value].attributeData[k] === undefined || getAttribute[complementIndex.value].attributeData[k] === '') {
+            missingNumber = missingNumber + 1
+        }
+    }
+    getAttribute[complementIndex.value].missingRate = missingNumber / getAttribute[complementIndex.value].attributeData.length
     dialogVisibleConst.value = false
 }
 
 
 //线性插值法
 import * as echarts from 'echarts';
+import { min } from '@pureadmin/utils';
 const dialogVisibleLinear = ref(false)       //线性插值法界面展现响应式
 const dependentVariable = ref(0)          //选择因变量响应式
-const chartRef = ref<HTMLDivElement | null>(null); 
-let chartInstance: echarts.ECharts | null = null; 
+const chartRef = ref<HTMLDivElement | null>(null);
+let chartInstance: echarts.ECharts | null = null;
 
 let dependentVariableList = []      //因变量数组
 let inDependentVariableList = []     //自变量数组
-let dependentName=''                 //因变量变量名
-let independentName=''               //自变量变量名
+let dependentName = ''                 //因变量变量名
+let independentName = ''               //自变量变量名
 function dependentAccess() {
     chartInstance?.dispose()
-    dependentName=getAttribute[dependentVariable.value].attributeName
-    independentName=getAttribute[complementIndex.value].attributeName
+    dependentName = getAttribute[dependentVariable.value].attributeName
+    independentName = getAttribute[complementIndex.value].attributeName
     dependentVariableList = getAttribute[dependentVariable.value].attributeData
     inDependentVariableList = getAttribute[complementIndex.value].attributeData
-    const valueList=[[0,0]]
+    const valueList = [[0, 0]]
     valueList.pop()
-    for(let i=0;i<dependentVariableList.length;i++){
-        let obj=[]
+    for (let i = 0; i < dependentVariableList.length; i++) {
+        let obj = []
         obj.push(inDependentVariableList[i])
         obj.push(dependentVariableList[i])
         valueList.push(obj)
     }
-    
+
     chartInstance = echarts.init(chartRef.value);
     var option = {
         xAxis: {
-            name:independentName
+            name: independentName,
+            min: min(inDependentVariableList) - 1
         },
         yAxis: {
-            name:dependentName
+            name: dependentName,
+
         },
         series: [
             {
@@ -531,7 +577,7 @@ function dialogVisibleLinearPrimary() {        //确认使用线性回归
     dialogVisibleLinear.value = false
 }
 
-function dialogVisibleLinearCancel(){
+function dialogVisibleLinearCancel() {            //不使用线性回归
     chartInstance?.dispose()
     dialogVisibleLinear.value = false
 }
@@ -564,7 +610,7 @@ function findMode(array: any) {                          //寻找众数的函数
 }
 function dataImputationAccept(index: any, dataImputation: any) {
     if (dataImputation === 0) {                                      //采用中位数填补
-        if (getAttribute[index].attributeValue === 2) {
+        if (typeof getAttribute[index].attributeData[0] === typeof '') {
             message('字符数据无法采用中位数填补', { type: 'error' })
         }
         else {
@@ -580,11 +626,18 @@ function dataImputationAccept(index: any, dataImputation: any) {
                     getAttribute[index].attributeData[i] = middle
                 }
             }
+            let missingNumber = 0
+            for (let k = 0; k < getAttribute[index].attributeData.length; k++) {
+                if (getAttribute[index].attributeData[k] === null || getAttribute[index].attributeData[k] === undefined || getAttribute[index].attributeData[k] === '') {
+                    missingNumber = missingNumber + 1
+                }
+            }
+            getAttribute[index].missingRate = missingNumber / getAttribute[index].attributeData.length
             message(getAttribute[index].attributeName + '已采用中位数填补成功', { type: 'success' })
         }
     }
     if (dataImputation === 1) {                                      //采用均数填补
-        if (getAttribute[index].attributeValue === 2) {
+        if (typeof getAttribute[index].attributeData[0] === typeof '') {
             message('字符数据无法采用均数填补', { type: 'error' })
         }
         else {
@@ -603,6 +656,13 @@ function dataImputationAccept(index: any, dataImputation: any) {
                     getAttribute[index].attributeData[i] = average
                 }
             }
+            let missingNumber = 0
+            for (let k = 0; k < getAttribute[index].attributeData.length; k++) {
+                if (getAttribute[index].attributeData[k] === null || getAttribute[index].attributeData[k] === undefined || getAttribute[index].attributeData[k] === '') {
+                    missingNumber = missingNumber + 1
+                }
+            }
+            getAttribute[index].missingRate = missingNumber / getAttribute[index].attributeData.length
             message(getAttribute[index].attributeName + '已采用均数填补成功', { type: 'success' })
         }
     }
@@ -619,6 +679,13 @@ function dataImputationAccept(index: any, dataImputation: any) {
                 getAttribute[index].attributeData[i] = mode[0]
             }
         }
+        let missingNumber = 0
+        for (let k = 0; k < getAttribute[index].attributeData.length; k++) {
+            if (getAttribute[index].attributeData[k] === null || getAttribute[index].attributeData[k] === undefined || getAttribute[index].attributeData[k] === '') {
+                missingNumber = missingNumber + 1
+            }
+        }
+        getAttribute[index].missingRate = missingNumber / getAttribute[index].attributeData.length
         message(getAttribute[index].attributeName + '已采用众数填补成功', { type: 'success' })
     }
     if (dataImputation === 3) {                                    //采用常数填补
@@ -629,9 +696,71 @@ function dataImputationAccept(index: any, dataImputation: any) {
         dialogVisibleLinear.value = true
         complementIndex.value = index
     }
+}
 
+//将本页面的数据保存为Excel文件
+import XLSX from 'xlsx'
+function saveasExcel(fileName = 'test.xlsx') {
+    let jsonArray = []; // 用于存储JSON对象的数组  
+
+    // 获取第一个元素的attributeData长度，作为循环次数  
+    let rowCount = getAttribute[0].attributeData.length;
+    // 遍历每一行数据  
+    for (let i = 0; i < rowCount; i++) {
+        let obj:any = {}; // 当前行的对象  
+
+        // 遍历所有列（getAttribute数组中的元素）  
+        for (let j = 0; j < getAttribute.length; j++) {
+            // 使用attributeName作为键，attributeData[i]作为值  
+            obj[getAttribute[j].attributeName] = getAttribute[j].attributeData[i];
+        }
+
+        // 将当前行的对象添加到jsonArray中  
+        jsonArray.push(obj);
+    }
+    const wb = XLSX.utils.book_new();
+    // 转换JSON数据到工作表，假设jsonData是一个包含对象的数组，每个对象代表一行数据  
+    const a = JSON.parse(JSON.stringify(jsonArray));//进行深拷贝从而不影响输入进来的原数组（先转换成字符串再重新转换成数组，这样a就不指向原json文件的地址了）
+    a.forEach((item: any) => {
+        item.attributeData = JSON.stringify(item.attributeData);
+    });  //将数据预处理为字符串
+    // console.log(JSON.parse(a[0].attributeData))        //！！！！！！利用这个方法可以把字符串重新变回数组！！！！！！
+    const ws = XLSX.utils.json_to_sheet(a);
+    // 将工作表添加到工作簿中，并命名为'Sheet1'  
+    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+    // 生成Excel文件的二进制数据  
+    const wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+    // 创建一个Blob对象，并设置MIME类型为Excel文件  
+    const blob = new Blob([s2ab(wbout)], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    // 创建一个指向该Blob的URL  
+    const url = URL.createObjectURL(blob);
+    // 创建一个<a>标签，并设置href为Blob的URL，然后模拟点击下载  
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = fileName; // 设置下载文件的文件名  
+    document.body.appendChild(link);
+    link.click(); // 模拟点击下载文件  
+    document.body.removeChild(link); // 下载完成后移除<a>标签  
+    // 释放URL对象，以避免内存泄漏  
+    URL.revokeObjectURL(url);
 
 }
+
+// 辅助函数，用于将二进制字符串转换为ArrayBuffer对象（如果需要的话）  
+function s2ab(s: any) {
+    const buffer = new ArrayBuffer(s.length);
+    const view = new Uint8Array(buffer);
+    for (let i = 0; i < s.length; i++) {
+        view[i] = s.charCodeAt(i) & 0xFF;
+    }
+    return buffer;
+}
+
+const jsonData = [
+    { 'zi': '门窗安装-0101', 'time': 8, 'start': 1, 'end': 8 },
+    { 'zi': '墙面方正、垂直度-0102', 'time': 8, 'start': 1, 'end': 8 },
+    { 'zi': '空鼓-0103', 'time': 8, 'start': 1, 'end': 8 }
+];
 </script>
 
 <template>
@@ -665,6 +794,9 @@ function dataImputationAccept(index: any, dataImputation: any) {
         <div v-if="sampleMissingValueHandling === 1" class="child-div2">
             <el-input size="small" v-model="missingValueProportion" style="max-width: 100px">
             </el-input>
+        </div>
+        <div class="child-div">
+            <el-button type="success" size="small" round @click="saveasExcel()">保存预处理数据</el-button>
         </div>
         <div class="child-div">
             <el-button type="success" size="small" round @click="onSubmit()">分析数据</el-button>
@@ -712,6 +844,16 @@ function dataImputationAccept(index: any, dataImputation: any) {
                     v-model="scope.row.isCovariate" />
                 <el-switch v-if="scope.row.isGroup === false && scope.row.isInfluence === false" width="40"
                     v-model="scope.row.isCovariate" />
+            </template>
+        </el-table-column>
+        <el-table-column label="缺失率" width="200">
+            <template #default="scope">
+                <div v-if="scope.row.missingRate === 0" style="display: flex; align-items: center">
+                    <span style="margin-left: 10px">{{ scope.row.missingRate }}</span>
+                </div>
+                <div class="text-red-500" v-if="scope.row.missingRate !== 0" style="display: flex; align-items: center">
+                    <span style="margin-left: 10px">{{ scope.row.missingRate.toFixed(4) }}</span>
+                </div>
             </template>
         </el-table-column>
         <el-table-column label="一般数据填补" width="300">

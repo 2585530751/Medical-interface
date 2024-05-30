@@ -77,6 +77,8 @@ function deleteOneStudy(studyId: number) {
     .then((data) => {
       if (data.code == 200) {
         patientStateStore.getPatientListPage()
+        studyStateStore.getStudyListPage()
+        seriesStateStore.getSeriesListPage()
         message(data.msg, { type: 'success' })
       } else {
         message(data.msg, { type: 'error' })
@@ -95,6 +97,8 @@ function deleteOnePatient(patientId: number) {
     .then((data) => {
       if (data.code == 200) {
         patientStateStore.getPatientListPage()
+        studyStateStore.getStudyListPage()
+        seriesStateStore.getSeriesListPage()
         message(data.msg, { type: 'success' })
       } else {
         message(data.msg, { type: 'error' })

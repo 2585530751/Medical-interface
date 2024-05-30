@@ -8,10 +8,11 @@ import type { UploadUserFile } from 'element-plus'
 import type { UploadInstance } from 'element-plus'
 import { uploadSeriesApi } from '@/api/study'
 import { useSeriesStateStore } from '@/store/modules/seriesState'
+import { useStudyStateStore } from '@/store/modules/studyState'
+import { usePatientStateStore } from '@/store/modules/patientState'
 import { getPermissionByCurrentUserIdApi } from '@/api/user'
 import type { PermissionEntity } from '@/types/user'
 import { Warning } from '@element-plus/icons-vue'
-import { ElNotification } from 'element-plus'
 import { checkFilesType } from '@/utils/commonUtils'
 
 const props = defineProps<{
@@ -25,6 +26,8 @@ const emits = defineEmits<{
 var options: Ref<PermissionEntity[]> = ref([])
 
 const seriesStateStore = useSeriesStateStore()
+const studyStateStore = useStudyStateStore()
+const patientStateStore = usePatientStateStore()
 
 const dialogImageUrl = ref('')
 const dialogVisible = ref(false)
@@ -90,6 +93,8 @@ async function submitFileForm() {
           if (res.success) {
             console.log('res', res)
             seriesStateStore.getSeriesListPage()
+            studyStateStore.getStudyListPage()
+            patientStateStore.getPatientListPage()
             emits('uploadWindowClose')
           } else {
             message(res.msg, { type: 'error' })
@@ -232,7 +237,7 @@ const rules = reactive<FormRules>({
     </el-dialog>
     <template #footer>
       <span class="dialog-footer">
-        <el-button @click="centerDialogVisible = false">取消</el-button>
+        <el-button @click="imageList.length=0">清空</el-button>
         <el-button type="primary" @click="submitFileForm()"> 上传 </el-button>
       </span>
     </template>

@@ -37,6 +37,14 @@
           title: "倾向性匹配"
         }
       },
+      {
+        path: "/tools/1_3_automaticSampleElimination.vue",
+        name: "tools3",
+        component: () => import("@/views/tools/1_3_automaticSampleElimination.vue"),
+        meta: {
+          title: "样本自动剔除"
+        }
+      },
     ]
   } as RouteConfigsTable;
   

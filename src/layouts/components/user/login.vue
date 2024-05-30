@@ -8,6 +8,7 @@ import { forgetPassword } from '@/api/user'
 import { isLoggedIn } from '@/utils/auth'
 import securityCode from '@/layouts/components/user/securityCode.vue'
 import { departmentOptions } from '@/utils/commonVariables'
+import { resetForm } from '@/utils/commonUtils'
 
 const options = departmentOptions
 defineOptions({
@@ -56,6 +57,7 @@ const onLogin = async (formEl: FormInstance | undefined) => {
             //获取后端路由
             message(res.msg, { type: 'success' })
             emits('loginWindowClose')
+            location.reload()
             isLoggedIn.value = true
           } else {
             message(res.msg, { type: 'error' })
@@ -110,6 +112,7 @@ const onRegister = async (formEl: FormInstance | undefined) => {
             //获取后端路由
             message('注册成功！请重新登录！', { type: 'success' })
             emits('loginWindowClose')
+            resetForm(registerRuleFormRef.value)
           } else {
             message(res.msg, { type: 'error' })
           }

@@ -119,6 +119,7 @@ function deleteOneSeries(seriesId: number) {
     }
     message('删除成功', { type: 'success' })
     studyStateStore.getStudyListPage()
+    seriesStateStore.getSeriesListPage()
   })
 }
 
@@ -134,6 +135,7 @@ function deleteOneStudy(studyId: number) {
         } else {
           studyStateStore.getStudyListPage()
         }
+        seriesStateStore.getSeriesListPage()
         message(data.msg, { type: 'success' })
       } else {
         message(data.msg, { type: 'error' })

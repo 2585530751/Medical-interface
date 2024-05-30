@@ -69,6 +69,7 @@ const toolRoute = param.query.toolRoute;         //routeValue就是上一个界�
 import { shallowRef } from 'vue'
 import dataEditing from "@/views/tools/1_1_dataEditing.vue"
 import preferenceMatching from "@/views/tools/1_2_preferenceMatching.vue"
+import automaticSampleElimination from "@/views/tools/1_3_automaticSampleElimination.vue"
 import { basicImageUrl } from '@/api/utils'
 var currentComp = shallowRef(dataEditing)    //右端界面初始界面
 function changeCurrentComp(comp: any): void {    //右端界面切换
@@ -140,7 +141,7 @@ provide('attribute', attribute);
                     <button @click="changeCurrentComp(preferenceMatching)"
                         class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">2.倾向性匹配
                     </button>
-                    <button @click=""
+                    <button @click="changeCurrentComp(automaticSampleElimination)"
                         class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">3.样本自动剔除
                     </button>
                     <button @click=""

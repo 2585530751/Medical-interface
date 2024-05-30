@@ -21,7 +21,9 @@ const handleSelect = (key: string, keyPath: string[]) => {
 const centerDialogVisible = ref(false)
 onBeforeMount(() => {
   checkAuthStatus()
-  getHeadIcon()
+  if (isLoggedIn.value == true) {
+    getHeadIcon()
+  }
 })
 
 function getHeadIcon() {
