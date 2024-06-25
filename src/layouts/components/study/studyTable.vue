@@ -383,30 +383,56 @@ function deleteOneStudy(studyId: number) {
       />
       <el-table-column fixed="right" label="操作">
         <template #default="scope">
-          <el-popconfirm
-            title="将会删除该检查及其相关序列和图像，您确定吗?"
-            @confirm="deleteOneStudy(scope.row.studyId)"
-            width="200"
-          >
-            <template #reference>
-              <el-button link type="primary" size="small">
-                <template #icon>
-                  <IconifyIconOffline :icon="deleteItem"></IconifyIconOffline>
-                </template>
-                删除</el-button
+          <role-permission :value="['doctor']">
+            <div class="flex items-center gap-1">
+              <el-popconfirm
+                title="将会删除该检查及其相关序列和图像，您确定吗?"
+                @confirm="deleteOneStudy(scope.row.studyId)"
+                width="200"
               >
-            </template>
-          </el-popconfirm>
-          <el-button
-            link
-            type="primary"
-            size="default"
-            @click="viewSerieslistByStudyId(scope.row.studyId)"
-            ><template #icon>
-              <IconifyIconOffline :icon="pictrueIcon"></IconifyIconOffline>
-            </template>
-            序列</el-button
-          >
+                <template #reference>
+                  <el-button link type="primary" size="small">
+                    <template #icon>
+                      <IconifyIconOffline :icon="deleteItem"></IconifyIconOffline>
+                    </template>
+                    删除</el-button
+                  >
+                </template>
+              </el-popconfirm>
+              <el-button
+                link
+                type="primary"
+                size="default"
+                @click="viewSerieslistByStudyId(scope.row.studyId)"
+                ><template #icon>
+                  <IconifyIconOffline :icon="pictrueIcon"></IconifyIconOffline>
+                </template>
+                序列</el-button
+              >
+            </div>
+          </role-permission>
+          <role-permission :value="['radiologist']">
+            <div class="flex items-center gap-1">
+              <el-button
+                link
+                type="primary"
+                size="default"
+                @click="viewSerieslistByStudyId(scope.row.studyId)"
+                ><template #icon>
+                  <IconifyIconOffline :icon="pictrueIcon"></IconifyIconOffline>
+                </template>
+                序列</el-button
+              >
+              <el-dropdown class="">
+                <el-button :icon="IonEllipsisHorizontal" link type="primary"></el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item></el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
+          </role-permission>
         </template>
       </el-table-column>
     </el-table>

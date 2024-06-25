@@ -139,43 +139,14 @@ provide('attribute', attribute);
                         class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">1.数据编辑
                     </button>
                     <button @click="changeCurrentComp(preferenceMatching)"
-                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">2.倾向性匹配
+                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">2.数据预处理及倾向性匹配分析
                     </button>
                     <button @click="changeCurrentComp(automaticSampleElimination)"
-                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">3.样本自动剔除
+                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">3.样本均衡
                     </button>
                     <button @click=""
-                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">4.变量自动剔除
+                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">4.数据拆分
                     </button>
-                    <button @click=""
-                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">5.一般数据填补
-                    </button>
-                    <button @click=""
-                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">6.多重插补
-                    </button>
-                    <button @click=""
-                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">7.异常值处理
-                    </button>
-                    <button @click=""
-                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">8.数据标准化
-                    </button>
-                    <button @click=""
-                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">9.哑变量重编码
-                    </button>
-                    <button @click=""
-                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">10.样本均衡
-                    </button>
-                    <button @click=""
-                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">11.数据拆分
-                    </button>
-                    <button @click=""
-                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">12.分组重编码
-                    </button>
-                    <button @click=""
-                        class="border-none text-slate-500 bg-white hover:text-blue-300 hover:cursor-pointer focus:text-blue-500 h-10 text-xs focus:bg-blue-100 focus:font-bold smallpaddingleft">13.一般数据填补
-                    </button>
-
-
                 </el-container>
             </el-aside>
 

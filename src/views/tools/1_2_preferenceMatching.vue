@@ -2,7 +2,9 @@
 //接收来自父组件的信息
 import { inject, onMounted } from 'vue'
 let attribute: unknown = inject('attribute');
-
+function removeDuplicates(array: any) {                 //去重函数
+    return [...new Set(array)];
+}
 onMounted(() => {
     getInformation()
     // console.log(post)
@@ -88,8 +90,9 @@ function getInformation() {                                 //将从父组件得
 
 //用户设置匹配方式的相关信息
 const matchProportion = ref(1)             //设置匹配比例
-const caliper = ref(0)                       //设置卡钳值
+const caliper = ref(0.01)                       //设置卡钳值
 const missingValueProportion = ref(0)        //设置缺失率
+const variableMissingValueProportion = ref(0)   //设置变量缺失率
 const matchManner = ref(1)                 //设置匹配方式
 const sampleMissingValueHandling = ref(1)                 //样本缺失处理方式
 const matchMannerOptions = [
@@ -100,6 +103,7 @@ const matchMannerOptions = [
     {
         value: 2,
         label: 'K邻近匹配',
+        disabled: true,
 
     },
     {
@@ -136,29 +140,61 @@ const sampleMissingValueHandlingOptions = [
     },
     {
         value: 3,
-        label: '一般数据填补',
-        disabled: true,
-    },
-    {
-        value: 4,
         label: '多重插补',
         disabled: true,
     },
-    {
-        value: 5,
-        label: '异常值处理',
-        disabled: true,
-    },
-    {
-        value: 6,
-        label: '数据标准化',
-        disabled: true,
-    }
 ]
+
+function sampleDelete() {                           //样本缺失自动剔除
+    let rowLength = getAttribute.length
+    let columnLength = getAttribute[0].attributeData.length
+    let deleteList = []
+    for (let i = 0; i < columnLength; i++) {
+        let count = 0
+        for (let j = 0; j < rowLength; j++) {
+            if (getAttribute[j].attributeData[i] !== null && getAttribute[j].attributeData[i] !== undefined && getAttribute[j].attributeData[i] !== '') {
+                count = count + 1
+            }
+        }
+        if (((rowLength - count) / rowLength) > missingValueProportion.value) {
+            deleteList.push(i)
+        }
+    }
+    deleteList.reverse()        //逆序删除list内下标的数据
+    for (let i = 0; i < deleteList.length; i++) {
+        for (let j = 0; j < getAttribute.length; j++) {
+            getAttribute[j].attributeData.splice(deleteList[i], 1)
+        }
+    }
+    for (let i = 0; i < getAttribute.length; i++) {
+        let count = 0
+        for (let j = 0; j < getAttribute[i].attributeData.length; j++) {
+            if (getAttribute[i].attributeData[j] !== null && getAttribute[i].attributeData[j] !== undefined && getAttribute[i].attributeData[j] !== '') {
+                count = count + 1
+            }
+        }
+        getAttribute[i].missingRate = (getAttribute[i].attributeData.length - count) / getAttribute[i].attributeData.length
+    }
+}
+
+function variableDelete() {                     //变量缺失自动剔除
+    let deleteIndex = []
+    for (let i = 0; i < getAttribute.length; i++) {
+        if (getAttribute[i].missingRate > variableMissingValueProportion.value) {
+            deleteIndex.push(i)
+        }
+    }
+    deleteIndex.reverse()
+    for (let i = 0; i < deleteIndex.length; i++) {
+        getAttribute.splice(deleteIndex[i], 1)
+    }
+}
+
 //测试连接flask
 import { reactive, ref, computed, watch } from 'vue'
 import { message } from '@/utils/message'
 import axios from 'axios'
+
 const FPath = 'http://127.0.0.1:5001/preferenceMatching'
 const post = reactive({                              //定义响应式发送数据变量
     group: {                                        //分组变量
@@ -220,21 +256,39 @@ const onSubmit = () => {                            //上传页面信息
     else if (!Number.isInteger(Number(post.matchProportion))) {
         message('匹配比例请输入整数', { type: 'error' })
     }
+    else if (removeDuplicates(post.group.attributeData).length !== 2) {
+        message('分组变量数据种数应等于2且每一项分组变量数据值只能为0或1', { type: 'error' })
+    }
+    else if ((removeDuplicates(post.group.attributeData)[0] !== 0 && removeDuplicates(post.group.attributeData)[0] !== 1) || (removeDuplicates(post.group.attributeData)[1] !== 0 && removeDuplicates(post.group.attributeData)[1] !== 1)) {
+        message('分组变量数据种数应等于2且每一项分组变量数据值只能为0或1', { type: 'error' })
+    }
     else {
         axios.post(FPath, post).then(res => {
             // console.log(res.data.count)
-            get.value = res.data.pdfUrl
-            console.log(get.value)
-            //通过axios发送post请求，将mqttM发送给后端，FPath是定义了一个常量表示服务器登录接口的URL地址。
-            // 创建一个指向该Blob的URL  
+            if (res.data.treatmentGroupIsZero === true) {
+                message('样本剔除后处理组数据为0,无法匹配计算,请尽量减少数据缺失率', { type: 'error' })
+            }
+            else if (res.data.controlGroupIsZero === true) {
+                message('样本剔除后处理组数据为0,无法匹配计算,请尽量减少数据缺失率', { type: 'error' })
+            }
+            else if (res.data.treatmentGroupMatchIsZero === true) {
+                message('处理组匹配到的控制组数据为0,请增大卡钳值', { type: 'error' })
+            }
+            else {
+                get.value = res.data.pdfUrl
+                console.log(get.value)
+                //通过axios发送post请求，将mqttM发送给后端，FPath是定义了一个常量表示服务器登录接口的URL地址。
+                // 创建一个指向该Blob的URL  
 
-            // // 创建一个<a>标签，并设置href为Blob的URL，然后模拟点击下载  
-            const link = document.createElement('a');
-            link.href = get.value;
-            link.download = 'example.pdf'; // 设置下载文件的文件名  
-            document.body.appendChild(link);
-            link.click(); // 模拟点击下载文件  
-            document.body.removeChild(link); // 下载完成后移除<a>标签
+                // // 创建一个<a>标签，并设置href为Blob的URL，然后模拟点击下载  
+                const link = document.createElement('a');
+                link.href = get.value;
+                link.download = 'example.pdf'; // 设置下载文件的文件名  
+                document.body.appendChild(link);
+                link.click(); // 模拟点击下载文件  
+                document.body.removeChild(link); // 下载完成后移除<a>标签
+            }
+
         })
     }
 }
@@ -258,9 +312,7 @@ const dummyVariable = reactive<dummyVariable[]>([
 ])
 
 const dialogVisible = ref(false)
-function removeDuplicates(array: any) {                 //去重函数
-    return [...new Set(array)];
-}
+
 let remove = []               //去重结果保存在这里
 const rowIndex = ref(-1)          //记录当前点击的重编码页面所属的数组下标
 function reEncoding(index: any) {
@@ -305,7 +357,6 @@ const handleClose = (done: () => void) => {
 
 function cancel() {
     dialogVisible.value = false
-
     reEncodingValue.value = 0
 }
 
@@ -420,7 +471,7 @@ const reEncodingOptions = [
     },
     {
         value: 1,
-        label: '阈值分类',
+        label: '分组重编码',
         disabled: false,
     }
 ]
@@ -480,7 +531,16 @@ const dataImputationOptions = [
     },
     {
         value: 4,
-        label: '线性插值法',
+        label: '线性插值法填补',
+    },
+    {
+        value: 5,
+        label: '异常值处理',
+    },
+    {
+        value: 6,
+        label: '数据标准化',
+        disabled: true
     },
 ]
 
@@ -506,7 +566,6 @@ function constPrimary() {                 //常数填补法具体操作
             }
         }
     }
-
     if (constValue.value === 1) {
         for (let i = 0; i < getAttribute[complementIndex.value].attributeData.length; i++) {
             if (getAttribute[complementIndex.value].attributeData[i] === null || getAttribute[complementIndex.value].attributeData[i] === undefined) {
@@ -523,26 +582,23 @@ function constPrimary() {                 //常数填补法具体操作
     getAttribute[complementIndex.value].missingRate = missingNumber / getAttribute[complementIndex.value].attributeData.length
     dialogVisibleConst.value = false
 }
-
-
 //线性插值法
 import * as echarts from 'echarts';
 import { min } from '@pureadmin/utils';
 const dialogVisibleLinear = ref(false)       //线性插值法界面展现响应式
-const dependentVariable = ref(0)          //选择因变量响应式
+const inDependentVariable = ref(0)          //选择自变量响应式
 const chartRef = ref<HTMLDivElement | null>(null);
 let chartInstance: echarts.ECharts | null = null;
-
-let dependentVariableList = []      //因变量数组
-let inDependentVariableList = []     //自变量数组
+let dependentVariableList: any[] = []      //因变量数组
+let inDependentVariableList: any[] = []     //自变量数组
 let dependentName = ''                 //因变量变量名
 let independentName = ''               //自变量变量名
 function dependentAccess() {
     chartInstance?.dispose()
-    dependentName = getAttribute[dependentVariable.value].attributeName
-    independentName = getAttribute[complementIndex.value].attributeName
-    dependentVariableList = getAttribute[dependentVariable.value].attributeData
-    inDependentVariableList = getAttribute[complementIndex.value].attributeData
+    dependentName = getAttribute[complementIndex.value].attributeName
+    independentName = getAttribute[inDependentVariable.value].attributeName
+    dependentVariableList = getAttribute[complementIndex.value].attributeData
+    inDependentVariableList = getAttribute[inDependentVariable.value].attributeData
     const valueList = [[0, 0]]
     valueList.pop()
     for (let i = 0; i < dependentVariableList.length; i++) {
@@ -572,22 +628,118 @@ function dependentAccess() {
     // 使用刚指定的配置项和数据显示图表。
     chartInstance.setOption(option); // 初始设置配置项
 }
-function dialogVisibleLinearPrimary() {        //确认使用线性回归
+function dialogVisibleLinearPrimary() {        //确认使用线性插值法
+    const valuePath = 'http://127.0.0.1:5001/linearInterpolation'
+    const postLinearValue = reactive({
+        dependentVariableList: dependentVariableList,
+        inDependentVariableList: inDependentVariableList
+    })
+    if (typeof dependentVariableList[0] === typeof 'string' || typeof inDependentVariableList[0] === typeof 'string') {
+        message('自变量和因变量应该为数字而不是字符', { type: 'error' })
+    }
+    else if (getAttribute[inDependentVariable.value].missingRate !== 0) {
+        message('自变量的缺失率请保证为0', { type: 'error' })
+    }
+    else {
+        axios.post(valuePath, postLinearValue).then(res => {
+            getAttribute[complementIndex.value].attributeData = res.data.dependentVariableList
+            let missingNumber = 0
+            for (let k = 0; k < getAttribute[complementIndex.value].attributeData.length; k++) {
+                if (getAttribute[complementIndex.value].attributeData[k] === null || getAttribute[complementIndex.value].attributeData[k] === undefined || getAttribute[complementIndex.value].attributeData[k] === '') {
+                    missingNumber = missingNumber + 1
+                }
+            }
+            getAttribute[complementIndex.value].missingRate = missingNumber / getAttribute[complementIndex.value].attributeData.length
+        })
+
+
+        chartInstance?.dispose()
+        dialogVisibleLinear.value = false
+    }
+}
+function dialogVisibleLinearCancel() {            //不使用线性插值法
     chartInstance?.dispose()
     dialogVisibleLinear.value = false
+}
+//异常值处理方法界面
+const dialogVisibleOutlierTreatment = ref(false)       //异常值处理界面响应式
+const outlierTreatment = ref(0)                        //异常处理方法响应式
+const imputationMethods = ref(0)                       //填补方式响应式
+const abnormalDiscriminationMethod = ref(0)              //异常判别方式响应式
+const outlierTreatmentOptions = [                      //异常处理方法选项
+    {
+        value: 0,
+        label: '异常偏离值处理',
+    },
+    {
+        value: 1,
+        label: '非数值异常处理',
+    },
+]
+const imputationMethodsOptions = [                     //异常填补方式
+    {
+        value: 0,
+        label: '中位数填补',
+    },
+    {
+        value: 1,
+        label: '均数填补',
+    },
+    {
+        value: 2,
+        label: '众数填补',
+    },
+    {
+        value: 3,
+        label: '零值填补',
+    },
+    {
+        value: 4,
+        label: '空值填补',
+    },
+]
+const abnormalDiscriminationMethodOptions = [                      //异常判别方式选项
+    {
+        value: 0,
+        label: '拉依达准则',
+    },
+]
+
+function outlierTreatmentConstPrimary() {
+    const outlierTreatmentPost = reactive({                              //定义响应式发送数据变量
+        outlierTreatment: outlierTreatment,
+        abnormalDiscriminationMethod: abnormalDiscriminationMethod,
+        imputationMethods: imputationMethods,
+        data: getAttribute[complementIndex.value].attributeData
+    })
+    const outlierTreatmentPath = 'http://127.0.0.1:5001/outlierTreatment'
+    if (outlierTreatment.value === 0 && abnormalDiscriminationMethod.value === 0) {         //数值异常且为拉伊达准则
+        axios.post(outlierTreatmentPath, outlierTreatmentPost).then(res => {
+            if (res.data.dontHaveMode === true) {
+                message('非异常值没有众数', { type: 'error' })
+            }
+            else {
+                getAttribute[complementIndex.value].attributeData = res.data.data
+                let missingNumber = 0
+                for (let k = 0; k < getAttribute[complementIndex.value].attributeData.length; k++) {
+                    if (getAttribute[complementIndex.value].attributeData[k] === null || getAttribute[complementIndex.value].attributeData[k] === undefined || getAttribute[complementIndex.value].attributeData[k] === '') {
+                        missingNumber = missingNumber + 1
+                    }
+                }
+                getAttribute[complementIndex.value].missingRate = missingNumber / getAttribute[complementIndex.value].attributeData.length
+                console.log(getAttribute[complementIndex.value].missingRate)
+            }
+        })
+    }
+    dialogVisibleOutlierTreatment.value = false
 }
 
-function dialogVisibleLinearCancel() {            //不使用线性回归
-    chartInstance?.dispose()
-    dialogVisibleLinear.value = false
-}
 
 function findMode(array: any) {                          //寻找众数的函数
     // 创建一个对象来存储每个元素的计数  
     const countMap = <any>{};
     let maxCount = 0;
     let modes = [];
-
     // 遍历数组并计数  
     for (let i = 0; i < array.length; i++) {
         const num = array[i];
@@ -596,7 +748,6 @@ function findMode(array: any) {                          //寻找众数的函数
         } else {
             countMap[num] = 1;
         }
-
         // 更新最大计数和众数数组  
         if (countMap[num] > maxCount) {
             maxCount = countMap[num];
@@ -696,6 +847,10 @@ function dataImputationAccept(index: any, dataImputation: any) {
         dialogVisibleLinear.value = true
         complementIndex.value = index
     }
+    if (dataImputation === 5) {                                     //异常值处理
+        dialogVisibleOutlierTreatment.value = true
+        complementIndex.value = index
+    }
 }
 
 //将本页面的数据保存为Excel文件
@@ -707,7 +862,7 @@ function saveasExcel(fileName = 'test.xlsx') {
     let rowCount = getAttribute[0].attributeData.length;
     // 遍历每一行数据  
     for (let i = 0; i < rowCount; i++) {
-        let obj:any = {}; // 当前行的对象  
+        let obj: any = {}; // 当前行的对象  
 
         // 遍历所有列（getAttribute数组中的元素）  
         for (let j = 0; j < getAttribute.length; j++) {
@@ -755,12 +910,6 @@ function s2ab(s: any) {
     }
     return buffer;
 }
-
-const jsonData = [
-    { 'zi': '门窗安装-0101', 'time': 8, 'start': 1, 'end': 8 },
-    { 'zi': '墙面方正、垂直度-0102', 'time': 8, 'start': 1, 'end': 8 },
-    { 'zi': '空鼓-0103', 'time': 8, 'start': 1, 'end': 8 }
-];
 </script>
 
 <template>
@@ -783,17 +932,28 @@ const jsonData = [
             <el-input size="small" v-model="caliper" style="max-width: 100px">
             </el-input>
         </div>
-        <div class="child-div">样本缺失处理方式:</div>
+        <div class="child-div">缺失处理:</div>
         <div class="child-div2">
             <el-select size="small" v-model="sampleMissingValueHandling" placeholder="Select" style="width: 140px">
                 <el-option v-for="item in sampleMissingValueHandlingOptions" :key="item.value" :label="item.label"
                     :value="item.value" :disabled="item.disabled" />
             </el-select>
         </div>
-        <div v-if="sampleMissingValueHandling === 1" class="child-div">缺失率:</div>
-        <div v-if="sampleMissingValueHandling === 1" class="child-div2">
+        <div v-if="sampleMissingValueHandling === 1" class="child-div">样本缺失率阈值:</div>
+        <div v-if="sampleMissingValueHandling === 1" class="child-div">
             <el-input size="small" v-model="missingValueProportion" style="max-width: 100px">
             </el-input>
+        </div>
+        <div v-if="sampleMissingValueHandling === 1" class="child-div2">
+            <el-button type="success" size="small" round @click="sampleDelete()">确定</el-button>
+        </div>
+        <div v-if="sampleMissingValueHandling === 2" class="child-div">变量缺失率阈值:</div>
+        <div v-if="sampleMissingValueHandling === 2" class="child-div">
+            <el-input size="small" v-model="variableMissingValueProportion" style="max-width: 100px">
+            </el-input>
+        </div>
+        <div v-if="sampleMissingValueHandling === 2" class="child-div2">
+            <el-button type="success" size="small" round @click="variableDelete()">确定</el-button>
         </div>
         <div class="child-div">
             <el-button type="success" size="small" round @click="saveasExcel()">保存预处理数据</el-button>
@@ -801,9 +961,9 @@ const jsonData = [
         <div class="child-div">
             <el-button type="success" size="small" round @click="onSubmit()">分析数据</el-button>
         </div>
-
     </div>
-    <el-table :data="getAttribute" style="width: 100%; margin-top:20px">
+
+    <el-table :data="getAttribute" height="800" style="width: 100%; margin-top:20px">
         <el-table-column label="属性" width="260">
             <template #default="scope">
                 <div v-if="scope.row.fontColor === false" style="display: flex; align-items: center">
@@ -856,12 +1016,12 @@ const jsonData = [
                 </div>
             </template>
         </el-table-column>
-        <el-table-column label="一般数据填补" width="300">
+        <el-table-column label="数据填补及处理" width="300">
             <template #default="scope">
                 <el-select class="child-div1" v-model="scope.row.dataImputation" placeholder="Select" size="small"
                     style="width: 120px">
                     <el-option v-for="item in dataImputationOptions" :key="item.value" :label="item.label"
-                        :value="item.value" />
+                        :value="item.value" :disabled="item.disabled" />
                 </el-select>
                 <el-button class="child-div1 " size="small" type="success"
                     @click="dataImputationAccept(scope.$index, scope.row.dataImputation)">确定</el-button>
@@ -882,6 +1042,7 @@ const jsonData = [
             </template>
         </el-table-column>
     </el-table>
+
     <el-dialog class="font-bold" center v-model="dialogVisible" title="哑变量设置" width="600" :before-close="handleClose">
         <div class="parent-div justify-center">
             <div class="dialog">
@@ -976,9 +1137,9 @@ const jsonData = [
     </el-dialog>
     <el-dialog center :show-close="false" v-model="dialogVisibleLinear" title="线性插值法" width="600">
         <div style="margin-top: 10px;margin-left: 20px;">
-            <div class="child-div1">请选择因变量:</div>
+            <div class="child-div1">请选择自变量:</div>
             <div class="child-div1">
-                <el-select v-model="dependentVariable" placeholder="Select" size="small" style="width: 140px">
+                <el-select v-model="inDependentVariable" placeholder="Select" size="small" style="width: 140px">
                     <el-option v-for="item in getAttribute" :key="item.attributeIndex" :label="item.attributeName"
                         :value="item.attributeIndex" />
                 </el-select>
@@ -988,9 +1149,12 @@ const jsonData = [
             </div>
         </div>
         <div style="margin-top: 10px;margin-left: 20px;">
-            散点图预览
+            散点图预览(请保证自变量缺失率为0且自变量、因变量数据类型为数字)
         </div>
-        <div ref="chartRef" style="width: 100%;height:400px;"></div>
+        <div style="margin-top: 10px;margin-left: 20px;">
+            当前自变量缺失率:{{ getAttribute[inDependentVariable].missingRate }}
+        </div>
+        <div ref="chartRef" style="width: 100%;height:400px;margin-top: 10px;"></div>
         <template #footer>
             <div class="dialog-footer">
                 <el-button @click="dialogVisibleLinearCancel()">取消</el-button>
@@ -1000,7 +1164,45 @@ const jsonData = [
             </div>
         </template>
     </el-dialog>
+    <el-dialog center v-model="dialogVisibleOutlierTreatment" title="异常值处理" width="300">
+        <div>
+            <div style="margin-left: 20px;" class="child-div1">选择方法:</div>
+            <div class="child-div1">
+                <el-select v-model="outlierTreatment" placeholder="Select" size="small" style="width: 140px">
+                    <el-option v-for="item in outlierTreatmentOptions" :key="item.value" :label="item.label"
+                        :value="item.value" />
+                </el-select>
+            </div>
+        </div>
 
+        <div>
+            <div class="child-div1" style="margin-top: 10px;margin-left: 20px;">异常判别:</div>
+            <div class="child-div1" style="margin-top: 10px;">
+                <el-select v-model="abnormalDiscriminationMethod" placeholder="Select" size="small"
+                    style="width: 140px">
+                    <el-option v-for="item in abnormalDiscriminationMethodOptions" :key="item.value" :label="item.label"
+                        :value="item.value" />
+                </el-select>
+            </div>
+        </div>
+        <div>
+            <div class="child-div1" style="margin-top: 10px;margin-left: 20px;">填充方法:</div>
+            <div class="child-div1" style="margin-top: 10px;">
+                <el-select v-model="imputationMethods" placeholder="Select" size="small" style="width: 140px">
+                    <el-option v-for="item in imputationMethodsOptions" :key="item.value" :label="item.label"
+                        :value="item.value" />
+                </el-select>
+            </div>
+        </div>
+        <template #footer>
+            <div class="dialog-footer">
+                <el-button @click="dialogVisibleOutlierTreatment = false">取消</el-button>
+                <el-button type="primary" @click="outlierTreatmentConstPrimary()">
+                    确认
+                </el-button>
+            </div>
+        </template>
+    </el-dialog>
 </template>
 
 <style lang="scss" scoped>
@@ -1039,5 +1241,16 @@ const jsonData = [
     /* 设置间隔 */
     vertical-align: top;
     /* 确保子元素顶部对齐 */
+}
+
+.table-container {
+    width: 100%;
+    /* 设置你想要的固定宽度 */
+    height: 800px;
+    /* 设置你想要的固定高度 */
+    overflow: auto;
+    /* 内容超出时显示滚动条 */
+    margin: 0 auto;
+    /* 可选：使容器在页面中居中 */
 }
 </style>

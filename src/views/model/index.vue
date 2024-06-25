@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import modelCard from '@/layouts/components/model/card.vue'
 import modelSelection from '@/layouts/components/model/selection.vue'
-import { computed, reactive, ref } from 'vue'
+import type { ModelInfo } from '@/types/model'
+import { reactive, type Ref, ref } from 'vue'
 
-const modelInfo = ref<ModelInfo>()
+const modelInfo: Ref<ModelInfo> = ref()
 const uploadModelInfo = (modelInfoPara: ModelInfo) => {
   modelInfo.value = modelInfoPara
 }

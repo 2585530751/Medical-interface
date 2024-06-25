@@ -74,7 +74,7 @@ watch(handleReturn, (newVal, oldVal) => {
 
 
 //定类阈值设置
-const chooseType = ref(0)
+const chooseType = ref(2)
 
 watch(chooseType, (newVal, oldVal) => {
     test2()
@@ -356,7 +356,7 @@ function notifyParent() {
             <el-button type="success" size="small" round @click="jsonToExcel(attribute)">保存</el-button>
         </div>
     </div>
-    <el-table :data="attribute" style="width: 100%; margin-top:20px">
+    <el-table :data="attribute" height="800" style="width: 100%; margin-top:20px">
         <el-table-column label="属性" width="250">
             <template #default="scope">
                 <div v-if="attribute[scope.$index].isDelete === false" style="display: flex; align-items: center">

@@ -42,7 +42,10 @@ watch(
 )
 
 async function addImages() {
-  if (!checkFilesType(imagesList.value, props.dialogSeriesFileType)) return
+  if (props.dialogSeriesFileType != null && props.dialogSeriesFileType != '') {
+    if (!checkFilesType(imagesList.value, props.dialogSeriesFileType)) return
+  }
+
   let formData = new FormData()
   imagesList.value.forEach((file) => {
     formData.append('files', file.raw!)
